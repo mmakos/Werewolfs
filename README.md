@@ -23,7 +23,7 @@ Serwer przechowuje 3 główne wektory: Wektor graczy (WG), wektor kart graczy na
 Główna funkcja:
 Po kolei sprawdza czy jest dana funkcja, a potem robi odpowiednie rzeczy. Coś w stylu:
 
-```
+```ruby
 void play(){
 	boolean insomniac = false;
 	//Wywalamy insomniaca bo on na końcu
@@ -57,7 +57,7 @@ COPYCAT:
 - serwer wysyła do klienta info, jaką kartą się staje i podmienia u siebi odpowiednio w wektorze WP i WA.
 Przykładowy kod poniżej:
 
-```
+```ruby
 void makeCopycat(){
 	if( LK.contains( "copycat" )
 		return;
