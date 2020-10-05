@@ -9,7 +9,7 @@ public class Server{
     public String[] cardsInCenter;
     private Game game;
     private static int gameMsg = 1;
-    private final String MSG_SPLITTER = String.valueOf( ( char )28 );
+    private final String COM_SPLITTER = String.valueOf( ( char )28 );
 
     Server(){
         cardsInCenter = new String[ 3 ];
@@ -50,10 +50,10 @@ public class Server{
 
     //Comunication
     void sendGame( int id, String msg ){
-        sendMsg( gameMsg + MSG_SPLITTER + msg );     //send msg of type gameMsg
+        sendMsg( gameMsg + COM_SPLITTER + msg );     //send msg of type gameMsg
     }
     String receiveGame( int id ){
-        return receiveMsg().split( MSG_SPLITTER )[ 1 ];
+        return receiveMsg().split( COM_SPLITTER )[ 1 ];
     }
 
     void sendMsg( String str ){}

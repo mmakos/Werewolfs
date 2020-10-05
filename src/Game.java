@@ -3,6 +3,7 @@ import java.util.*;
 public class Game{
     private final Server s;
     private int idOfCopycat;        // Needed to show on the end whowas copycat
+    private final String MSG_SPLITTER = String.valueOf( ( char )29 );
 
     Game( Server server ){
         this.s = server;
@@ -42,7 +43,7 @@ public class Game{
         //send to player info, to make his move (let it be name of his card)
         s.sendGame( idOfCopycat, "COPYCAT" );
         //receive his moves, which is generally numbers splitted with "_" sign, here is one number, but for example Seer will send two numbers
-        int chosenCardId = Integer.parseInt( s.receiveGame( idOfCopycat ).split( "_" )[ 0 ] );     // first received number
+        int chosenCardId = Integer.parseInt( s.receiveGame( idOfCopycat ).split( MSG_SPLITTER )[ 0 ] );     // first received number
         //send name of card, which player has become
         s.sendGame( idOfCopycat, s.cardsInCenter[ chosenCardId ] );
         //Change his card information on server
