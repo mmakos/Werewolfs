@@ -8,6 +8,8 @@ public class Server{
     public List< String > cardsInGame;
     public String[] cardsInCenter;
     private Game game;
+    private static int gameMsg = 1;
+    private final String MSG_SPLITTER = String.valueOf( ( char )28 );
 
     Server(){
         cardsInCenter = new String[ 3 ];
@@ -47,8 +49,15 @@ public class Server{
     void sendCardsToPlayers(){} //TODO
 
     //Comunication
-    void sendGame( int id, String msg ){} //TODO
-    String receiveGame( int id ){ return new String(); }    //TODO
+    void sendGame( int id, String msg ){
+        sendMsg( gameMsg + MSG_SPLITTER + msg );     //send msg of type gameMsg
+    }
+    String receiveGame( int id ){
+        return receiveMsg().split( MSG_SPLITTER )[ 1 ];
+    }
+
+    void sendMsg( String str ){}
+    String receiveMsg(){ return new String(); }
 
     public class Player{
         public int id;

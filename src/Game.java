@@ -19,8 +19,9 @@ public class Game{
         makeMysticWolf();
 
         Random rand = new Random();
-        while( s.cardsInGame.size() != 0 ){
 
+        // TODO main loop, here we have to put all the cards, and call theirs functions
+        while( s.cardsInGame.size() != 0 ){
             switch( s.cardsInGame.get( rand.nextInt( s.cardsInGame.size() ) ) ){
                 case "Witch" -> makeWitch();
                 case "Beholder" -> makeBeholder();
