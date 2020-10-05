@@ -2,6 +2,7 @@ package client;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
@@ -67,13 +68,14 @@ public class Connect{
             System.out.println( "Connected :)" );       //TODO to delete
             Game game = new Game( socket );
             game.sendNickname( loginField.getText() );
-            if( game.receiveMsg().equals( "0" + Game.COM_SPLITTER + "ok" ) )
-                loginField.getScene().getWindow().hide();
+            if( !game.receiveMsg().equals( "0" + Game.COM_SPLITTER + "ok" ) ) return;
+            Statement.display( "Info", "Game will start soon.\nWait for other players to join." );
+            loginField.getScene().getWindow().hide();
             game.run();
         }catch( UnknownHostException e ){
-            Error.display( "Cannot connect to " + ip + " on port " + port );
+            Statement.display( "Error", "Cannot connect to " + ip + " on port " + port );
         }catch( IOException e ){
-            Error.display( "IO Exception" );
+            Statement.display( "Error", "IO Exception" );
         }
     }
 

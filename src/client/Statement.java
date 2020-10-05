@@ -6,14 +6,17 @@ import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class Error{
-    public static void display( String errMsg ){
+public class Statement{
+    public static void display( String title, String errMsg ){
         Stage stage = new Stage();
-        stage.setTitle( "Error" );
+        stage.setTitle( title );
         Label l = new Label( errMsg );
         l.setAlignment( Pos.CENTER );
         stage.setScene( new Scene( l, 300, 100 ) );
         stage.initModality( Modality.APPLICATION_MODAL );
-        stage.showAndWait();
+        if( title.equals( "Error" ) )
+            stage.showAndWait();
+        else
+            stage.show();
     }
 }
