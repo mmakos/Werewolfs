@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.Vector;
 
 public class Game{
+    private volatile boolean waitingForButton = false;
+    private int clickedCard = 0;
     private static final int nicknameType = 0;
     private static final int gameType = 1;
     public static final String COM_SPLITTER = String.valueOf( ( char )28 );
@@ -24,6 +26,7 @@ public class Game{
 
     public BufferedReader input;
     public PrintWriter output;
+    private Thread gameLogic;
 
     Game( Socket socket ) throws IOException{
         this.input = new BufferedReader( new InputStreamReader( socket.getInputStream() ) );
@@ -34,11 +37,17 @@ public class Game{
         getPlayers();
         getCard();
         gameWindow();
-        while( true ){
-            String msg = readMsgOnly();
-            if( msg.equals( card.toUpperCase() ) ) proceedCard();
-            if( msg.equals( "WakeUp" ) ) break;
-        }
+    }
+
+    public void gameLogic(){
+        gameLogic = new Thread( () -> {
+            while( true ){
+                String msg = readMsgOnly();
+                if( msg.equals( card.toUpperCase() ) ) proceedCard();
+                if( msg.equals( "WakeUp" ) ) break;
+            }
+        });
+        gameLogic.start();
     }
 
     private void proceedCard(){
@@ -54,10 +63,13 @@ public class Game{
     }
 
     void makeCopycat(){
-        //TODO, now I assume we choose card in the middle
-        sendMsg( gameType, "1" );
+        gameWindow.setStatementLabel( "Copycat wakes up" );
+        waitingForButton = true;
+        gameWindow.setCards012( true );
+        while( waitingForButton ) Thread.onSpinWait();      // waits, until button pressed
+        sendMsg( gameType, Integer.toString( clickedCard ) );
         card = readMsgOnly();
-        gameWindow.cardLabel.setText( card );
+        gameWindow.setCardButton( card );
         System.out.println( "Now you are " + card );
     }
 
@@ -73,10 +85,13 @@ public class Game{
         FXMLLoader fxmlLoader = new FXMLLoader( getClass().getResource( "gameWindow.fxml" ) );
         Stage stage = new Stage();
         stage.setTitle( "Werewolfs" );
-        stage.setScene( new Scene( fxmlLoader.load(), 1280, 720 ) );
+        stage.setScene( new Scene( fxmlLoader.load(), 1280, 820 ) );
         stage.initStyle( StageStyle.TRANSPARENT);
         stage.show();
         gameWindow = fxmlLoader.getController();
+        gameWindow.setCardButton( card );
+        gameWindow.setGame( this );
+        gameLogic();
     }
 
     private void getPlayers(){
@@ -86,7 +101,6 @@ public class Game{
 
     private void getCard(){
         card = readMsgOnly();
-        gameWindow.cardLabel.setText( card );
     }
 
     public void sendNickname( String nickname ){
@@ -98,8 +112,11 @@ public class Game{
     }
 
     String readMsgOnly(){
-
-        return receiveMsg().split( COM_SPLITTER, -1 )[ 1 ];
+        try{
+            return receiveMsg().split( COM_SPLITTER, -1 )[ 1 ];
+        } catch( ArrayIndexOutOfBoundsException e ){
+            return "dupa";
+        }
     }
 
     public String receiveMsg(){
@@ -112,4 +129,7 @@ public class Game{
             return "";
         }
     }
+
+    public void setWaitingForButton( boolean value ){ waitingForButton = value; }
+    public void setClickedCard( int i ){ clickedCard = i; }
 }
