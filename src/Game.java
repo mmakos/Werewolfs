@@ -40,8 +40,8 @@ public class Game{
 
         //find players id who has copycat card
         idOfCopycat = s.players.get( s.cardsNow.indexOf( "Copycat" ) ).id;
-        //send to player info, to make his move (let it be name of his card)
-        s.sendGame( idOfCopycat, "COPYCAT" );
+        //send to all players info, whose move is now, proper player will make his move
+        s.sendGame( 0, "COPYCAT" );     // 0 means, we will send msg to all players.
         //receive his moves, which is generally numbers splitted with "_" sign, here is one number, but for example Seer will send two numbers
         int chosenCardId = Integer.parseInt( s.receiveGame( idOfCopycat ).split( MSG_SPLITTER )[ 0 ] );     // first received number
         //send name of card, which player has become
