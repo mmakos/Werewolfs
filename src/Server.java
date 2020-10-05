@@ -1,3 +1,5 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -31,7 +33,13 @@ public class Server{
 
     void collectPlayers(){  //TODO to remove, when connect() done
         // add as many players as cards - 3
-        IntStream.range( 0, Card.card.length - 3 ).forEach( i -> players.add( new Player( i + 99, new Socket() ) ) );
+        IntStream.range( 0, Card.card.length - 3 ).forEach( i -> {
+            try{
+                players.add( new Player( i + 99, new Socket() ) );
+            }catch( IOException e ){
+                e.printStackTrace();
+            }
+        } );
     }
 
     void chooseCards(){
@@ -63,7 +71,7 @@ public class Server{
     void sendCardsToPlayers(){} //TODO
 
     //Comunication
-    void sendGame( int id, String msg ){
+    void sendGame( int id, String msg ) throws IOException{
         if( id == 0 ){
             for( Player player : players ){
                 sendMsg( player.id, msg );
@@ -72,21 +80,30 @@ public class Server{
         else
             sendMsg( id, gameMsg + COM_SPLITTER + msg );     //send msg of type gameMsg
     }
-    String receiveGame( int id ){
-        return receiveMsg().split( COM_SPLITTER )[ 1 ];
+    String receiveGame( int id ) throws IOException{
+        return receiveMsg( id ).split( COM_SPLITTER )[ 1 ];
     }
 
-    void sendMsg( int id, String str ){}
-    String receiveMsg(){ return new String(); }
+    void sendMsg( int id, String str ) throws IOException{
+        players.get( id - 100 ).output.writeUTF( str );
+    }
+
+    String receiveMsg( int id ) throws IOException{
+        return players.get( id - 100 ).input.readUTF();
+    }
 
     public class Player extends Thread{
         public int id;
         public String name;
         private final Socket socket;
+        public DataInputStream input;
+        public DataOutputStream output;
 
-        Player( int id, Socket socket ){
+        Player( int id, Socket socket ) throws IOException{
             this.id = id;
             this.socket = socket;
+            this.input = new DataInputStream( socket.getInputStream() );
+            this.output = new DataOutputStream( socket.getOutputStream() );
         }
 
         @Override
