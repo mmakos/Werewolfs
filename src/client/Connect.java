@@ -1,20 +1,17 @@
 package client;
 
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class Connect{
     @FXML
@@ -46,9 +43,9 @@ public class Connect{
 
     @FXML protected void setDefault(){
         if( defaultCheckBox.isSelected() ){
-            ipField.setText( "89.228.22.224" );
+            ipField.setText( "localhost" );
             ipField.setDisable( true );
-            portField.setText( "54000" );
+            portField.setText( "23000" );
             portField.setDisable( true );
         } else{
             ipField.setText( "" );
@@ -58,13 +55,26 @@ public class Connect{
         }
     }
 
-    private void connectWindow() throws IOException{
-
-
-    }
-
     @FXML protected void connect(){
-
+        Socket socket;
+        String ip = ipField.getText();
+        int port = 23000;
+        try{
+            port = Integer.parseInt( portField.getText() );
+        } catch( NumberFormatException ignored ){        }
+        try{
+            socket = new Socket( ip, port );
+            System.out.println( "Connected :)" );       //TODO to delete
+            Game game = new Game( socket );
+            game.sendNickname( loginField.getText() );
+            if( game.receiveMsg().equals( "0" + Game.COM_SPLITTER + "ok" ) )
+                loginField.getScene().getWindow().hide();
+            game.run();
+        }catch( UnknownHostException e ){
+            Error.display( "Cannot connect to " + ip + " on port " + port );
+        }catch( IOException e ){
+            Error.display( "IO Exception" );
+        }
     }
 
     @FXML private TextField loginField;
@@ -72,7 +82,6 @@ public class Connect{
     @FXML private TextField portField;
     @FXML private PasswordField passwordField;
     @FXML private CheckBox defaultCheckBox;
-    @FXML private Button loginButton;
     @FXML private GridPane dragField;
     private double x = 0, y = 0;
 }

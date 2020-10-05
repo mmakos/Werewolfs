@@ -1,3 +1,5 @@
+package server;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -11,8 +13,8 @@ public class Server{
     public Vector< String > cardsOnBegin;
     public Vector< String > cardsNow;
     public List< String > cardsInGame;
-    public String[] cardsInCenter;
     private static final int gameMsg = 1;
+    public String[] cardsInCenter;
     private final String COM_SPLITTER = String.valueOf( ( char )28 );
 
     Server() throws IOException{
@@ -106,7 +108,7 @@ public class Server{
 
         @Override
         public void run(){
-            System.out.println( "Card.Client connected." );
+            System.out.println( "server.Card.Client connected." );
         }
     }
 
