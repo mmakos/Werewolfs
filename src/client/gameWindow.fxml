@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="817.0" prefWidth="1080.0" style="-fx-background-color: #2b2a4c;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.GameWindow">
+   <children>
+      <HBox alignment="TOP_CENTER" layoutX="435.0" layoutY="69.0" prefHeight="100.0" prefWidth="210.0" AnchorPane.topAnchor="69.0">
+         <children>
+            <ToggleButton fx:id="card0" mnemonicParsing="false" prefHeight="100.0" prefWidth="64.0" text="Card0">
+               <HBox.margin>
+                  <Insets left="3.0" right="3.0" />
+               </HBox.margin>
+            </ToggleButton>
+            <ToggleButton fx:id="card1" mnemonicParsing="false" prefHeight="100.0" prefWidth="64.0" text="Card1">
+               <HBox.margin>
+                  <Insets left="3.0" right="3.0" />
+               </HBox.margin>
+            </ToggleButton>
+            <ToggleButton fx:id="card2" mnemonicParsing="false" prefHeight="100.0" prefWidth="64.0" text="Card2">
+               <HBox.margin>
+                  <Insets left="3.0" right="3.0" />
+               </HBox.margin>
+            </ToggleButton>
+         </children>
+      </HBox>
+      <Label fx:id="statement" layoutX="455.0" layoutY="14.0" text="City falls asleep " textFill="WHITE">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Button fx:id="cardLabel" alignment="TOP_CENTER" disable="true" layoutX="509.0" layoutY="683.0" mnemonicParsing="false" prefHeight="100.0" prefWidth="64.0" text="kot">
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </Button>
+      <Label layoutX="529.0" layoutY="733.0" text="Card" />
+   </children>
+</AnchorPane>

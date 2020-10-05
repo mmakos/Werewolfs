@@ -17,6 +17,6 @@ public class Statement{
         if( title.equals( "Error" ) )
             stage.showAndWait();
         else
-            stage.show();
+            stage.showAndWait();
     }
 }

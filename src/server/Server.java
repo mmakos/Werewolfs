@@ -17,13 +17,13 @@ public class Server{
     public String[] cardsInCenter;
     private final String COM_SPLITTER = String.valueOf( ( char )28 );
 
-    Server() throws IOException{
+    Server(){
         cardsInCenter = new String[ 3 ];
     }
 
     void connect() throws IOException{
         ServerSocket ss = new ServerSocket( 23000 );
-        Socket socket = new Socket();
+        Socket socket;
         for( int i = 0; i < 2; ++ i ){     // later while( nie wciśnięto "RUN GAME" ), for now 2 clients will be accepted
             socket = ss.accept();
             players.add( new Player( players.size() + 100, socket ) );  // new player with id: 100, 101, 102 itd.
