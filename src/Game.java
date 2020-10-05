@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.*;
 
 public class Game{
@@ -9,7 +10,7 @@ public class Game{
         this.s = server;
     }
 
-    void start(){
+    void start() throws IOException{
         boolean insomniac = false;
         if( s.cardsInGame.contains( "Insomniac" ) ){
             insomniac = true;
@@ -34,7 +35,7 @@ public class Game{
 
     }
 
-    void makeCopycat(){
+    void makeCopycat() throws IOException{
         //Check if copycat is not "one of 3 cards"
         if( !s.cardsNow.contains( "Copycat" ) ) return;
 

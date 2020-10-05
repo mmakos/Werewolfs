@@ -17,8 +17,6 @@ public class Server{
 
     Server() throws IOException{
         cardsInCenter = new String[ 3 ];
-        connect();
-        runGame();
     }
 
     void connect() throws IOException{
@@ -47,7 +45,7 @@ public class Server{
         IntStream.range( 0, Card.card.length ).forEach( i -> cardsInGame.add( Card.card[ i ] ) );   //Add all cards, for now
     }
 
-    void runGame(){
+    void runGame() throws IOException{
         giveAwayCards();
         sendCardsToPlayers();
         Game game = new Game( this );
@@ -108,10 +106,14 @@ public class Server{
 
         @Override
         public void run(){
-            System.out.println( "Client connected." );
+            System.out.println( "Card.Client connected." );
         }
     }
 
-    public static void main( String[] args ){}
+    public static void main( String[] args ) throws IOException{
+        Server server = new Server();
+        server.connect();
+        server.runGame();
+    }
 }
 
