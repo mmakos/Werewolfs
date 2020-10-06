@@ -75,7 +75,7 @@ public class Connect{
         }catch( UnknownHostException e ){
             Statement.display( "Error", "Cannot connect to " + ip + " on port " + port );
         }catch( IOException e ){
-            Statement.display( "Error", "IO Exception" );
+            Statement.display( "Error", "Cannot connect to server." );
         }
     }
 

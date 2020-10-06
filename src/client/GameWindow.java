@@ -1,8 +1,17 @@
 package client;
 
+import java.lang.*;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
+import server.Card;
+
+import java.util.Vector;
 
 public class GameWindow{
     private Game game;
@@ -12,7 +21,7 @@ public class GameWindow{
     @FXML public void initialize(){}
 
     public void setCardButton( String str ){
-       Platform.runLater( () -> cardLabel.setText( str ) );
+       Platform.runLater( () -> cardLabel.setText( cardLabel.getText() + str ) );
     }
 
     public void setStatementLabel( String str ){
@@ -37,12 +46,72 @@ public class GameWindow{
         game.setWaitingForButton( false );
     }
 
+    public void createPlayersCards(){
+        int a = 500, b = 280, p = game.players.size(), t = 360 / p;
+        int yourCardIdx = p - 1;
+        p = 20;     //todo to delete
+        t = 360 / p;//todo to delete
+        for( int i = 0, j = 0; i < p - 1; ++i, ++j ){
+            if( j < game.players.size() && game.players.get( j ).equals( game.nickname ) ){         //Todo to delete first condition
+                yourCardIdx = j;
+                --i;
+                ToggleButton toggle = getPlayerCard( "You" );
+                double ti = Math.toRadians( -90 );
+                toggle.setLayoutX( a * Math.cos( ti ) + ( sceneWidth / 2.0 ) - ( cardWidth / 2.0 ) + 20 );
+                toggle.setLayoutY( -1 * ( b * Math.sin( ti ) ) + ( sceneHeight / 2.0 ) - ( cardHeight / 2.0 ) + 40 );
+                toggle.setOpacity( 1.0 );
+                playersCards.add( toggle );
+                gamePane.getChildren().add( toggle );
+            }
+            else{
+                //ToggleButton toggle = getPlayerCard( game.players.get( j ) );
+                ToggleButton toggle = getPlayerCard( "player" + j );    //todo to delete
+                double ti = Math.toRadians( -90 - ( 360.0 / p ) * ( i + 1 ) - angleDiffFunction( i + 1, p ) );
+                toggle.setLayoutX( a * Math.cos( ti ) + ( sceneWidth / 2.0 ) - ( cardWidth / 2.0 ) + 20 );
+                toggle.setLayoutY( -1 * ( b * Math.sin( ti ) ) + ( sceneHeight / 2.0 ) - ( cardHeight / 2.0 ) + 40 );
+                playersCards.add( toggle );
+                gamePane.getChildren().add( toggle );
+            }
+        }
+    }
+
+    private double angleDiffFunction( int i, int p ){
+        return  ( -10 ) * Math.sin( Math.toRadians( ( 720.0 * i ) / p ) );
+    }
+
+    private ToggleButton getPlayerCard( String nickname ){
+        ToggleButton toggle = new ToggleButton( "\n\n\n\n" + nickname );
+        toggle.setMinSize( 72, 100 );
+        toggle.setMaxSize( 72, 100 );
+        toggle.setDisable( true );
+        final Image unselected = new Image( "/img/backCardSmallDark.png" );
+        final Image selected = new Image( "/img/backCardSmall.png" );
+        final ImageView toggleImage = new ImageView();
+        toggleImage.setFitWidth( 72 );      // scaling
+        toggleImage.setPreserveRatio( true );
+        toggle.setTextFill( Color.WHITE );
+        toggle.setGraphic( toggleImage );
+        toggle.setContentDisplay( ContentDisplay.CENTER );
+        toggleImage.imageProperty().bind( Bindings
+                .when( toggle.selectedProperty() )
+                .then( selected )
+                .otherwise( unselected )
+        );
+        //toggle.setOnAction( this::toggleClicked );
+        return toggle;
+    }
+
     private String getToggleId( Toggle toggle ){
         return toggle.toString().split( "=" )[ 1 ].split( "," )[ 0 ];
     }
+
+    @FXML private AnchorPane gamePane;
     @FXML private ToggleButton card0;
     @FXML private ToggleButton card1;
     @FXML private ToggleButton card2;
-    @FXML private Button cardLabel;
+    private Vector< ToggleButton > playersCards = new Vector<>();
+    @FXML private Label cardLabel;
     @FXML private Label statementLabel;
+    private static final int sceneWidth = 1280, sceneHeight = 820;
+    private static final int cardWidth = 100, cardHeight = 72;
 }

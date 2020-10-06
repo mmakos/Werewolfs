@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
@@ -9,9 +8,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="820.0" prefWidth="1080.0" style="-fx-background-color: #2b2a4c;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.GameWindow">
+<AnchorPane fx:id="gamePane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" prefHeight="820.0" prefWidth="1280.0" style="-fx-background-color: #2b2a4c;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.GameWindow">
    <children>
-      <HBox alignment="TOP_CENTER" layoutX="435.0" layoutY="69.0" prefHeight="100.0" prefWidth="210.0" AnchorPane.topAnchor="69.0">
+      <HBox alignment="TOP_CENTER" layoutX="535.0" layoutY="360.0" prefHeight="100.0" prefWidth="210.0" AnchorPane.topAnchor="360.0">
          <children>
             <ToggleButton fx:id="card0" disable="true" mnemonicParsing="false" onAction="#tableCardClicked" opacity="1.0" prefHeight="100.0" prefWidth="64.0" text="Card0">
                <HBox.margin>
@@ -33,16 +32,15 @@
             </ToggleButton>
          </children>
       </HBox>
-      <Label fx:id="statementLabel" layoutX="455.0" layoutY="14.0" text="City falls asleep " textFill="WHITE">
+      <Label fx:id="statementLabel" layoutX="555.0" layoutY="54.0" text="City falls asleep " textFill="WHITE">
          <font>
             <Font size="24.0" />
          </font>
       </Label>
-      <Button fx:id="cardLabel" alignment="TOP_CENTER" disable="true" layoutX="509.0" layoutY="683.0" mnemonicParsing="false" opacity="1.0" prefHeight="100.0" prefWidth="64.0">
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets>disable="true" opacity="1.0"
-      </Button>
-      <Label layoutX="529.0" layoutY="733.0" text="Card" />
+      <Label fx:id="cardLabel" layoutX="57.0" layoutY="58.0" text="You are " textFill="WHITE">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

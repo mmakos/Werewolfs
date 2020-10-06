@@ -20,9 +20,10 @@ public class Game{
     private static final int gameType = 1;
     public static final String COM_SPLITTER = String.valueOf( ( char )28 );
     private final String MSG_SPLITTER = String.valueOf( ( char )29 );
-    private Vector< String > players = new Vector<>();
+    public Vector< String > players = new Vector<>();
     private String card;
     private GameWindow gameWindow;
+    public String nickname;
 
     public BufferedReader input;
     public PrintWriter output;
@@ -69,7 +70,7 @@ public class Game{
         while( waitingForButton ) Thread.onSpinWait();      // waits, until button pressed
         sendMsg( gameType, Integer.toString( clickedCard ) );
         card = readMsgOnly();
-        gameWindow.setCardButton( card );
+        gameWindow.setCardButton( " -> " + card );
         System.out.println( "Now you are " + card );
     }
 
@@ -91,6 +92,7 @@ public class Game{
         gameWindow = fxmlLoader.getController();
         gameWindow.setCardButton( card );
         gameWindow.setGame( this );
+        gameWindow.createPlayersCards();
         gameLogic();
     }
 
@@ -105,6 +107,7 @@ public class Game{
 
     public void sendNickname( String nickname ){
         sendMsg( nicknameType, nickname );
+        this.nickname = nickname;
     }
 
     private void sendMsg( int type, String str ){
