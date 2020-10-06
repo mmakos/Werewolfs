@@ -55,7 +55,7 @@ public class Game{
     private void proceedCard(){
         gameWindow.setStatementLabel( gameWindow.statementLabel.getText() + " - YOUR TURN" );
         switch( card ){
-            case "Mysticwolf" -> makeMysticWolf();
+            case "Mystic wolf" -> makeMysticWolf();
             case "Copycat" -> makeCopycat();
             case "Insomniac" -> makeInsomniac();
             case "Werewolf" -> makeWerewolf();
@@ -66,13 +66,14 @@ public class Game{
     }
 
     void makeCopycat(){
+        gameWindow.setRoleInfo( "Choose one card from the middle. From this moment you will become the card you chose." );
         waitingForButton = true;
         gameWindow.setCards012( true );
         while( waitingForButton ) Thread.onSpinWait();      // waits, until button pressed
         sendMsg( gameType, Integer.toString( clickedCard ) );
         card = readMsgOnly();
         gameWindow.setCardButton( " -> " + card );
-        System.out.println( "Now you are " + card );
+        gameWindow.setRoleInfo( "On the top left corner you can see which card you were, and which card you are now." );
     }
 
     //TODO
@@ -86,7 +87,7 @@ public class Game{
     private void gameWindow() throws IOException{
         FXMLLoader fxmlLoader = new FXMLLoader( getClass().getResource( "gameWindow.fxml" ) );
         Stage stage = new Stage();
-        stage.setTitle( "Werewolfs" );
+        stage.setTitle( "Werewolves" );
         stage.setScene( new Scene( fxmlLoader.load(), 1280, 820 ) );
         stage.initStyle( StageStyle.TRANSPARENT);
         stage.show();

@@ -1,15 +1,16 @@
 package client;
 
-import java.lang.*;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import server.Card;
 
 import java.util.Vector;
 
@@ -26,6 +27,9 @@ public class GameWindow{
 
     public void setStatementLabel( String str ){
         Platform.runLater( () -> statementLabel.setText( str ) );
+    }
+    public void setRoleInfo( String str ){
+        Platform.runLater( () -> roleInfo.setText( str ) );
     }
 
     public void setCards012( boolean active ){
@@ -112,6 +116,7 @@ public class GameWindow{
     @FXML private Label cardLabel;
     @FXML public Label statementLabel;
     @FXML private Label nicknameLabel;
+    @FXML private Label roleInfo;
     private static final int sceneWidth = 1280, sceneHeight = 820;
     private static final int cardWidth = 100, cardHeight = 72;
 
