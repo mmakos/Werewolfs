@@ -22,7 +22,7 @@ public class Game{
         if( s.cardsInGame.contains( "Copycat" ) )
             makeCopycat();
         if( s.cardsInGame.contains( "Werewolf" ) )
-            makeWerewolfs();
+            makeWerewolves();
         if( s.cardsInGame.contains( "Mystic wolf" ) )
             makeMysticWolf();
 
@@ -88,23 +88,22 @@ public class Game{
         s.cardsInGame.remove( "Copycat" );
     }
 
-    //TODO
-    void makeWerewolfs() throws IOException, InterruptedException{
+    void makeWerewolves() throws IOException, InterruptedException{
         s.sendGame( 0, "WEREWOLF" );
         s.writeLog( "Werewolf" + "'s move" );
         boolean isAnyoneWerewolf = false;
-        for( int i = 0; i < Card.werewolvesQuant; ++i ){
-            if( s.cardsOnBegin.contains( "Werewolf_" + i ) ){
-                isAnyoneWerewolf = true;
-                break;
+        if( s.cardsOnBegin.contains( "Mystic wolf" ) ) isAnyoneWerewolf = true;
+        else{
+            for( int i = 0; i < Card.werewolvesQuant; ++i ){
+                if( s.cardsOnBegin.contains( "Werewolf_" + i ) ){
+                    isAnyoneWerewolf = true;
+                    break;
+                }
             }
         }
         if( !isAnyoneWerewolf ){
             s.writeLog( "All werewolves are on table" );
             Thread.sleep( 5000 );
-            for( int i = 0; i < Card.werewolvesQuant; ++i )
-                s.cardsInGame.remove( "Werewolf_" + i );
-            s.writeLog( "Werewolves fall asleep" );
         }
         else{
             StringBuilder str = new StringBuilder();
@@ -117,11 +116,19 @@ public class Game{
                     s.writeLog( "Werewolf is player " + s.players.get( indexOfWerewolf ).id );
                 }
             }
+            int indexOfMystic = s.cardsOnBegin.indexOf( "Mystic wolf" );
+            if( indexOfMystic != -1 ){
+                str.append( s.players.get( indexOfMystic ) ).append( MSG_SPLITTER );
+                werewolves.add( s.players.get( indexOfMystic ).id );
+                s.writeLog( "Mystic wolf is player " + s.players.get( indexOfMystic ).id );
+            }
             for( Integer werewolf: werewolves )
                 s.sendGame( werewolf, str.toString() );
             Thread.sleep( 5000 );       //Not necessary, time for werewolves to meet together
-            s.writeLog( "Werewolves fall asleep" );
         }
+        for( int i = 0; i < Card.werewolvesQuant; ++i )
+            s.cardsInGame.remove( "Werewolf_" + i );
+        s.writeLog( "Werewolves fall asleep" );
     }
 
     void makeMysticWolf() throws IOException, InterruptedException{
