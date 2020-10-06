@@ -10,9 +10,9 @@
 
 <AnchorPane fx:id="gamePane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" prefHeight="820.0" prefWidth="1280.0" style="-fx-background-color: #2b2a4c;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.GameWindow">
    <children>
-      <HBox alignment="TOP_CENTER" layoutX="535.0" layoutY="360.0" prefHeight="100.0" prefWidth="210.0" AnchorPane.topAnchor="360.0">
+      <HBox alignment="TOP_CENTER" layoutX="523.0" layoutY="360.0" prefHeight="100.0" prefWidth="210.0" AnchorPane.topAnchor="360.0">
          <children>
-            <ToggleButton fx:id="card0" disable="true" mnemonicParsing="false" onAction="#tableCardClicked" opacity="1.0" prefHeight="100.0" prefWidth="64.0" text="Card0">
+            <ToggleButton fx:id="card0" disable="true" maxWidth="72.0" minWidth="72.0" mnemonicParsing="false" onAction="#tableCardClicked" prefHeight="100.0" prefWidth="72.0" stylesheets="@../css/cardToggle.css" text="Card0" textFill="TRANSPARENT">
                <HBox.margin>
                   <Insets left="3.0" right="3.0" />
                </HBox.margin>
@@ -20,12 +20,12 @@
                   <ToggleGroup fx:id="tableCards" />
                </toggleGroup>
             </ToggleButton>
-            <ToggleButton fx:id="card1" disable="true" mnemonicParsing="false" onAction="#tableCardClicked" opacity="1.0" prefHeight="100.0" prefWidth="64.0" text="Card1" toggleGroup="$tableCards">
+            <ToggleButton fx:id="card1" disable="true" maxWidth="72.0" minWidth="72.0" mnemonicParsing="false" onAction="#tableCardClicked" prefHeight="100.0" prefWidth="72.0" stylesheets="@../css/cardToggle.css" text="Card1" textFill="TRANSPARENT" toggleGroup="$tableCards">
                <HBox.margin>
                   <Insets left="3.0" right="3.0" />
                </HBox.margin>
             </ToggleButton>
-            <ToggleButton fx:id="card2" disable="true" mnemonicParsing="false" onAction="#tableCardClicked" opacity="1.0" prefHeight="100.0" prefWidth="64.0" text="Card2" toggleGroup="$tableCards">
+            <ToggleButton fx:id="card2" disable="true" maxWidth="72.0" minWidth="72.0" mnemonicParsing="false" onAction="#tableCardClicked" prefHeight="100.0" prefWidth="72.0" stylesheets="@../css/cardToggle.css" text="Card2" textFill="TRANSPARENT" toggleGroup="$tableCards">
                <HBox.margin>
                   <Insets left="3.0" right="3.0" />
                </HBox.margin>

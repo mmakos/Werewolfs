@@ -25,6 +25,7 @@ public class Server{
     public Vector< String > cardsNow = new Vector<>();
     public LinkedList< String > cardsInGame;
     private static final int gameMsg = 1;
+    private static final int MAX_PLAYERS = Card.card.length;
     private volatile boolean connecting = false;
     public String[] cardsInCenter;
     private final String COM_SPLITTER = String.valueOf( ( char )28 );
@@ -44,7 +45,7 @@ public class Server{
                 ss = new ServerSocket( 23000 );
                 Socket socket;
                 connecting = true;
-                for( int i = 0; ; ++i ){     // later while( nie wciśnięto "RUN GAME" ), for now 2 clients will be accepted
+                for( int i = 0; i < MAX_PLAYERS; ++i ){     // later while( nie wciśnięto "RUN GAME" ), for now 2 clients will be accepted
                     socket = ss.accept();
                     if( connecting ){
                         players.add( new Player( players.size() + 100, socket ) );  // new player with id: 100, 101, 102 itd.
@@ -97,7 +98,7 @@ public class Server{
 
     void drawCards(){   // Randomly give cards to players and 3 on the table
         Random rand = new Random();
-        LinkedList< String > temp = cardsInGame;
+        LinkedList< String > temp = new LinkedList<>( cardsInGame );
         for( int i = 0; i < 3; ++i ){
             int randInt = rand.nextInt( temp.size() );
             cardsInCenter[ i ] = temp.get( randInt );

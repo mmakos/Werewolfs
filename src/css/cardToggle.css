@@ -1,11 +1,11 @@
 .toggle-button{
-  -fx-background-image: url( -fx-myimage );
+  -fx-background-image: url( "/img/backCardSmallDark.png" );
   -fx-background-repeat: no-repeat;
   -fx-background-position: center;
 }
 
 .toggle-button:selected{
-  -fx-background-image: url( -fx-myimage );
+  -fx-background-image: url( "/img/backCardSmall.png" );
   -fx-background-repeat: no-repeat;
   -fx-background-position: center;
 }

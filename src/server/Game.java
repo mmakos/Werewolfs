@@ -19,14 +19,17 @@ public class Game{
             insomniac = true;
             s.cardsInGame.remove( "Insomniac" );
         }
-        makeCopycat();
-        makeWerewolfs();
-        makeMysticWolf();
+        if( s.cardsInGame.contains( "Copycat" ) );
+            makeCopycat();
+        if( s.cardsInGame.contains( "Werewolf" ) )
+            makeWerewolfs();
+        if( s.cardsInGame.contains( "Mystic wolf" ) )
+            makeMysticWolf();
 
         Random rand = new Random();
 
         // TODO main loop, here we have to put all the cards, and call theirs functions
-        while( s.cardsInGame.size() != 0 ){
+        while( s.cardsInGame.size() > 0 ){
             switch( s.cardsInGame.get( rand.nextInt( s.cardsInGame.size() ) ) ){
                 case "Witch" -> makeWitch();
                 case "Beholder" -> makeBeholder();
@@ -38,41 +41,89 @@ public class Game{
 
     }
 
-    void makeCopycat() throws IOException, InterruptedException{
-        //send to all players info, whose move is now, proper player will make his move
-        s.sendGame( 0, "COPYCAT" );     // 0 means, we will send msg to all players.
-        s.writeLog( "Copycat move" );
-        //Check if copycat is not "one of 3 cards" - than waits random amount of time
-        if( !s.cardsNow.contains( "Copycat" ) ){
-            s.writeLog( "Copycat is on table" );
-            Thread.sleep( 5000 );
-        }
-        else{
-            //find players id who has copycat card
-            idOfCopycat = s.players.get( s.cardsNow.indexOf( "Copycat" ) ).id;
-            s.writeLog( "Copycat is player " + idOfCopycat );
-            //receive his moves, which is generally numbers splitted with "_" sign, here is one number, but for example Seer will send two numbers
-            int chosenCardId = Integer.parseInt( s.receiveGame( idOfCopycat ).split( MSG_SPLITTER )[ 0 ] );     // first received number
-            s.writeLog( "Player chose card " + chosenCardId );
-            //send name of card, which player has become
-            s.sendGame( idOfCopycat, s.cardsInCenter[ chosenCardId ] );
-            s.writeLog( "This card is " + s.cardsInCenter[ chosenCardId ] );
-            //Change his card information on server
-            s.cardsNow.set( s.cardsOnBegin.indexOf( "Copycat" ), s.cardsInCenter[ chosenCardId ] );
-            s.cardsOnBegin.set( s.cardsOnBegin.indexOf( "Copycat" ), s.cardsInCenter[ chosenCardId ] );
+//    void makeCopycat() throws IOException, InterruptedException{
+//        //send to all players info, whose move is now, proper player will make his move
+//        s.sendGame( 0, "COPYCAT" );     // 0 means, we will send msg to all players.
+//        s.writeLog( "Copycat move" );
+//        //Check if copycat is not "one of 3 cards" - than waits random amount of time
+//        if( !s.cardsNow.contains( "Copycat" ) ){
+//            s.writeLog( "Copycat is on table" );
+//            Thread.sleep( 5000 );
+//        }
+//        else{
+//            //find players id who has copycat card
+//            idOfCopycat = s.players.get( s.cardsNow.indexOf( "Copycat" ) ).id;
+//            s.writeLog( "Copycat is player " + idOfCopycat );
+//            //receive his moves, which is generally numbers splitted with (char)29 sign, here is one number, but for example Seer will send two numbers
+//            int chosenCardId = Integer.parseInt( s.receiveGame( idOfCopycat ).split( MSG_SPLITTER )[ 0 ] );     // first received number
+//            s.writeLog( "Player chose card " + chosenCardId );
+//            //send name of card, which player has become
+//            s.sendGame( idOfCopycat, s.cardsInCenter[ chosenCardId ] );
+//            s.writeLog( "This card is " + s.cardsInCenter[ chosenCardId ] );
+//            //Change his card information on server
+//            s.cardsNow.set( s.cardsOnBegin.indexOf( "Copycat" ), s.cardsInCenter[ chosenCardId ] );
+//            s.cardsOnBegin.set( s.cardsOnBegin.indexOf( "Copycat" ), s.cardsInCenter[ chosenCardId ] );
+//
+//            //Remove this card from list of cards (we don't want to make copycat move again)
+//            s.cardsInGame.remove( "Copycat" );
+//        }
+//        s.writeLog( "Copycat falls asleep" );
+//    }
 
-            //Remove this card from list of cards (we don't want to make copycat move again)
-            s.cardsInGame.remove( "Copycat" );
-        }
-        s.writeLog( "Copycat falls asleep" );
+    //new function copycat
+    void makeCopycat() throws IOException, InterruptedException{
+        if( !startRole( "Copycat" ) ) return;
+
+        //receive his moves, which is generally numbers splitted with (char)29 sign, here is one number, but for example Seer will send two numbers
+        int chosenCardId = Integer.parseInt( s.receiveGame( idOfCopycat ).split( MSG_SPLITTER )[ 0 ] );     // first received number
+        s.writeLog( "Player chose card " + chosenCardId );
+        //send name of card, which player has become
+        s.sendGame( idOfCopycat, s.cardsInCenter[ chosenCardId ] );
+        s.writeLog( "This card is " + s.cardsInCenter[ chosenCardId ] );
+        //Change his card information on server
+        s.cardsNow.set( s.cardsOnBegin.indexOf( "Copycat" ), s.cardsInCenter[ chosenCardId ] );
+        s.cardsOnBegin.set( s.cardsOnBegin.indexOf( "Copycat" ), s.cardsInCenter[ chosenCardId ] );
+
+        //Remove this card from list of cards (we don't want to make copycat move again)
+        s.cardsInGame.remove( "Copycat" );
     }
 
     //TODO
-    void makeWerewolfs(){}
-    void makeMysticWolf(){}
-    void makeWitch(){}
-    void makeBeholder(){}
-    void makeSeer(){}
-    void makeInsomniac(){}
+    void makeWerewolfs() throws IOException, InterruptedException{
+        startRole( "Werewolf" );
+    }
+    void makeMysticWolf() throws IOException, InterruptedException{
+        startRole( "Mystic wolf" );
+    }
+    void makeWitch() throws IOException, InterruptedException{
+        startRole( "Witch" );
+    }
+    void makeBeholder() throws IOException, InterruptedException{
+        startRole( "Beholder" );
+    }
+    void makeSeer() throws IOException, InterruptedException{
+        startRole( "Seer" );
+    }
+    void makeInsomniac() throws IOException, InterruptedException{
+        startRole( "Insomniac" );
+    }
+
+    //function does same begin of every role and returns true, if role was not on the middle
+    boolean startRole( String card ) throws IOException, InterruptedException{
+        s.sendGame( 0, card.toUpperCase() );
+        s.writeLog( card + "'s move" );
+        if( !s.cardsNow.contains( card ) ){
+            s.writeLog( card + " is on table" );
+            Thread.sleep( 5000 );
+            s.cardsInGame.remove( card );
+            s.writeLog( card + " falls asleep" );
+            return false;
+        }
+        else{
+            idOfCopycat = s.players.get( s.cardsNow.indexOf( card ) ).id;
+            s.writeLog( card + " is player " + idOfCopycat );
+            return true;
+        }
+    }
 
 }

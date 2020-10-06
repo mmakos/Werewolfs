@@ -44,6 +44,7 @@ public class Game{
         gameLogic = new Thread( () -> {
             while( true ){
                 String msg = readMsgOnly();
+                gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " wakes up" );
                 if( msg.equals( card.toUpperCase() ) ) proceedCard();
                 if( msg.equals( "WakeUp" ) ) break;
             }
@@ -52,6 +53,7 @@ public class Game{
     }
 
     private void proceedCard(){
+        gameWindow.setStatementLabel( gameWindow.statementLabel.getText() + " - YOUR TURN" );
         switch( card ){
             case "Mysticwolf" -> makeMysticWolf();
             case "Copycat" -> makeCopycat();
@@ -64,7 +66,6 @@ public class Game{
     }
 
     void makeCopycat(){
-        gameWindow.setStatementLabel( "Copycat wakes up" );
         waitingForButton = true;
         gameWindow.setCards012( true );
         while( waitingForButton ) Thread.onSpinWait();      // waits, until button pressed

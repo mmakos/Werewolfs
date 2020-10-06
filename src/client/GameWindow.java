@@ -48,18 +48,17 @@ public class GameWindow{
 
     public void createPlayersCards(){
         int a = 500, b = 280, p = game.players.size(), t = 360 / p;
-        int yourCardIdx = p - 1;
         p = 20;     //todo to delete
         t = 360 / p;//todo to delete
         for( int i = 0, j = 0; i < p - 1; ++i, ++j ){
             if( j < game.players.size() && game.players.get( j ).equals( game.nickname ) ){         //Todo to delete first condition
-                yourCardIdx = j;
                 --i;
                 ToggleButton toggle = getPlayerCard( "You" );
                 double ti = Math.toRadians( -90 );
                 toggle.setLayoutX( a * Math.cos( ti ) + ( sceneWidth / 2.0 ) - ( cardWidth / 2.0 ) + 20 );
                 toggle.setLayoutY( -1 * ( b * Math.sin( ti ) ) + ( sceneHeight / 2.0 ) - ( cardHeight / 2.0 ) + 40 );
                 toggle.setOpacity( 1.0 );
+                toggle.setSelected( true );
                 playersCards.add( toggle );
                 gamePane.getChildren().add( toggle );
             }
@@ -111,7 +110,7 @@ public class GameWindow{
     @FXML private ToggleButton card2;
     private Vector< ToggleButton > playersCards = new Vector<>();
     @FXML private Label cardLabel;
-    @FXML private Label statementLabel;
+    @FXML public Label statementLabel;
     @FXML private Label nicknameLabel;
     private static final int sceneWidth = 1280, sceneHeight = 820;
     private static final int cardWidth = 100, cardHeight = 72;
