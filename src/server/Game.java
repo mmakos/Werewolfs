@@ -101,22 +101,29 @@ public class Game{
         }
         if( !isAnyoneWerewolf ){
             s.writeLog( "All werewolves are on table" );
-            Thread.sleep( 10000 );
+            Thread.sleep( 5000 );
             for( int i = 0; i < Card.werewolvesQuant; ++i )
                 s.cardsInGame.remove( "Werewolf_" + i );
             s.writeLog( "Werewolves fall asleep" );
         }
         else{
+            StringBuilder str = new StringBuilder();
             Vector< Integer > werewolves = new Vector<>();
             for( int i = 0; i < Card.werewolvesQuant; ++i ){
-                int idOfWerewolf = s.players.get( s.cardsOnBegin.indexOf( "Werewolf_" + i ) ).id;
+                int indexOfWerewolf = s.cardsOnBegin.indexOf( "Werewolf_" + i );
+                if( indexOfWerewolf != -1 ){
+                    str.append( s.players.get( indexOfWerewolf ) ).append( MSG_SPLITTER );
+                    werewolves.add( s.players.get( indexOfWerewolf ).id );
+                    s.writeLog( "Werewolf is player " + s.players.get( indexOfWerewolf ).id );
+                }
             }
-
-            idOfCopycat = s.players.get( s.cardsNow.indexOf( card ) ).id;
-            s.writeLog( card + " is player " + idOfCopycat );
-            return true;
+            for( Integer werewolf: werewolves )
+                s.sendGame( werewolf, str.toString() );
+            Thread.sleep( 5000 );       //Not necessary, time for werewolves to meet together
+            s.writeLog( "Werewolves fall asleep" );
         }
     }
+
     void makeMysticWolf() throws IOException, InterruptedException{
         startRole( "Mystic wolf" );
     }
