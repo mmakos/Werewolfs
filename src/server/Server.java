@@ -20,14 +20,13 @@ import java.util.stream.IntStream;
 
 public class Server{
     public Vector< Player > players = new Vector<>();
-    public Vector< String > cardsOnBegin;
-    public Vector< String > cardsNow;
+    public Vector< String > cardsOnBegin = new Vector<>();
+    public Vector< String > cardsNow = new Vector<>();
     public LinkedList< String > cardsInGame;
     private static final int gameMsg = 1;
     private volatile boolean connecting = false;
     public String[] cardsInCenter;
     private final String COM_SPLITTER = String.valueOf( ( char )28 );
-    private Thread connect;
     private CardChooser cardChooser;
 
     @FXML public void initialize(){
@@ -35,7 +34,10 @@ public class Server{
     }
 
     @FXML void connect(){
-        connect = new Thread( () -> {
+        // later while( nie wciśnięto "RUN GAME" ), for now 2 clients will be accepted
+        // new player with id: 100, 101, 102 itd.
+        // starting thread for player
+        Thread connect = new Thread( () -> {
             runServer.setDisable( true );
             ServerSocket ss;
             try{
@@ -47,6 +49,7 @@ public class Server{
                     if( connecting ){
                         players.add( new Player( players.size() + 100, socket ) );  // new player with id: 100, 101, 102 itd.
                         players.get( i ).start();       // starting thread for player
+                        sendMsg( players.get( i ).id, "0" + COM_SPLITTER + "ok" );
                         int finalI = i;
                         Platform.runLater( () -> playersLabel.setText( playersLabel.getText() + " " + players.get( finalI ).getNickname() + "," ) );
                     }
@@ -60,6 +63,7 @@ public class Server{
 
     @FXML void runGame() throws IOException{
         connecting = false;
+        sendPlayersList();
         playersLabel.setText( "Starting game..." );
         FXMLLoader fxmlLoader = new FXMLLoader( getClass().getResource( "cardChooser.fxml" ) );
         Stage stage = new Stage();
@@ -75,7 +79,7 @@ public class Server{
         cardsInGame = selectedCards;
     }
 
-    void giveAwayCards(){   // Randomly give cards to players and 3 on the table
+    void drawCards(){   // Randomly give cards to players and 3 on the table
         Random rand = new Random();
         LinkedList< String > temp = cardsInGame;
         for( int i = 0; i < 3; ++i ){
@@ -91,13 +95,23 @@ public class Server{
         }
     }
 
-    void sendCardsToPlayers(){} //TODO
+    void sendCardsToPlayers() throws IOException{
+        for( int i = 0; i < players.size(); ++i ){
+            sendGame( players.get( i ).id, cardsOnBegin.get( i ) );
+        }
+    }
+
+    void sendPlayersList() throws IOException{
+        StringBuilder playersList = new StringBuilder();
+        for( Player player : players ) playersList.append( player.name ).append( Game.MSG_SPLITTER );
+        sendGame( 0, playersList.toString() );
+    }
 
     //Comunication
     void sendGame( int id, String msg ) throws IOException{
         if( id == 0 ){
             for( Player player : players ){
-                sendMsg( player.id, msg );
+                sendMsg( player.id, gameMsg + COM_SPLITTER + msg );
             }
         }
         else

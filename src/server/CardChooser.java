@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -71,9 +72,10 @@ public class CardChooser{
         }
     }
 
-    @FXML public void dealTheCards(){
+    @FXML public void dealTheCards() throws IOException{
         server.setSelectedCards( getSelectedCards() );
-        server.giveAwayCards();
+        server.drawCards();
+        server.sendCardsToPlayers();
     }
 
     private LinkedList< String > getSelectedCards(){
