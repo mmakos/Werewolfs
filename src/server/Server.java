@@ -15,17 +15,14 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.Vector;
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class Server{
     public Vector< Player > players = new Vector<>();
     public Vector< String > cardsOnBegin;
     public Vector< String > cardsNow;
-    public List< String > cardsInGame;
+    public LinkedList< String > cardsInGame;
     private static final int gameMsg = 1;
     private volatile boolean connecting = false;
     public String[] cardsInCenter;
@@ -68,27 +65,29 @@ public class Server{
         Stage stage = new Stage();
         stage.setTitle( "Choose card" );
         stage.setScene( new Scene( fxmlLoader.load(), 720, 480 ) );
-        stage.showAndWait();
+        stage.show();
         cardChooser = fxmlLoader.getController();
         cardChooser.setPlayers( players.size() );
         cardChooser.setServer( this );
     }
 
-    public void setSelectedCards( String[] selectedCards ){
-        cardsInGame = Arrays.asList( selectedCards );
+    public void setSelectedCards( LinkedList< String > selectedCards ){
+        cardsInGame = selectedCards;
     }
 
     void giveAwayCards(){   // Randomly give cards to players and 3 on the table
         Random rand = new Random();
-        List< String > temp = cardsInGame;
+        LinkedList< String > temp = cardsInGame;
         for( int i = 0; i < 3; ++i ){
-            cardsInCenter[ i ] = temp.get( rand.nextInt( temp.size() ) );
-            temp.remove( i );
+            int randInt = rand.nextInt( temp.size() );
+            cardsInCenter[ i ] = temp.get( randInt );
+            temp.remove( randInt );
         }
         for( int i = 0; i < players.size(); ++i ){
-            cardsOnBegin.add( temp.get( rand.nextInt( temp.size() ) ) );
+            int randInt = rand.nextInt( temp.size() );
+            cardsOnBegin.add( temp.get( randInt ) );
             cardsNow.add( cardsOnBegin.get( i ) );
-            temp.remove( i );
+            temp.remove( randInt );
         }
     }
 

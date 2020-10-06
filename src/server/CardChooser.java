@@ -1,5 +1,6 @@
 package server;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -11,6 +12,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 public class CardChooser{
@@ -73,8 +76,15 @@ public class CardChooser{
         server.giveAwayCards();
     }
 
-    private String[] getSelectedCards(){
-        String[] string = new String[ players + 3 ];
+    private LinkedList< String > getSelectedCards(){
+        LinkedList< String > selectedCards = new LinkedList<>();
+        for( ToggleButton toggle: toggles ){
+            if( toggle.isSelected() ){
+                String[] temp = ( toggle.getText().split( "\n" ) );
+                selectedCards.add( temp[ temp.length - 1 ] );
+            }
+        }
+        return selectedCards;
     }
 
     private int players = 0;
