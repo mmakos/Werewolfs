@@ -5,7 +5,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 public class main extends Application{
 
@@ -14,7 +13,6 @@ public class main extends Application{
         Parent root = FXMLLoader.load( getClass().getResource( "runWindow.fxml" ) );
         stage.setTitle( "Players" );
         stage.setScene( new Scene( root, 600, 400 ) );
-        stage.initStyle( StageStyle.TRANSPARENT);
         stage.setResizable( false );
         stage.show();
     }

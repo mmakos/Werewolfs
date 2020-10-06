@@ -6,8 +6,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,8 +15,9 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.*;
-import java.util.stream.IntStream;
+import java.util.LinkedList;
+import java.util.Random;
+import java.util.Vector;
 
 public class Server{
     public Vector< Player > players = new Vector<>();
@@ -27,7 +28,6 @@ public class Server{
     private volatile boolean connecting = false;
     public String[] cardsInCenter;
     private final String COM_SPLITTER = String.valueOf( ( char )28 );
-    private CardChooser cardChooser;
 
     @FXML public void initialize(){
         cardsInCenter = new String[ 3 ];
@@ -70,9 +70,13 @@ public class Server{
         stage.setTitle( "Choose card" );
         stage.setScene( new Scene( fxmlLoader.load(), 720, 480 ) );
         stage.show();
-        cardChooser = fxmlLoader.getController();
+        CardChooser cardChooser = fxmlLoader.getController();
         cardChooser.setPlayers( players.size() );
         cardChooser.setServer( this );
+        startGame.setVisible( false );
+        runServer.setVisible( false );
+        playersLabel.setVisible( false );
+        logField.setVisible( true );
     }
 
     public void setSelectedCards( LinkedList< String > selectedCards ){
@@ -107,6 +111,15 @@ public class Server{
         sendGame( 0, playersList.toString() );
     }
 
+    void startGame() throws IOException, InterruptedException{
+        Game game = new Game( this );
+        game.start();
+    }
+
+    public void writeLog( String log ){
+        Platform.runLater( () -> logField.setText( logField.getText() + "\n" + log ) );
+    }
+
     //Comunication
     void sendGame( int id, String msg ) throws IOException{
         if( id == 0 ){
@@ -129,6 +142,7 @@ public class Server{
         return players.get( id - 100 ).input.readLine();
     }
 
+    @FXML private TextArea logField;
     @FXML private Button runServer;
     @FXML private Button startGame;
     @FXML private Label playersLabel;

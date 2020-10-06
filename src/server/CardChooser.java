@@ -14,7 +14,6 @@ import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Vector;
 
 public class CardChooser{
@@ -49,20 +48,18 @@ public class CardChooser{
 
     private void toggleClicked( ActionEvent event ){
         ToggleButton selectedToggle = ( ToggleButton )event.getSource();
-        String[] temp = ( selectedToggle.getText().split( "\n" ) );
-        String clickedCard = temp[ temp.length - 1 ];
         if( selectedToggle.isSelected() )
-            addCard( clickedCard, selectedToggle );
+            addCard( selectedToggle );
         else
-            removeCard( clickedCard, selectedToggle );
+            removeCard();
     }
 
-    private void removeCard( String clickedCard, ToggleButton selectedToggle ){
+    private void removeCard(){
         --selectedToggles;
         dealButton.setDisable( true );
     }
 
-    private void addCard( String clickedCard, ToggleButton selectedToggle ){
+    private void addCard( ToggleButton selectedToggle ){
         if( selectedToggles >= players )
             selectedToggle.setSelected( false );
         else{
@@ -72,10 +69,19 @@ public class CardChooser{
         }
     }
 
-    @FXML public void dealTheCards() throws IOException{
-        server.setSelectedCards( getSelectedCards() );
-        server.drawCards();
-        server.sendCardsToPlayers();
+    @FXML public void dealTheCards(){
+        Thread game = new Thread( () -> {
+            server.setSelectedCards( getSelectedCards() );
+            server.drawCards();
+            try{
+                server.sendCardsToPlayers();
+                Platform.runLater( () -> dealButton.getScene().getWindow().hide() );
+                server.startGame();
+            }catch( IOException | InterruptedException e ){
+                e.printStackTrace();
+            }
+        });
+        game.start();
     }
 
     private LinkedList< String > getSelectedCards(){
