@@ -6,7 +6,7 @@ import java.util.*;
 public class Game{
     private final Server s;
     private int idOfCopycat;        // Needed to show on the end whowas copycat
-    private final String MSG_SPLITTER = String.valueOf( ( char )29 );
+    public final static String MSG_SPLITTER = String.valueOf( ( char )29 );
 
     Game( Server server ){
         this.s = server;

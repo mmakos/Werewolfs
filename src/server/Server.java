@@ -1,45 +1,62 @@
 package server;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.*;
+import java.util.List;
+import java.util.Random;
+import java.util.Vector;
 import java.util.stream.IntStream;
 
 public class Server{
-    public Vector< Player > players;
+    public Vector< Player > players = new Vector<>();
     public Vector< String > cardsOnBegin;
     public Vector< String > cardsNow;
     public List< String > cardsInGame;
     private static final int gameMsg = 1;
+    private volatile boolean connecting = false;
     public String[] cardsInCenter;
     private final String COM_SPLITTER = String.valueOf( ( char )28 );
+    private Thread connect;
 
-    Server(){
+    @FXML public void initialize(){
         cardsInCenter = new String[ 3 ];
     }
 
-    void connect() throws IOException{
-        ServerSocket ss = new ServerSocket( 23000 );
-        Socket socket;
-        for( int i = 0; i < 2; ++ i ){     // later while( nie wciśnięto "RUN GAME" ), for now 2 clients will be accepted
-            socket = ss.accept();
-            players.add( new Player( players.size() + 100, socket ) );  // new player with id: 100, 101, 102 itd.
-            players.get( i ).start();       // starting thread for player
-        }
-    }
-
-    void collectPlayers(){  //TODO to remove, when connect() done
-        // add as many players as cards - 3
-        IntStream.range( 0, Card.card.length - 3 ).forEach( i -> {
+    @FXML void connect(){
+        connect = new Thread( () -> {
+            runServer.setDisable( true );
+            ServerSocket ss;
             try{
-                players.add( new Player( i + 99, new Socket() ) );
+                ss = new ServerSocket( 23000 );
+                Socket socket;
+                connecting = true;
+                for( int i = 0; ; ++i ){     // later while( nie wciśnięto "RUN GAME" ), for now 2 clients will be accepted
+                    socket = ss.accept();
+                    if( connecting ){
+                        players.add( new Player( players.size() + 100, socket ) );  // new player with id: 100, 101, 102 itd.
+                        players.get( i ).start();       // starting thread for player
+                        int finalI = i;
+                        Platform.runLater( () -> playersLabel.setText( playersLabel.getText() + " " + players.get( finalI ).getNickname() + "," ) );
+                    }
+                }
             }catch( IOException e ){
-                e.printStackTrace();
+                runServer.setDisable( false );
             }
         } );
+        connect.start();
     }
 
     void chooseCards(){
@@ -47,9 +64,18 @@ public class Server{
         IntStream.range( 0, Card.card.length ).forEach( i -> cardsInGame.add( Card.card[ i ] ) );   //Add all cards, for now
     }
 
-    void runGame() throws IOException{
-        giveAwayCards();
-        sendCardsToPlayers();
+    @FXML void runGame() throws IOException{
+        connecting = false;
+        playersLabel.setText( "Starting game..." );
+        FXMLLoader fxmlLoader = new FXMLLoader( getClass().getResource( "cardChooser.fxml" ) );
+        Stage stage = new Stage();
+        stage.setTitle( "Choose card" );
+        stage.setScene( new Scene( fxmlLoader.load(), 720, 480 ) );
+        stage.showAndWait();
+
+        //chooseCards();
+        //giveAwayCards();
+        //sendCardsToPlayers();
         Game game = new Game( this );
         game.start();
     }
@@ -85,37 +111,45 @@ public class Server{
     }
 
     void sendMsg( int id, String str ) throws IOException{
-        players.get( id - 100 ).output.writeUTF( str );
+        players.get( id - 100 ).output.println( str );
     }
 
     String receiveMsg( int id ) throws IOException{
-        return players.get( id - 100 ).input.readUTF();
+        return players.get( id - 100 ).input.readLine();
     }
+
+    @FXML private Button runServer;
+    @FXML private Button startGame;
+    @FXML private Label playersLabel;
 
     public class Player extends Thread{
         public int id;
         public String name;
         private final Socket socket;
-        public DataInputStream input;
-        public DataOutputStream output;
+        public BufferedReader input;
+        public PrintWriter output;
 
         Player( int id, Socket socket ) throws IOException{
             this.id = id;
             this.socket = socket;
-            this.input = new DataInputStream( socket.getInputStream() );
-            this.output = new DataOutputStream( socket.getOutputStream() );
+            this.input = new BufferedReader( new InputStreamReader( this.socket.getInputStream() ) );
+            this.output = new PrintWriter( this.socket.getOutputStream(), true );
         }
 
         @Override
         public void run(){
-            System.out.println( "server.Card.Client connected." );
+            System.out.println( "Client connected." );
         }
-    }
 
-    public static void main( String[] args ) throws IOException{
-        Server server = new Server();
-        server.connect();
-        server.runGame();
+        public String getNickname(){
+            try{
+                this.name = input.readLine().split( COM_SPLITTER )[ 1 ];
+            }
+            catch( NullPointerException | IOException | ArrayIndexOutOfBoundsException e ){
+                this.name = "player" + id;
+            }
+            return this.name;
+        }
     }
 }
 
