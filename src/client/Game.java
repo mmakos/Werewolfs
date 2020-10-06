@@ -1,14 +1,14 @@
 package client;
 
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import javax.swing.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.Vector;
@@ -93,6 +93,7 @@ public class Game{
         gameWindow.setCardButton( card );
         gameWindow.setGame( this );
         gameWindow.createPlayersCards();
+        gameWindow.setNicknameLabel( nickname );
         gameLogic();
     }
 
@@ -118,7 +119,7 @@ public class Game{
         try{
             return receiveMsg().split( COM_SPLITTER, -1 )[ 1 ];
         } catch( ArrayIndexOutOfBoundsException e ){
-            return "dupa";
+            return "";
         }
     }
 

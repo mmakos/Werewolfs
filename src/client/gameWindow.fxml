@@ -37,9 +37,14 @@
             <Font size="24.0" />
          </font>
       </Label>
-      <Label fx:id="cardLabel" layoutX="57.0" layoutY="58.0" text="You are " textFill="WHITE">
+      <Label fx:id="cardLabel" alignment="TOP_LEFT" layoutX="49.0" layoutY="72.0" prefHeight="120.0" prefWidth="294.0" text="You are " textFill="WHITE" wrapText="true">
          <font>
             <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="nicknameLabel" layoutX="49.0" layoutY="37.0" text="Nickname" textFill="WHITE">
+         <font>
+            <Font size="24.0" />
          </font>
       </Label>
    </children>

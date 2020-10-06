@@ -68,7 +68,12 @@ public class Connect{
             System.out.println( "Connected :)" );       //TODO to delete
             Game game = new Game( socket );
             game.sendNickname( loginField.getText() );
-            if( !game.receiveMsg().equals( "0" + Game.COM_SPLITTER + "ok" ) ) return;
+            String nickInfo = game.receiveMsg();
+            if( nickInfo.equals( "0" + Game.COM_SPLITTER + "wrongNickname" ) ){
+                Statement.display( "Error", "Nickname already taken." );
+                return;
+            }
+            if( !nickInfo.equals( "0" + Game.COM_SPLITTER + "ok" ) ) return;
             Statement.display( "Info", "Game will start soon.\nWait for other players to join." );
             loginField.getScene().getWindow().hide();
             game.run();

@@ -49,9 +49,21 @@ public class Server{
                     if( connecting ){
                         players.add( new Player( players.size() + 100, socket ) );  // new player with id: 100, 101, 102 itd.
                         players.get( i ).start();       // starting thread for player
-                        sendMsg( players.get( i ).id, "0" + COM_SPLITTER + "ok" );
                         int finalI = i;
-                        Platform.runLater( () -> playersLabel.setText( playersLabel.getText() + " " + players.get( finalI ).getNickname() + "," ) );
+                        String nickname = players.get( finalI ).getNickname();
+                        for( int j = 0; j < players.size() - 1; ++j ){
+                            if( players.get( j ).name.equals( nickname ) ){       // same nickname
+                                sendMsg( players.get( finalI ).id, "0" + COM_SPLITTER + "wrongNickname" );
+                                players.remove( players.lastElement() );
+                                break;
+                            }
+                        }
+                        if( i >= players.size() )   //was same nickname
+                            --i;
+                        else{
+                            Platform.runLater( () -> playersLabel.setText( playersLabel.getText() + " " + players.get( finalI ).name + "," ) );
+                            sendMsg( players.get( finalI ).id, "0" + COM_SPLITTER + "ok" );
+                        }
                     }
                 }
             }catch( IOException e ){

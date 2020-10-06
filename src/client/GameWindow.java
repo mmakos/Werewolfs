@@ -112,6 +112,11 @@ public class GameWindow{
     private Vector< ToggleButton > playersCards = new Vector<>();
     @FXML private Label cardLabel;
     @FXML private Label statementLabel;
+    @FXML private Label nicknameLabel;
     private static final int sceneWidth = 1280, sceneHeight = 820;
     private static final int cardWidth = 100, cardHeight = 72;
+
+    public void setNicknameLabel( String nickname ){
+        this.nicknameLabel.setText( nickname );
+    }
 }
