@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
@@ -30,6 +31,7 @@ public class Server{
     public String[] cardsInCenter;
     private final String COM_SPLITTER = String.valueOf( ( char )28 );
     private Thread connect;
+    private CardChooser cardChooser;
 
     @FXML public void initialize(){
         cardsInCenter = new String[ 3 ];
@@ -59,11 +61,6 @@ public class Server{
         connect.start();
     }
 
-    void chooseCards(){
-        //TODO function somehow have to fulfill cards in game vector
-        IntStream.range( 0, Card.card.length ).forEach( i -> cardsInGame.add( Card.card[ i ] ) );   //Add all cards, for now
-    }
-
     @FXML void runGame() throws IOException{
         connecting = false;
         playersLabel.setText( "Starting game..." );
@@ -72,12 +69,13 @@ public class Server{
         stage.setTitle( "Choose card" );
         stage.setScene( new Scene( fxmlLoader.load(), 720, 480 ) );
         stage.showAndWait();
+        cardChooser = fxmlLoader.getController();
+        cardChooser.setPlayers( players.size() );
+        cardChooser.setServer( this );
+    }
 
-        //chooseCards();
-        //giveAwayCards();
-        //sendCardsToPlayers();
-        Game game = new Game( this );
-        game.start();
+    public void setSelectedCards( String[] selectedCards ){
+        cardsInGame = Arrays.asList( selectedCards );
     }
 
     void giveAwayCards(){   // Randomly give cards to players and 3 on the table
