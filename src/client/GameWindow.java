@@ -3,6 +3,7 @@ package client;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Toggle;
@@ -38,6 +39,29 @@ public class GameWindow{
         card2.setDisable( !active );
     }
 
+    public void reverseCard( String player, String card ){
+        ToggleButton toggle = switch( player ){
+            case "card0" -> card0;
+            case "card1" -> card1;
+            case "card2" -> card2;
+            default -> playersCards.get( game.players.indexOf( player ) );
+        };
+        if( !game.players.contains( player ) ){
+            Platform.runLater( () -> {
+                toggle.setText( card );
+                toggle.setTextFill( Color.WHITE );
+                toggle.setStyle( "-fx-background-image: url(\"/img/backCardSmall.png\")" );
+            } );
+        }
+        else{
+            Platform.runLater( () -> {
+                toggle.setText( card + "\n\n\n\n" + player );
+                toggle.setStyle( "-fx-graphic: url(\"/img/backCardSmall.png\")" );
+            } );
+        }
+        toggle.setOpacity( 1.0 );
+    }
+
     @FXML void tableCardClicked(){
         String selected = getToggleId( card0.getToggleGroup().getSelectedToggle() );
         System.out.println( selected );
@@ -68,6 +92,7 @@ public class GameWindow{
             }
             else{
                 //ToggleButton toggle = getPlayerCard( game.players.get( j ) );
+                game.players.add( "player" + j  );
                 ToggleButton toggle = getPlayerCard( "player" + j );    //todo to delete
                 double ti = Math.toRadians( -90 - ( 360.0 / p ) * ( i + 1 ) - angleDiffFunction( i + 1, p ) );
                 toggle.setLayoutX( a * Math.cos( ti ) + ( sceneWidth / 2.0 ) - ( cardWidth / 2.0 ) + 20 );

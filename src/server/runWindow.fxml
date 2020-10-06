@@ -22,7 +22,7 @@
             <Font size="18.0" />
          </font>
       </Button>
-      <Button fx:id="startGame" layoutX="311.0" layoutY="345.0" mnemonicParsing="false" onAction="#runGame" prefHeight="41.0" prefWidth="160.0" stylesheets="@css/button.css" text="Start game">
+      <Button fx:id="startGame" disable="true" layoutX="311.0" layoutY="345.0" mnemonicParsing="false" onAction="#runGame" prefHeight="41.0" prefWidth="160.0" stylesheets="@css/button.css" text="Start game">
          <font>
             <Font size="18.0" />
          </font>

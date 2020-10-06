@@ -55,6 +55,10 @@ public class Connect{
     }
 
     @FXML protected void connect(){
+        if( loginField.getText().length() == 0 ){
+            Statement.display( "Error", "Empty login" );
+            return;
+        }
         Socket socket;
         String ip = ipField.getText();
         int port = 23000;

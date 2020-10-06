@@ -12,7 +12,7 @@
    <children>
       <HBox alignment="TOP_CENTER" layoutX="523.0" layoutY="310.0" prefHeight="100.0" prefWidth="210.0" AnchorPane.topAnchor="310.0">
          <children>
-            <ToggleButton fx:id="card0" disable="true" maxWidth="72.0" minWidth="72.0" mnemonicParsing="false" onAction="#tableCardClicked" prefHeight="100.0" prefWidth="72.0" stylesheets="@../css/cardToggle.css" text="Card0" textFill="TRANSPARENT">
+            <ToggleButton fx:id="card0" alignment="TOP_CENTER" disable="true" maxWidth="72.0" minWidth="72.0" mnemonicParsing="false" onAction="#tableCardClicked" prefHeight="100.0" prefWidth="72.0" stylesheets="@../css/cardToggle.css" text="Card0" textFill="TRANSPARENT">
                <HBox.margin>
                   <Insets left="3.0" right="3.0" />
                </HBox.margin>
@@ -20,19 +20,19 @@
                   <ToggleGroup fx:id="tableCards" />
                </toggleGroup>
             </ToggleButton>
-            <ToggleButton fx:id="card1" disable="true" maxWidth="72.0" minWidth="72.0" mnemonicParsing="false" onAction="#tableCardClicked" prefHeight="100.0" prefWidth="72.0" stylesheets="@../css/cardToggle.css" text="Card1" textFill="TRANSPARENT" toggleGroup="$tableCards">
+            <ToggleButton fx:id="card1" alignment="TOP_CENTER" disable="true" maxWidth="72.0" minWidth="72.0" mnemonicParsing="false" onAction="#tableCardClicked" prefHeight="100.0" prefWidth="72.0" stylesheets="@../css/cardToggle.css" text="Card1" textFill="#ffffff00" toggleGroup="$tableCards">
                <HBox.margin>
                   <Insets left="3.0" right="3.0" />
                </HBox.margin>
             </ToggleButton>
-            <ToggleButton fx:id="card2" disable="true" maxWidth="72.0" minWidth="72.0" mnemonicParsing="false" onAction="#tableCardClicked" prefHeight="100.0" prefWidth="72.0" stylesheets="@../css/cardToggle.css" text="Card2" textFill="TRANSPARENT" toggleGroup="$tableCards">
+            <ToggleButton fx:id="card2" alignment="TOP_CENTER" disable="true" maxWidth="72.0" minWidth="72.0" mnemonicParsing="false" onAction="#tableCardClicked" prefHeight="100.0" prefWidth="72.0" stylesheets="@../css/cardToggle.css" text="Card2" textFill="TRANSPARENT" toggleGroup="$tableCards">
                <HBox.margin>
                   <Insets left="3.0" right="3.0" />
                </HBox.margin>
             </ToggleButton>
          </children>
       </HBox>
-      <Label fx:id="statementLabel" layoutX="555.0" layoutY="54.0" text="City falls asleep " textFill="WHITE">
+      <Label fx:id="statementLabel" alignment="CENTER" layoutX="373.0" layoutY="55.0" prefHeight="35.0" prefWidth="536.0" text="City falls asleep " textFill="WHITE">
          <font>
             <Font size="24.0" />
          </font>

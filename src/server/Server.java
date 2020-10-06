@@ -26,6 +26,7 @@ public class Server{
     public LinkedList< String > cardsInGame;
     private static final int gameMsg = 1;
     private static final int MAX_PLAYERS = Card.card.length;
+    private static final int MIN_PLAYERS = 1;
     private volatile boolean connecting = false;
     public String[] cardsInCenter;
     private final String COM_SPLITTER = String.valueOf( ( char )28 );
@@ -62,6 +63,7 @@ public class Server{
                         if( i >= players.size() )   //was same nickname
                             --i;
                         else{
+                            if( finalI >= MIN_PLAYERS - 1 ) startGame.setDisable( false );
                             Platform.runLater( () -> playersLabel.setText( playersLabel.getText() + " " + players.get( finalI ).name + "," ) );
                             sendMsg( players.get( finalI ).id, "0" + COM_SPLITTER + "ok" );
                         }
@@ -99,12 +101,18 @@ public class Server{
     void drawCards(){   // Randomly give cards to players and 3 on the table
         Random rand = new Random();
         LinkedList< String > temp = new LinkedList<>( cardsInGame );
+
+        //todo to remove when not testing with one player
+        cardsOnBegin.add( "Copycat" );
+        cardsNow.add( cardsOnBegin.get( 0 ) );
+        temp.remove( "Copycat" );
+
         for( int i = 0; i < 3; ++i ){
             int randInt = rand.nextInt( temp.size() );
             cardsInCenter[ i ] = temp.get( randInt );
             temp.remove( randInt );
         }
-        for( int i = 0; i < players.size(); ++i ){
+        for( int i = 1; i < players.size(); ++i ){      //todo to i=0 when not testing with one player
             int randInt = rand.nextInt( temp.size() );
             cardsOnBegin.add( temp.get( randInt ) );
             cardsNow.add( cardsOnBegin.get( i ) );

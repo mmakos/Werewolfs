@@ -24,7 +24,8 @@ public class CardChooser{
 
     public void createToggles(){
         for( int i = 0; i < Card.card.length; ++i ){
-            ToggleButton toggle = new ToggleButton( "\n\n\n\n" + Card.card[ i ] );
+            ToggleButton toggle = new ToggleButton( "\n\n\n\n" + Card.card[ i ].split( "_" )[ 0 ] );
+            toggle.setId( Card.card[ i ] );
             toggle.setMinSize( 72, 100 );
             toggle.setMaxSize( 72, 100 );
             final Image unselected = new Image( "/img/backCardSmallDark.png" );
@@ -43,6 +44,7 @@ public class CardChooser{
             toggle.setOnAction( this::toggleClicked );
             toggles.add( toggle );
             gridpane.add( toggle, i % gridpaneWidth, i / gridpaneWidth );
+            System.out.println( toggle );
         }
     }
 
@@ -88,8 +90,7 @@ public class CardChooser{
         LinkedList< String > selectedCards = new LinkedList<>();
         for( ToggleButton toggle: toggles ){
             if( toggle.isSelected() ){
-                String[] temp = ( toggle.getText().split( "\n" ) );
-                selectedCards.add( temp[ temp.length - 1 ] );
+                selectedCards.add( toggle.getId() );
             }
         }
         return selectedCards;

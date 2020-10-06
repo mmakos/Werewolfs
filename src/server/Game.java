@@ -21,7 +21,14 @@ public class Game{
         }
         if( s.cardsInGame.contains( "Copycat" ) )
             makeCopycat();
-        if( s.cardsInGame.contains( "Werewolf" ) )
+        boolean isWerewolf = false;
+        for( int i = 0; i < Card.werewolvesQuant; ++i ){
+            if( s.cardsInGame.contains( "Werewolf_" + i ) ){
+                isWerewolf = true;
+                break;
+            }
+        }
+        if( isWerewolf )
             makeWerewolves();
         if( s.cardsInGame.contains( "Mystic wolf" ) )
             makeMysticWolf();
@@ -111,7 +118,7 @@ public class Game{
             for( int i = 0; i < Card.werewolvesQuant; ++i ){
                 int indexOfWerewolf = s.cardsOnBegin.indexOf( "Werewolf_" + i );
                 if( indexOfWerewolf != -1 ){
-                    str.append( s.players.get( indexOfWerewolf ) ).append( MSG_SPLITTER );
+                    str.append( s.players.get( indexOfWerewolf ).name ).append( MSG_SPLITTER );
                     werewolves.add( s.players.get( indexOfWerewolf ).id );
                     s.writeLog( "Werewolf is player " + s.players.get( indexOfWerewolf ).id );
                 }

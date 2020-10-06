@@ -45,7 +45,10 @@ public class Game{
             while( true ){
                 String msg = readMsgOnly();
                 gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " wakes up" );
-                if( msg.equals( card.toUpperCase() ) ) proceedCard();
+                if( msg.equals( card.split( "_" )[ 0 ].toUpperCase() ) ){
+                    gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " wakes  - YOUR TURN" );
+                    proceedCard();
+                }
                 if( msg.equals( "WakeUp" ) ) break;
             }
         });
@@ -53,8 +56,7 @@ public class Game{
     }
 
     private void proceedCard(){
-        gameWindow.setStatementLabel( gameWindow.statementLabel.getText() + " - YOUR TURN" );
-        switch( card ){
+        switch( card.split( "_" )[ 0 ] ){
             case "Mystic wolf" -> makeMysticWolf();
             case "Copycat" -> makeCopycat();
             case "Insomniac" -> makeInsomniac();
@@ -72,12 +74,26 @@ public class Game{
         while( waitingForButton ) Thread.onSpinWait();      // waits, until button pressed
         sendMsg( gameType, Integer.toString( clickedCard ) );
         card = readMsgOnly();
-        gameWindow.setCardButton( " -> " + card );
+        gameWindow.reverseCard( "card" + clickedCard, card.split( "_" )[ 0 ] );
+        gameWindow.setCardButton( " -> " + card.split( "_" )[ 0 ] );
         gameWindow.setRoleInfo( "On the top left corner you can see which card you were, and which card you are now." );
     }
 
     //TODO
-    void makeWerewolf(){}
+    void makeWerewolf(){
+        StringBuilder str = new StringBuilder();
+        String[] werewolves = readMsgOnly().split( MSG_SPLITTER );
+        for( String werewolf: werewolves ){
+            if( !werewolf.equals( nickname ) ){
+                gameWindow.reverseCard( werewolf, "Werewolf" );
+                str.append( " " ).append( werewolf );
+            }
+        }
+        if( str.toString().isEmpty() )
+            gameWindow.setRoleInfo( "You are the only werewolf." );
+        else
+            gameWindow.setRoleInfo( "Other werewolves are" + str.toString() + "." );
+    }
     void makeMysticWolf(){}
     void makeWitch(){}
     void makeBeholder(){}
@@ -92,7 +108,7 @@ public class Game{
         stage.initStyle( StageStyle.TRANSPARENT);
         stage.show();
         gameWindow = fxmlLoader.getController();
-        gameWindow.setCardButton( card );
+        gameWindow.setCardButton( card.split( "_" )[ 0 ] );
         gameWindow.setGame( this );
         gameWindow.createPlayersCards();
         gameWindow.setNicknameLabel( nickname );
