@@ -82,9 +82,10 @@ public class Game{
         if( idOfCopycat == -1 ) return;
 
         //receive his moves, which is generally numbers splitted with (char)29 sign, here is one number, but for example Seer will send two numbers
-        int chosenCardId = Integer.parseInt( s.receiveGame( idOfCopycat ).split( MSG_SPLITTER )[ 0 ] );     // first received number
-        s.writeLog( "Player chose card " + chosenCardId );
+        String chosenCard = s.receiveGame( idOfCopycat ).split( MSG_SPLITTER )[ 0 ];     // first received number
+        s.writeLog( "Player chose card " + chosenCard );
         //send name of card, which player has become
+        int chosenCardId = s.getTableCardId( chosenCard );
         s.sendGame( idOfCopycat, s.cardsInCenter[ chosenCardId ] );
         s.writeLog( "This card is " + s.cardsInCenter[ chosenCardId ] );
         //Change his card information on server

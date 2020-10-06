@@ -44,7 +44,6 @@ public class CardChooser{
             toggle.setOnAction( this::toggleClicked );
             toggles.add( toggle );
             gridpane.add( toggle, i % gridpaneWidth, i / gridpaneWidth );
-            System.out.println( toggle );
         }
     }
 

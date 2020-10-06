@@ -15,7 +15,7 @@ import java.util.Vector;
 
 public class Game{
     private volatile boolean waitingForButton = false;
-    private int clickedCard = 0;
+    private String clickedCard = "card0";
     private static final int nicknameType = 0;
     private static final int gameType = 1;
     public static final String COM_SPLITTER = String.valueOf( ( char )28 );
@@ -70,11 +70,11 @@ public class Game{
     void makeCopycat(){
         gameWindow.setRoleInfo( "Choose one card from the middle. From this moment you will become the card you chose." );
         waitingForButton = true;
-        gameWindow.setCards012( true );
+        gameWindow.setTableCardsActive( true );
         while( waitingForButton ) Thread.onSpinWait();      // waits, until button pressed
-        sendMsg( gameType, Integer.toString( clickedCard ) );
+        sendMsg( gameType, clickedCard );
         card = readMsgOnly();
-        gameWindow.reverseCard( "card" + clickedCard, card.split( "_" )[ 0 ] );
+        gameWindow.reverseCard( clickedCard, card.split( "_" )[ 0 ] );
         gameWindow.setCardButton( " -> " + card.split( "_" )[ 0 ] );
         gameWindow.setRoleInfo( "On the top left corner you can see which card you were, and which card you are now." );
     }
@@ -153,5 +153,5 @@ public class Game{
     }
 
     public void setWaitingForButton( boolean value ){ waitingForButton = value; }
-    public void setClickedCard( int i ){ clickedCard = i; }
+    public void setClickedCard( String card ){ clickedCard = card; }
 }

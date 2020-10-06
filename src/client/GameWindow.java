@@ -2,8 +2,8 @@ package client;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Toggle;
@@ -33,11 +33,6 @@ public class GameWindow{
         Platform.runLater( () -> roleInfo.setText( str ) );
     }
 
-    public void setCards012( boolean active ){
-        card0.setDisable( !active );
-        card1.setDisable( !active );
-        card2.setDisable( !active );
-    }
 
     public void reverseCard( String player, String card ){
         ToggleButton toggle = switch( player ){
@@ -60,18 +55,6 @@ public class GameWindow{
             } );
         }
         toggle.setOpacity( 1.0 );
-    }
-
-    @FXML void tableCardClicked(){
-        String selected = getToggleId( card0.getToggleGroup().getSelectedToggle() );
-        System.out.println( selected );
-        setCards012( false );
-        switch( selected ){
-            case "card0" -> game.setClickedCard( 0 );
-            case "card1" -> game.setClickedCard( 1 );
-            case "card2" -> game.setClickedCard( 2 );
-        }
-        game.setWaitingForButton( false );
     }
 
     public void createPlayersCards(){
@@ -109,6 +92,7 @@ public class GameWindow{
 
     private ToggleButton getPlayerCard( String nickname ){
         ToggleButton toggle = new ToggleButton( "\n\n\n\n" + nickname );
+        toggle.setId( nickname );
         toggle.setMinSize( 72, 100 );
         toggle.setMaxSize( 72, 100 );
         toggle.setDisable( true );
@@ -125,8 +109,36 @@ public class GameWindow{
                 .then( selected )
                 .otherwise( unselected )
         );
-        //toggle.setOnAction( this::toggleClicked );
+        toggle.setOnAction( this::toggleClicked );
         return toggle;
+    }
+
+    @FXML private void toggleClicked( ActionEvent event ){
+        String selected = ( ( ToggleButton )event.getSource() ).getId();
+        game.setClickedCard( selected );
+        game.setWaitingForButton( false );
+    }
+
+    public void setPlayersCardsActive( boolean active ){
+        for( ToggleButton toggle: playersCards )
+            toggle.setDisable( !active );
+    }
+
+    public void sePlayerCardActive( int playerIndex, boolean active ){
+        playersCards.get( playerIndex ).setDisable( !active );
+    }
+
+    public void setTableCardsActive( boolean active ){
+        card0.setDisable( !active );
+        card1.setDisable( !active );
+        card2.setDisable( !active );
+    }
+
+    @FXML void tableCardClicked(){
+        String selected = getToggleId( card0.getToggleGroup().getSelectedToggle() );
+        setTableCardsActive( false );
+        game.setClickedCard( selected );
+        game.setWaitingForButton( false );
     }
 
     private String getToggleId( Toggle toggle ){

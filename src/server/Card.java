@@ -10,7 +10,8 @@ import javafx.stage.StageStyle;
 public class Card{
     public static int werewolvesQuant = 3;
     public static String[] card = { "Copycat", "Werewolf_0", "Insomniac", "Mystic wolf", "Seer", "Beholder",
-                                    "Witch", "Apprentice seer", "Tanner", "Minion", "Werewolf_1", "Werewolf_2" };
+                                    "Witch", "Apprentice seer", "Tanner", "Minion", "Werewolf_1", "Werewolf_2",
+                                    "Robber" };
 
     public static class Client extends Application{
 

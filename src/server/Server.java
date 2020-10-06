@@ -103,16 +103,16 @@ public class Server{
         LinkedList< String > temp = new LinkedList<>( cardsInGame );
 
         //todo to remove when not testing with one player
-        cardsOnBegin.add( "Copycat" );
-        cardsNow.add( cardsOnBegin.get( 0 ) );
-        temp.remove( "Copycat" );
+//        cardsOnBegin.add( "Copycat" );
+//        cardsNow.add( cardsOnBegin.get( 0 ) );
+//        temp.remove( "Copycat" );
 
         for( int i = 0; i < 3; ++i ){
             int randInt = rand.nextInt( temp.size() );
             cardsInCenter[ i ] = temp.get( randInt );
             temp.remove( randInt );
         }
-        for( int i = 1; i < players.size(); ++i ){      //todo to i=0 when not testing with one player
+        for( int i = 0; i < players.size(); ++i ){      //todo to i=0 when not testing with one player
             int randInt = rand.nextInt( temp.size() );
             cardsOnBegin.add( temp.get( randInt ) );
             cardsNow.add( cardsOnBegin.get( i ) );
@@ -120,13 +120,13 @@ public class Server{
         }
     }
 
-    void sendCardsToPlayers() throws IOException{
+    void sendCardsToPlayers(){
         for( int i = 0; i < players.size(); ++i ){
             sendGame( players.get( i ).id, cardsOnBegin.get( i ) );
         }
     }
 
-    void sendPlayersList() throws IOException{
+    void sendPlayersList(){
         StringBuilder playersList = new StringBuilder();
         for( Player player : players ) playersList.append( player.name ).append( Game.MSG_SPLITTER );
         sendGame( 0, playersList.toString() );
@@ -142,7 +142,7 @@ public class Server{
     }
 
     //Comunication
-    void sendGame( int id, String msg ) throws IOException{
+    void sendGame( int id, String msg ){
         if( id == 0 ){
             for( Player player : players ){
                 sendMsg( player.id, gameMsg + COM_SPLITTER + msg );
@@ -155,12 +155,21 @@ public class Server{
         return receiveMsg( id ).split( COM_SPLITTER )[ 1 ];
     }
 
-    void sendMsg( int id, String str ) throws IOException{
+    void sendMsg( int id, String str ){
         players.get( id - 100 ).output.println( str );
     }
 
     String receiveMsg( int id ) throws IOException{
         return players.get( id - 100 ).input.readLine();
+    }
+
+    public int getTableCardId( String str ){
+        switch( str ){
+            case "card0" -> { return 0; }
+            case "card1" -> { return 1; }
+            case "card2" -> { return 2; }
+        }
+        return -1;
     }
 
     @FXML private TextArea logField;
@@ -171,15 +180,13 @@ public class Server{
     public class Player extends Thread{
         public int id;
         public String name;
-        private final Socket socket;
         public BufferedReader input;
         public PrintWriter output;
 
         Player( int id, Socket socket ) throws IOException{
             this.id = id;
-            this.socket = socket;
-            this.input = new BufferedReader( new InputStreamReader( this.socket.getInputStream() ) );
-            this.output = new PrintWriter( this.socket.getOutputStream(), true );
+            this.input = new BufferedReader( new InputStreamReader( socket.getInputStream() ) );
+            this.output = new PrintWriter( socket.getOutputStream(), true );
         }
 
         @Override
