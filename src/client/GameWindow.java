@@ -42,7 +42,7 @@ public class GameWindow{
             case "card1": toggle = card1; break;
             case "card2": toggle = card2; break;
             default: toggle = playersCards.get( game.players.indexOf( player ) );
-        };
+        }
         if( !game.players.contains( player ) ){
             Platform.runLater( () -> {
                 toggle.setText( card );
@@ -62,6 +62,7 @@ public class GameWindow{
     public void createPlayersCards(){
         int a = 500, b = 280, p = game.players.size(), t = 360 / p;
 
+        playersCards = new Vector<>( p );
         int ourPos = game.players.indexOf( game.nickname );        //start drawing cadrs from ours
         ToggleButton toggle = getPlayerCard( "You" );
         toggle.setId( Game.UNIQUE_CHAR + "You" );
@@ -70,7 +71,7 @@ public class GameWindow{
         toggle.setLayoutY( -1 * ( b * Math.sin( ti ) ) + ( sceneHeight / 2.0 ) - ( cardHeight / 2.0 ) + 40 );
         toggle.setOpacity( 1.0 );
         toggle.setStyle( "-fx-graphic: url(\"/img/backCardSmall.png\")" );
-        playersCards.add( toggle );
+        playersCards.set( ourPos, toggle );
         gamePane.getChildren().add( toggle );
 
         int pos = 0;
@@ -85,7 +86,7 @@ public class GameWindow{
         double ti = Math.toRadians( -90 - ( 360.0 / p ) * ( pos + 1 ) - angleDiffFunction( pos + 1, p ) );
         toggle.setLayoutX( a * Math.cos( ti ) + ( sceneWidth / 2.0 ) - ( cardWidth / 2.0 ) + 20 );
         toggle.setLayoutY( -1 * ( b * Math.sin( ti ) ) + ( sceneHeight / 2.0 ) - ( cardHeight / 2.0 ) + 40 );
-        playersCards.add( toggle );
+        playersCards.set( pos, toggle );
         gamePane.getChildren().add( toggle );
     }
 
@@ -165,7 +166,7 @@ public class GameWindow{
     @FXML private ToggleButton card0;
     @FXML private ToggleButton card1;
     @FXML private ToggleButton card2;
-    private Vector< ToggleButton > playersCards = new Vector<>();
+    private Vector< ToggleButton > playersCards;
     @FXML private Label cardLabel;
     @FXML public Label statementLabel;
     @FXML private Label nicknameLabel;
