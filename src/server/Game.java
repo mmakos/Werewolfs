@@ -136,7 +136,12 @@ public class Game{
         startRole( "Seer" );
     }
     void makeInsomniac() throws InterruptedException{
-        startRole( "Insomniac" );
+        if(startRole( "Insomniac" )<0) return;
+        String insomniacNow;
+        insomniacNow = s.cardsNow.get(s.cardsOnBegin.indexOf("Insomniac"));
+        s.writeLog( "This card is " + insomniacNow );
+        Thread.sleep( 5000 );
+        s.cardsInGame.remove( "Insomniac" );
     }
 
     //function does same begin of every role and returns id of player with this role, if role was not on the middle
