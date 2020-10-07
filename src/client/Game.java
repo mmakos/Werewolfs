@@ -1,14 +1,15 @@
 package client;
 
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.Vector;
@@ -44,13 +45,18 @@ public class Game{
         gameLogic = new Thread( () -> {
             while( true ){
                 String msg = readMsgOnly();
+                if( msg.equals( "WakeUp" ) ){
+                    wakeUp();
+                    break;
+                }
                 gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " wakes up" );
                 if( msg.equals( card.split( "_" )[ 0 ].toUpperCase() ) ){
                     gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " wakes  - YOUR TURN" );
                     proceedCard();
                 }
-                if( msg.equals( "WakeUp" ) ) break;
             }
+            if( readMsgOnly().equals( "VOTE" ) )
+                vote();
         });
         gameLogic.start();
     }
@@ -98,10 +104,12 @@ public class Game{
 
     void makeMinion(){
         StringBuilder str = new StringBuilder();
-        String[] werewolves = readMsgOnly().split( MSG_SPLITTER );
-        for( String werewolf: werewolves ){
-            gameWindow.reverseCard( werewolf, "Werewolf" );
-            str.append( " " ).append( werewolf );
+        String[] werewolves = readMsgOnly().split( MSG_SPLITTER, 0 );
+        if( !werewolves[ 0 ].equals( "" ) ){
+            for( String werewolf : werewolves ){
+                gameWindow.reverseCard( werewolf, "Werewolf" );
+                str.append( " " ).append( werewolf );
+            }
         }
         if( str.toString().isEmpty() )
             gameWindow.setRoleInfo( "There is no werewolves among the players." );
@@ -114,6 +122,16 @@ public class Game{
     void makeBeholder(){}
     void makeSeer(){}
     void makeInsomniac(){}
+
+    void wakeUp(){
+        gameWindow.setStatementLabel( "City wakes up!" );
+        gameWindow.setRoleInfo( "Now you need to connect with other players via outer application, such as Zoom, to establish who is who. " +
+                "When you will be ready, admin will press 'start vote' button and you'll be able to make your vote on person, you wish to be dead." );
+        gameWindow.playWakeUp();
+    }
+
+    void vote(){
+    }
 
     private void gameWindow() throws IOException{
         FXMLLoader fxmlLoader = new FXMLLoader( getClass().getResource( "gameWindow.fxml" ) );

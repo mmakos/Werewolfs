@@ -47,6 +47,7 @@ public class Game{
         }
         if( insomniac )
             makeInsomniac();
+        s.sendGame( 0, "WakeUp" );
     }
 
     //new function copycat
@@ -118,6 +119,7 @@ public class Game{
         if( minionsId < 0 ) return;
         s.sendGame( minionsId, werewolvesMsg );
         Thread.sleep( 5000 );
+        s.cardsInGame.remove( "Minion" );
     }
 
     void makeMysticWolf() throws InterruptedException{

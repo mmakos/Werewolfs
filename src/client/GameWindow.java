@@ -11,8 +11,11 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 
+import java.io.File;
 import java.util.Vector;
 
 public class GameWindow{
@@ -20,7 +23,10 @@ public class GameWindow{
 
     public void setGame( Game game ){ this.game = game; }
 
-    @FXML public void initialize(){}
+    @FXML public void initialize(){
+        Media media = new Media( new File( "src/audio/wakeUp.mp3" ).toURI().toString() );
+        wakeUpSignal = new MediaPlayer( media );
+    }
 
     public void setCardButton( String str ){
        Platform.runLater( () -> cardLabel.setText( cardLabel.getText() + str ) );
@@ -145,6 +151,11 @@ public class GameWindow{
         return toggle.toString().split( "=" )[ 1 ].split( "," )[ 0 ];
     }
 
+    public void playWakeUp(){
+        wakeUpSignal.play();
+    }
+
+    private MediaPlayer wakeUpSignal;
     @FXML private AnchorPane gamePane;
     @FXML private ToggleButton card0;
     @FXML private ToggleButton card1;
