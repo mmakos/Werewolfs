@@ -81,17 +81,22 @@ ITD.
 ## Funkcje klienta:
 
 **setPlayerCardActive( int playerIdx, boolean active )**<br>
-Funkcja ustawia karty gracza o indeksie *playerIdx*, jako możliwe do wyboru (kiedy active=true) i jako niemożliwe do wyboru w przciwnym wypadku.<br><br>
+Funkcja ustawia karty gracza o indeksie *playerIdx*, jako możliwe do wyboru (kiedy active=true) i jako niemożliwe do wyboru w przciwnym wypadku.
 
 **setPlayersCardsActive( boolean active )**<br>
-Funkcja ustawia karty wszystkich graczy, jako możliwe do wyboru (kiedy active=true) i jako niemożliwe do wyboru w przciwnym wypadku.<br><br>
+Funkcja ustawia karty wszystkich graczy, jako możliwe do wyboru (kiedy active=true) i jako niemożliwe do wyboru w przciwnym wypadku.
 
 **setTableCardsActive( boolean active )**<br>
 To co wyżej tylko z 3 kartami na środku stołu.
 
 **setPlayersCardsSelected( boolean selected )**<br>
-Funkcja ustawia karty wszystkich graczy jako niewybrane kiedy *selected* jest *false*. Używa się tego do tego, aby po wybraniu przez gracza kard można było je wybrać później, jeszcze raz, np. przy głosowaniu.<br><br>
+Funkcja ustawia karty wszystkich graczy jako niewybrane kiedy *selected* jest *false*. Używa się tego do tego, aby po wybraniu przez gracza kard można było je wybrać później, jeszcze raz, np. przy głosowaniu.
 
 **setTableCardsSelected( boolean selected )**<br>
-To co wyżej tylko z 3 kartami na środku stołu.<br><br>
+To co wyżej tylko z 3 kartami na środku stołu.
 
+Przykład:
+Aby gracz wybrał kartę spośród grczy należy najpierw ustawić zmienną *waitingForButton* na wartość true oraz ustawić karty graczy na active (*gameWindow.setPlayersCardsActive( true )*).
+Następnie w pętli czekamy, aż gracz naciśnie jakąś kartę ("while( waitingForButton );"). Możemy pobrać ze zmiennej *clickedCard* nazwę gracza, którego kartazostała wybrana, lub w przypadku 3 środkowych kard odpowiednio "card0", "card1" i "card2".
+Potem można pobrać kolejną klikniętą kartę powtarzając powyższe kroki (oprócz *gameWindow.setPlayersCardsActive( true )*), nic się nie stanie, ale nie ma to sensu.
+Na koniec należy pamiętać o sezaktywowaniu kart (*gameWindow.setPlayersCardsActive( false )*) oraz o odznaczeniu wszystkich kard (*gameWindow.setPlayersCardsSelected( false )*).
