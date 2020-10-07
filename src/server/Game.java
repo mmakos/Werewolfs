@@ -126,7 +126,7 @@ public class Game{
     void makeMysticWolf() throws InterruptedException{
 //        if(startRole( "MysticWolf" )<0) return;
 //        int idOfMysticWolf = ;
-//        String cardToSee = s.receiveGame( idOfMysticWolf ).split( MSG_SPLITTER )[ 0 ];
+        /*String cardToSee = s.receiveGame( idOfMysticWolf ).split( MSG_SPLITTER )[ 0 ];*/
     }
     void makeWitch() throws InterruptedException{
         if(startRole( "Witch" )<0) return;
