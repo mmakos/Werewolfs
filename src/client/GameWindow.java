@@ -73,7 +73,7 @@ public class GameWindow{
                 toggle.setLayoutX( a * Math.cos( ti ) + ( sceneWidth / 2.0 ) - ( cardWidth / 2.0 ) + 20 );
                 toggle.setLayoutY( -1 * ( b * Math.sin( ti ) ) + ( sceneHeight / 2.0 ) - ( cardHeight / 2.0 ) + 40 );
                 toggle.setOpacity( 1.0 );
-                toggle.setSelected( true );
+                toggle.setStyle( "-fx-graphic: url(\"/img/backCardSmall.png\")" );
                 playersCards.add( toggle );
                 gamePane.getChildren().add( toggle );
             }
@@ -124,12 +124,25 @@ public class GameWindow{
     }
 
     public void setPlayersCardsActive( boolean active ){
+        for( ToggleButton toggle: playersCards ){
+            if( !toggle.getId().equals( "You" ) )
+                toggle.setDisable( !active );
+        }
+    }
+
+    public void setPlayersCardsSelected( boolean selected ){
         for( ToggleButton toggle: playersCards )
-            toggle.setDisable( !active );
+            toggle.setSelected( selected );
     }
 
     public void sePlayerCardActive( int playerIndex, boolean active ){
         playersCards.get( playerIndex ).setDisable( !active );
+    }
+
+    public void setTableCardsSelected( boolean selected ){
+        card0.setSelected( selected );
+        card1.setSelected( selected );
+        card2.setSelected( selected );
     }
 
     public void setTableCardsActive( boolean active ){

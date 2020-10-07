@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Vector;
@@ -30,9 +31,13 @@ public class Server{
     private volatile boolean connecting = false;
     public String[] cardsInCenter;
     private final String COM_SPLITTER = String.valueOf( ( char )28 );
+    private Vector< Thread > playerReaders = new Vector<>();
+    private int[] votes;
 
     @FXML public void initialize(){
         cardsInCenter = new String[ 3 ];
+        voteButton.setVisible( false );
+        endVotingButton.setVisible( false );
     }
 
     @FXML void connect(){
@@ -92,6 +97,61 @@ public class Server{
         runServer.setVisible( false );
         playersLabel.setVisible( false );
         logField.setVisible( true );
+        voteButton.setVisible( true );
+    }
+
+    @FXML void orderVoting(){
+        voteButton.setDisable( true );
+        voteButton.setVisible( false );
+        endVotingButton.setVisible( true );
+        endVotingButton.setDisable( false );
+        sendGame( 0, "VOTE" );
+        votes = new int[ players.size() ];
+        Arrays.fill( votes, 0 );
+        for( Player player: players ){
+            playerReaders.add( new Thread( () -> {
+                String vote;
+                try{
+                    vote = receiveGame( player.id );
+                    int votedPlayerIdx = players.indexOf( getPlayer( vote ) );
+                    if( votedPlayerIdx != -1 ){
+                        ++votes[ votedPlayerIdx ];
+                    }
+                }catch( IOException ignored ){}
+            } ) );
+            playerReaders.lastElement().start();
+        }
+    }
+
+    @FXML void endVoting(){
+        for( Thread t: playerReaders ){
+            t.interrupt();
+        }
+        playerReaders.removeAllElements();
+        countVotes();
+    }
+
+    private void countVotes(){
+        int max = Arrays.stream( votes ).max().getAsInt();
+        int maxIdx = Arrays.asList( votes ).indexOf( max );
+        boolean temp = true;
+        if( maxIdx != -1 ){      //no one voted
+            votes[ maxIdx ] = -1;
+            temp = false;
+        }
+        if( !temp || Arrays.stream( votes ).max().getAsInt() == max )       // same votes quantity
+            orderVoting();                                          // vote again
+        else{
+            sendGame( 0, players.get( maxIdx ).name );
+            sendAllPlayers();
+        }
+    }
+
+    private void sendAllPlayers(){
+        StringBuilder str = new StringBuilder();
+        for( String cardNow: cardsNow )
+            str.append( cardNow ).append( Game.MSG_SPLITTER );
+        sendGame( 0, str.toString() );
     }
 
     public void setSelectedCards( LinkedList< String > selectedCards ){
@@ -172,9 +232,27 @@ public class Server{
         return -1;
     }
 
+    Player getPlayer( int id ){
+        for( Player player: players ){
+            if( player.id == id )
+                return player;
+        }
+        return null;
+    }
+
+    Player getPlayer( String name ){
+        for( Player player: players ){
+            if( player.name.equals( name ) )
+                return player;
+        }
+        return null;
+    }
+
     @FXML private TextArea logField;
     @FXML private Button runServer;
     @FXML private Button startGame;
+    @FXML public Button voteButton;
+    @FXML private Button endVotingButton;
     @FXML private Label playersLabel;
 
     public class Player extends Thread{

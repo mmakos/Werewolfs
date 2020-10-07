@@ -63,8 +63,10 @@ public class Game{
                     proceedCard();
                 }
             }
-            if( readMsgOnly().equals( "VOTE" ) )
+            if( readMsgOnly().equals( "VOTE" ) ){
+                gameWindow.setStatementLabel( "Vote" );
                 vote();
+            }
         });
         gameLogic.start();
     }
@@ -141,6 +143,25 @@ public class Game{
     }
 
     void vote(){
+        gameWindow.setPlayersCardsActive( true );
+        waitingForButton = true;
+        while( waitingForButton ) Thread.onSpinWait();
+        gameWindow.setPlayersCardsActive( false );
+        gameWindow.setPlayersCardsSelected( false );
+        sendMsg( gameType, clickedCard );
+        String voteResult = readMsgOnly();
+        if( voteResult.equals( "VOTE" ) ){      // vote again
+            gameWindow.setStatementLabel( "Vote again, decision must be unequivocal" );
+            vote();
+        }
+        else{
+            String killedPlayer = readMsgOnly();
+            String[] cardsNow = readMsgOnly().split( MSG_SPLITTER );
+            for( int i = 0; i < players.size(); ++i ){
+                gameWindow.reverseCard( players.get( i ), cardsNow[ i ] );
+            }
+            gameWindow.setStatementLabel( killedPlayer + " has been killed" );
+        }
     }
 
     private void gameWindow() throws IOException{

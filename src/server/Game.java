@@ -48,6 +48,7 @@ public class Game{
         if( insomniac )
             makeInsomniac();
         s.sendGame( 0, "WakeUp" );
+        s.voteButton.setDisable( false );
     }
 
     //new function copycat

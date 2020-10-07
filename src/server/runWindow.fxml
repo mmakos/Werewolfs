@@ -27,6 +27,16 @@
             <Font size="18.0" />
          </font>
       </Button>
-      <TextArea fx:id="logField" editable="false" layoutX="14.0" layoutY="14.0" prefHeight="373.0" prefWidth="573.0" style="-fx-background-color: #2b2a4c;" visible="false" wrapText="true" />
+      <TextArea fx:id="logField" editable="false" layoutX="14.0" layoutY="14.0" prefHeight="318.0" prefWidth="573.0" style="-fx-background-color: #2b2a4c;" visible="false" wrapText="true" />
+      <Button fx:id="voteButton" disable="true" layoutX="221.0" layoutY="345.0" mnemonicParsing="false" onAction="#orderVoting" prefHeight="41.0" prefWidth="160.0" stylesheets="@css/button.css" text="Order the voting">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <Button fx:id="endVotingButton" disable="true" layoutX="221.0" layoutY="345.0" mnemonicParsing="false" onAction="#endVoting" prefHeight="41.0" prefWidth="160.0" stylesheets="@css/button.css" text="End voting">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
    </children>
 </AnchorPane>
