@@ -42,7 +42,7 @@ public class Connect{
 
     @FXML protected void setDefault(){
         if( defaultCheckBox.isSelected() ){
-            ipField.setText( "localhost" );
+            ipField.setText( "185.20.175.81" );
             ipField.setDisable( true );
             portField.setText( "23000" );
             portField.setDisable( true );
