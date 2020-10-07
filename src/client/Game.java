@@ -37,9 +37,9 @@ public class Game{
         this.input = new BufferedReader( new InputStreamReader( socket.getInputStream() ) );
         this.output = new PrintWriter( socket.getOutputStream(), true );
 
-        Media media2 = new Media( new File( "/audio/role.wav" ).toURI().toString() );
+        Media media2 = new Media( new File( "audio/role.wav" ).toURI().toString() );
         roleSignal = new MediaPlayer( media2 );
-        Media media = new Media( new File( "/audio/wakeUp.mp3" ).toURI().toString() );
+        Media media = new Media( new File( "audio/wakeUp.mp3" ).toURI().toString() );
         wakeUpSignal = new MediaPlayer( media );
     }
 
