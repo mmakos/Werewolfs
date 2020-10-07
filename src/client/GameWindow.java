@@ -12,6 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import java.util.Vector;
 
@@ -62,7 +63,7 @@ public class GameWindow{
     public void createPlayersCards(){
         int a = 500, b = 280, p = game.players.size(), t = 360 / p;
 
-        playersCards = new Vector<>( p );
+        playersCards.setSize( p );
         int ourPos = game.players.indexOf( game.nickname );        //start drawing cadrs from ours
         ToggleButton toggle = getPlayerCard( "You" );
         toggle.setId( Game.UNIQUE_CHAR + "You" );
@@ -86,7 +87,7 @@ public class GameWindow{
         double ti = Math.toRadians( -90 - ( 360.0 / p ) * ( pos + 1 ) - angleDiffFunction( pos + 1, p ) );
         toggle.setLayoutX( a * Math.cos( ti ) + ( sceneWidth / 2.0 ) - ( cardWidth / 2.0 ) + 20 );
         toggle.setLayoutY( -1 * ( b * Math.sin( ti ) ) + ( sceneHeight / 2.0 ) - ( cardHeight / 2.0 ) + 40 );
-        playersCards.set( pos, toggle );
+        playersCards.set( player, toggle );
         gamePane.getChildren().add( toggle );
     }
 
@@ -99,6 +100,7 @@ public class GameWindow{
         toggle.setId( nickname );
         toggle.setMinSize( 72, 100 );
         toggle.setMaxSize( 72, 100 );
+        toggle.setFont( new Font( 12 ) );
         toggle.setDisable( true );
         final Image unselected = new Image( "/img/backCardSmallDark.png" );
         final Image selected = new Image( "/img/backCardSmall.png" );
@@ -166,7 +168,7 @@ public class GameWindow{
     @FXML private ToggleButton card0;
     @FXML private ToggleButton card1;
     @FXML private ToggleButton card2;
-    private Vector< ToggleButton > playersCards;
+    private Vector< ToggleButton > playersCards = new Vector<>();;
     @FXML private Label cardLabel;
     @FXML public Label statementLabel;
     @FXML private Label nicknameLabel;
