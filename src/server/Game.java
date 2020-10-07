@@ -28,8 +28,9 @@ public class Game{
                 break;
             }
         }
+        String werewolvesMsg = "";
         if( isWerewolf )
-            makeWerewolves();
+            werewolvesMsg = makeWerewolves();
         if( s.cardsInGame.contains( "Mystic wolf" ) )
             makeMysticWolf();
 
@@ -41,45 +42,17 @@ public class Game{
                 case "Witch" -> makeWitch();
                 case "Beholder" -> makeBeholder();
                 case "Seer" -> makeSeer();
+                case "Minion" -> makeMinion( werewolvesMsg );
             }
         }
         if( insomniac )
             makeInsomniac();
     }
 
-//    void makeCopycat() throws IOException, InterruptedException{
-//        //send to all players info, whose move is now, proper player will make his move
-//        s.sendGame( 0, "COPYCAT" );     // 0 means, we will send msg to all players.
-//        s.writeLog( "Copycat move" );
-//        //Check if copycat is not "one of 3 cards" - than waits random amount of time
-//        if( !s.cardsNow.contains( "Copycat" ) ){
-//            s.writeLog( "Copycat is on table" );
-//            Thread.sleep( 5000 );
-//        }
-//        else{
-//            //find players id who has copycat card
-//            idOfCopycat = s.players.get( s.cardsNow.indexOf( "Copycat" ) ).id;
-//            s.writeLog( "Copycat is player " + idOfCopycat );
-//            //receive his moves, which is generally numbers splitted with (char)29 sign, here is one number, but for example Seer will send two numbers
-//            int chosenCardId = Integer.parseInt( s.receiveGame( idOfCopycat ).split( MSG_SPLITTER )[ 0 ] );     // first received number
-//            s.writeLog( "Player chose card " + chosenCardId );
-//            //send name of card, which player has become
-//            s.sendGame( idOfCopycat, s.cardsInCenter[ chosenCardId ] );
-//            s.writeLog( "This card is " + s.cardsInCenter[ chosenCardId ] );
-//            //Change his card information on server
-//            s.cardsNow.set( s.cardsOnBegin.indexOf( "Copycat" ), s.cardsInCenter[ chosenCardId ] );
-//            s.cardsOnBegin.set( s.cardsOnBegin.indexOf( "Copycat" ), s.cardsInCenter[ chosenCardId ] );
-//
-//            //Remove this card from list of cards (we don't want to make copycat move again)
-//            s.cardsInGame.remove( "Copycat" );
-//        }
-//        s.writeLog( "Copycat falls asleep" );
-//    }
-
     //new function copycat
     void makeCopycat() throws IOException, InterruptedException{
         idOfCopycat = startRole( "Copycat" );
-        if( idOfCopycat == -1 ) return;
+        if( idOfCopycat < 0 ) return;
 
         //receive his moves, which is generally numbers splitted with (char)29 sign, here is one number, but for example Seer will send two numbers
         String chosenCard = s.receiveGame( idOfCopycat ).split( MSG_SPLITTER )[ 0 ];     // first received number
@@ -96,9 +69,10 @@ public class Game{
         s.cardsInGame.remove( "Copycat" );
     }
 
-    void makeWerewolves() throws IOException, InterruptedException{
+    String makeWerewolves() throws InterruptedException{
         s.sendGame( 0, "WEREWOLF" );
         s.writeLog( "Werewolf" + "'s move" );
+        StringBuilder str = new StringBuilder();
         boolean isAnyoneWerewolf = false;
         if( s.cardsOnBegin.contains( "Mystic wolf" ) ) isAnyoneWerewolf = true;
         else{
@@ -114,7 +88,6 @@ public class Game{
             Thread.sleep( 5000 );
         }
         else{
-            StringBuilder str = new StringBuilder();
             Vector< Integer > werewolves = new Vector<>();
             for( int i = 0; i < Card.werewolvesQuant; ++i ){
                 int indexOfWerewolf = s.cardsOnBegin.indexOf( "Werewolf_" + i );
@@ -137,26 +110,34 @@ public class Game{
         for( int i = 0; i < Card.werewolvesQuant; ++i )
             s.cardsInGame.remove( "Werewolf_" + i );
         s.writeLog( "Werewolves fall asleep" );
+        return str.toString();
     }
 
-    void makeMysticWolf() throws IOException, InterruptedException{
+    void  makeMinion( String werewolvesMsg ) throws InterruptedException{
+        int minionsId = startRole( "Minion" );
+        if( minionsId < 0 ) return;
+        s.sendGame( minionsId, werewolvesMsg );
+        Thread.sleep( 5000 );
+    }
+
+    void makeMysticWolf() throws InterruptedException{
         startRole( "Mystic wolf" );
     }
-    void makeWitch() throws IOException, InterruptedException{
+    void makeWitch() throws InterruptedException{
         startRole( "Witch" );
     }
-    void makeBeholder() throws IOException, InterruptedException{
+    void makeBeholder() throws InterruptedException{
         startRole( "Beholder" );
     }
-    void makeSeer() throws IOException, InterruptedException{
+    void makeSeer() throws InterruptedException{
         startRole( "Seer" );
     }
-    void makeInsomniac() throws IOException, InterruptedException{
+    void makeInsomniac() throws InterruptedException{
         startRole( "Insomniac" );
     }
 
     //function does same begin of every role and returns id of player with this role, if role was not on the middle
-    int startRole( String card ) throws IOException, InterruptedException{
+    int startRole( String card ) throws InterruptedException{
         s.sendGame( 0, card.toUpperCase() );
         s.writeLog( card + "'s move" );
         if( !s.cardsOnBegin.contains( card ) ){

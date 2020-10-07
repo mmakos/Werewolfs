@@ -58,6 +58,7 @@ public class Game{
     private void proceedCard(){
         switch( card.split( "_" )[ 0 ] ){
             case "Mystic wolf" -> makeMysticWolf();
+            case "Minion" -> makeMinion();
             case "Copycat" -> makeCopycat();
             case "Insomniac" -> makeInsomniac();
             case "Werewolf" -> makeWerewolf();
@@ -94,6 +95,20 @@ public class Game{
         else
             gameWindow.setRoleInfo( "Other werewolves are" + str.toString() + "." );
     }
+
+    void makeMinion(){
+        StringBuilder str = new StringBuilder();
+        String[] werewolves = readMsgOnly().split( MSG_SPLITTER );
+        for( String werewolf: werewolves ){
+            gameWindow.reverseCard( werewolf, "Werewolf" );
+            str.append( " " ).append( werewolf );
+        }
+        if( str.toString().isEmpty() )
+            gameWindow.setRoleInfo( "There is no werewolves among the players." );
+        else
+            gameWindow.setRoleInfo( "Werewolves are" + str.toString() + "." );
+    }
+
     void makeMysticWolf(){}
     void makeWitch(){}
     void makeBeholder(){}
@@ -143,10 +158,7 @@ public class Game{
 
     public String receiveMsg(){
         try{
-            String msg = input.readLine();
-            System.out.println( msg );
-            return msg;
-            //return input.readLine();
+            return input.readLine();
         }catch( IOException e ){
             return "";
         }
