@@ -39,10 +39,10 @@ public class Game{
         // TODO main loop, here we have to put all the cards, and call theirs functions
         while( s.cardsInGame.size() > 0 ){
             switch( s.cardsInGame.get( rand.nextInt( s.cardsInGame.size() ) ) ){
-                case "Witch" -> makeWitch();
-                case "Beholder" -> makeBeholder();
-                case "Seer" -> makeSeer();
-                case "Minion" -> makeMinion( werewolvesMsg );
+                case "Witch": makeWitch(); break;
+                case "Beholder": makeBeholder(); break;
+                case "Seer": makeSeer(); break;
+                case "Minion": makeMinion( werewolvesMsg ); break;
             }
         }
         if( insomniac )

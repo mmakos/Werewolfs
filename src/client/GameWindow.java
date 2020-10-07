@@ -11,11 +11,8 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 
-import java.io.File;
 import java.util.Vector;
 
 public class GameWindow{
@@ -39,11 +36,12 @@ public class GameWindow{
 
 
     public void reverseCard( String player, String card ){
-        ToggleButton toggle = switch( player ){
-            case "card0" -> card0;
-            case "card1" -> card1;
-            case "card2" -> card2;
-            default -> playersCards.get( game.players.indexOf( player ) );
+        ToggleButton toggle;
+        switch( player ){
+            case "card0": toggle = card0; break;
+            case "card1": toggle = card1; break;
+            case "card2": toggle = card2; break;
+            default: toggle = playersCards.get( game.players.indexOf( player ) );
         };
         if( !game.players.contains( player ) ){
             Platform.runLater( () -> {
@@ -63,31 +61,32 @@ public class GameWindow{
 
     public void createPlayersCards(){
         int a = 500, b = 280, p = game.players.size(), t = 360 / p;
-        p = 20;     //todo to delete
-        t = 360 / p;//todo to delete
-        for( int i = 0, j = 0; i < p - 1; ++i, ++j ){
-            if( j < game.players.size() && game.players.get( j ).equals( game.nickname ) ){         //Todo to delete first condition
-                --i;
-                ToggleButton toggle = getPlayerCard( "You" );
-                double ti = Math.toRadians( -90 );
-                toggle.setLayoutX( a * Math.cos( ti ) + ( sceneWidth / 2.0 ) - ( cardWidth / 2.0 ) + 20 );
-                toggle.setLayoutY( -1 * ( b * Math.sin( ti ) ) + ( sceneHeight / 2.0 ) - ( cardHeight / 2.0 ) + 40 );
-                toggle.setOpacity( 1.0 );
-                toggle.setStyle( "-fx-graphic: url(\"/img/backCardSmall.png\")" );
-                playersCards.add( toggle );
-                gamePane.getChildren().add( toggle );
-            }
-            else{
-                //ToggleButton toggle = getPlayerCard( game.players.get( j ) );
-                game.players.add( "player" + j  );
-                ToggleButton toggle = getPlayerCard( "player" + j );    //todo to delete
-                double ti = Math.toRadians( -90 - ( 360.0 / p ) * ( i + 1 ) - angleDiffFunction( i + 1, p ) );
-                toggle.setLayoutX( a * Math.cos( ti ) + ( sceneWidth / 2.0 ) - ( cardWidth / 2.0 ) + 20 );
-                toggle.setLayoutY( -1 * ( b * Math.sin( ti ) ) + ( sceneHeight / 2.0 ) - ( cardHeight / 2.0 ) + 40 );
-                playersCards.add( toggle );
-                gamePane.getChildren().add( toggle );
-            }
-        }
+
+        int ourPos = game.players.indexOf( game.nickname );        //start drawing cadrs from ours
+        ToggleButton toggle = getPlayerCard( "You" );
+        toggle.setId( Game.UNIQUE_CHAR + "You" );
+        double ti = Math.toRadians( -90 );
+        toggle.setLayoutX( a * Math.cos( ti ) + ( sceneWidth / 2.0 ) - ( cardWidth / 2.0 ) + 20 );
+        toggle.setLayoutY( -1 * ( b * Math.sin( ti ) ) + ( sceneHeight / 2.0 ) - ( cardHeight / 2.0 ) + 40 );
+        toggle.setOpacity( 1.0 );
+        toggle.setStyle( "-fx-graphic: url(\"/img/backCardSmall.png\")" );
+        playersCards.add( toggle );
+        gamePane.getChildren().add( toggle );
+
+        int pos = 0;
+        for( int player = ourPos + 1; player < p; ++pos, ++player )
+            addToggle( pos, player, a, b, p );
+        for( int player = 0; player < ourPos; ++pos, ++player )
+            addToggle( pos, player, a, b, p );
+    }
+
+    private void addToggle( int pos, int player, int a, int b, int p ){
+        ToggleButton toggle = getPlayerCard( game.players.get( player ) );
+        double ti = Math.toRadians( -90 - ( 360.0 / p ) * ( pos + 1 ) - angleDiffFunction( pos + 1, p ) );
+        toggle.setLayoutX( a * Math.cos( ti ) + ( sceneWidth / 2.0 ) - ( cardWidth / 2.0 ) + 20 );
+        toggle.setLayoutY( -1 * ( b * Math.sin( ti ) ) + ( sceneHeight / 2.0 ) - ( cardHeight / 2.0 ) + 40 );
+        playersCards.add( toggle );
+        gamePane.getChildren().add( toggle );
     }
 
     private double angleDiffFunction( int i, int p ){
@@ -125,7 +124,7 @@ public class GameWindow{
 
     public void setPlayersCardsActive( boolean active ){
         for( ToggleButton toggle: playersCards ){
-            if( !toggle.getId().equals( "You" ) )
+            if( !toggle.getId().equals( Game.UNIQUE_CHAR + "You" ) )
                 toggle.setDisable( !active );
         }
     }

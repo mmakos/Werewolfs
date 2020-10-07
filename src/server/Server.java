@@ -31,6 +31,7 @@ public class Server{
     private volatile boolean connecting = false;
     public String[] cardsInCenter;
     private final String COM_SPLITTER = String.valueOf( ( char )28 );
+    private final String UNIQUE_CHAR = String.valueOf( ( char )2 );
     private Vector< Thread > playerReaders = new Vector<>();
     private int[] votes;
 
@@ -58,6 +59,11 @@ public class Server{
                         players.get( i ).start();       // starting thread for player
                         int finalI = i;
                         String nickname = players.get( finalI ).getNickname();
+                        if( nickname.equals( "" ) ){
+                            players.remove( players.lastElement() );
+                            --i;
+                            continue;
+                        }
                         for( int j = 0; j < players.size() - 1; ++j ){
                             if( players.get( j ).name.equals( nickname ) ){       // same nickname
                                 sendMsg( players.get( finalI ).id, "0" + COM_SPLITTER + "wrongNickname" );
@@ -105,7 +111,7 @@ public class Server{
         voteButton.setVisible( false );
         endVotingButton.setVisible( true );
         endVotingButton.setDisable( false );
-        sendGame( 0, "VOTE" );
+        sendGame( 0, UNIQUE_CHAR + "VOTE" );
         votes = new int[ players.size() ];
         Arrays.fill( votes, 0 );
         for( Player player: players ){
@@ -163,16 +169,16 @@ public class Server{
         LinkedList< String > temp = new LinkedList<>( cardsInGame );
 
         //todo to remove when not testing with one player
-        cardsOnBegin.add( "Copycat" );
-        cardsNow.add( cardsOnBegin.get( 0 ) );
-        temp.remove( "Copycat" );
+//        cardsOnBegin.add( "Copycat" );
+//        cardsNow.add( cardsOnBegin.get( 0 ) );
+//        temp.remove( "Copycat" );
 
         for( int i = 0; i < 3; ++i ){
             int randInt = rand.nextInt( temp.size() );
             cardsInCenter[ i ] = temp.get( randInt );
             temp.remove( randInt );
         }
-        for( int i = 1; i < players.size(); ++i ){      //todo to i=0 when not testing with one player
+        for( int i = 0; i < players.size(); ++i ){      //todo to i=0 when not testing with one player
             int randInt = rand.nextInt( temp.size() );
             cardsOnBegin.add( temp.get( randInt ) );
             cardsNow.add( cardsOnBegin.get( i ) );
@@ -225,9 +231,9 @@ public class Server{
 
     public int getTableCardId( String str ){
         switch( str ){
-            case "card0" -> { return 0; }
-            case "card1" -> { return 1; }
-            case "card2" -> { return 2; }
+            case "card0": return 0;
+            case "card1": return 1;
+            case "card2": return 2;
         }
         return -1;
     }
@@ -277,7 +283,7 @@ public class Server{
                 this.name = input.readLine().split( COM_SPLITTER )[ 1 ];
             }
             catch( NullPointerException | IOException | ArrayIndexOutOfBoundsException e ){
-                this.name = "player" + id;
+                return "";
             }
             return this.name;
         }

@@ -1,6 +1,5 @@
 package client;
 
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.media.Media;
@@ -20,7 +19,8 @@ public class Game{
     private static final int nicknameType = 0;
     private static final int gameType = 1;
     public static final String COM_SPLITTER = String.valueOf( ( char )28 );
-    private final String MSG_SPLITTER = String.valueOf( ( char )29 );
+    public final static String MSG_SPLITTER = String.valueOf( ( char )29 );
+    public final static String UNIQUE_CHAR = String.valueOf( ( char )2 );
     public Vector< String > players = new Vector<>();
     private String card;
     private GameWindow gameWindow;
@@ -37,9 +37,9 @@ public class Game{
         this.input = new BufferedReader( new InputStreamReader( socket.getInputStream() ) );
         this.output = new PrintWriter( socket.getOutputStream(), true );
 
-        Media media2 = new Media( new File( "src/audio/role.wav" ).toURI().toString() );
+        Media media2 = new Media( new File( "/audio/role.wav" ).toURI().toString() );
         roleSignal = new MediaPlayer( media2 );
-        Media media = new Media( new File( "src/audio/wakeUp.mp3" ).toURI().toString() );
+        Media media = new Media( new File( "/audio/wakeUp.mp3" ).toURI().toString() );
         wakeUpSignal = new MediaPlayer( media );
     }
 
@@ -63,7 +63,7 @@ public class Game{
                     proceedCard();
                 }
             }
-            if( readMsgOnly().equals( "VOTE" ) ){
+            if( readMsgOnly().equals( UNIQUE_CHAR + "VOTE" ) ){
                 gameWindow.setStatementLabel( "Vote" );
                 vote();
             }
@@ -75,14 +75,14 @@ public class Game{
         roleSignal.seek( Duration.ZERO );
         roleSignal.play();
         switch( card.split( "_" )[ 0 ] ){
-            case "Mystic wolf" -> makeMysticWolf();
-            case "Minion" -> makeMinion();
-            case "Copycat" -> makeCopycat();
-            case "Insomniac" -> makeInsomniac();
-            case "Werewolf" -> makeWerewolf();
-            case "Witch" -> makeWitch();
-            case "Beholder" -> makeBeholder();
-            case "Seer" -> makeSeer();
+            case "Mystic wolf": makeMysticWolf(); break;
+            case "Minion": makeMinion(); break;
+            case "Copycat": makeCopycat(); break;
+            case "Insomniac": makeInsomniac(); break;
+            case "Werewolf": makeWerewolf(); break;
+            case "Witch": makeWitch();
+            case "Beholder": makeBeholder(); break;
+            case "Seer": makeSeer(); break;
         }
     }
 
@@ -90,7 +90,7 @@ public class Game{
         gameWindow.setRoleInfo( "Choose one card from the middle. From this moment you will become the card you chose." );
         waitingForButton = true;
         gameWindow.setTableCardsActive( true );
-        while( waitingForButton ) Thread.onSpinWait();      // waits, until button pressed
+        while( waitingForButton );
         sendMsg( gameType, clickedCard );
         card = readMsgOnly();
         gameWindow.reverseCard( clickedCard, card.split( "_" )[ 0 ] );
@@ -145,12 +145,12 @@ public class Game{
     void vote(){
         gameWindow.setPlayersCardsActive( true );
         waitingForButton = true;
-        while( waitingForButton ) Thread.onSpinWait();
+        while( waitingForButton );
         gameWindow.setPlayersCardsActive( false );
         gameWindow.setPlayersCardsSelected( false );
         sendMsg( gameType, clickedCard );
         String voteResult = readMsgOnly();
-        if( voteResult.equals( "VOTE" ) ){      // vote again
+        if( voteResult.equals( UNIQUE_CHAR + "VOTE" ) ){      // vote again
             gameWindow.setStatementLabel( "Vote again, decision must be unequivocal" );
             vote();
         }
@@ -160,7 +160,10 @@ public class Game{
             for( int i = 0; i < players.size(); ++i ){
                 gameWindow.reverseCard( players.get( i ), cardsNow[ i ] );
             }
-            gameWindow.setStatementLabel( killedPlayer + " has been killed" );
+            if( killedPlayer.equals( nickname ) )
+                gameWindow.setStatementLabel( "You have been killed" );
+            else
+                gameWindow.setStatementLabel( killedPlayer + " has been killed" );
         }
     }
 
