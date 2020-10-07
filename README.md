@@ -95,8 +95,12 @@ Funkcja ustawia karty wszystkich graczy jako niewybrane kiedy *selected* jest *f
 **setTableCardsSelected( boolean selected )**<br>
 To co wyżej tylko z 3 kartami na środku stołu.
 
+**reverseCard( String clickedCard, String card )**
+Odwraca kartę gracza o nazwie *clickedCard* lub jedną z 3 środkowych kard jeśli *clickedCard* jest "card0", "card1" lub "card2". *card* to nazwa karty, jaka ukaże się po odwróceniu (nsomniac, warewolf itd.).
+
 Przykład:
-Aby gracz wybrał kartę spośród grczy należy najpierw ustawić zmienną *waitingForButton* na wartość true oraz ustawić karty graczy na active (*gameWindow.setPlayersCardsActive( true )*).
-Następnie w pętli czekamy, aż gracz naciśnie jakąś kartę ("while( waitingForButton );"). Możemy pobrać ze zmiennej *clickedCard* nazwę gracza, którego kartazostała wybrana, lub w przypadku 3 środkowych kard odpowiednio "card0", "card1" i "card2".
-Potem można pobrać kolejną klikniętą kartę powtarzając powyższe kroki (oprócz *gameWindow.setPlayersCardsActive( true )*), nic się nie stanie, ale nie ma to sensu.
-Na koniec należy pamiętać o sezaktywowaniu kart (*gameWindow.setPlayersCardsActive( false )*) oraz o odznaczeniu wszystkich kard (*gameWindow.setPlayersCardsSelected( false )*).
+* Aby gracz wybrał kartę spośród grczy należy najpierw ustawić zmienną *waitingForButton* na wartość true oraz ustawić karty graczy na active (*gameWindow.setPlayersCardsActive( true )*).<br>
+* Następnie w pętli czekamy, aż gracz naciśnie jakąś kartę ("while( waitingForButton );"). Możemy pobrać ze zmiennej *clickedCard* nazwę gracza, którego kartazostała wybrana, lub w przypadku 3 środkowych kard odpowiednio "card0", "card1" i "card2".<br>
+* Potem można pobrać kolejną klikniętą kartę powtarzając powyższe kroki (oprócz *gameWindow.setPlayersCardsActive( true )*), nic się nie stanie, ale nie ma to sensu.<br>
+* Na koniec należy pamiętać o sezaktywowaniu kart (*gameWindow.setPlayersCardsActive( false )*) oraz o odznaczeniu wszystkich kard (*gameWindow.setPlayersCardsSelected( false )*).<br>
+* Potem już tylko odwrócić kartę i wyświetlić odpowiednie napisy.<br>
