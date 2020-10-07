@@ -124,16 +124,19 @@ public class Game{
     }
 
     void makeMysticWolf() throws InterruptedException{
-        startRole( "Mystic wolf" );
+//        if(startRole( "MysticWolf" )<0) return;
+//        int idOfMysticWolf = ;
+//        String cardToSee = s.receiveGame( idOfMysticWolf ).split( MSG_SPLITTER )[ 0 ];
     }
     void makeWitch() throws InterruptedException{
-        startRole( "Witch" );
+        if(startRole( "Witch" )<0) return;
     }
     void makeBeholder() throws InterruptedException{
-        startRole( "Beholder" );
+        if(startRole( "Beholder" )<0) return;
     }
     void makeSeer() throws InterruptedException{
-        startRole( "Seer" );
+        if(startRole( "Seer" )<0) return;
+
     }
     void makeInsomniac() throws InterruptedException{
         if(startRole( "Insomniac" )<0) return;
