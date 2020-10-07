@@ -137,7 +137,7 @@ public class GameWindow{
             toggle.setSelected( selected );
     }
 
-    public void sePlayerCardActive( int playerIndex, boolean active ){
+    public void setPlayerCardActive( int playerIndex, boolean active ){
         playersCards.get( playerIndex ).setDisable( !active );
     }
 
@@ -152,13 +152,13 @@ public class GameWindow{
         card1.setDisable( !active );
         card2.setDisable( !active );
     }
-
-    @FXML void tableCardClicked(){
-        String selected = getToggleId( card0.getToggleGroup().getSelectedToggle() );
-        setTableCardsActive( false );
-        game.setClickedCard( selected );
-        game.setWaitingForButton( false );
-    }
+//
+//    @FXML void tableCardClicked(){
+//        String selected = getToggleId( card0.getToggleGroup().getSelectedToggle() );
+//        setTableCardsActive( false );
+//        game.setClickedCard( selected );
+//        game.setWaitingForButton( false );
+//    }
 
     private String getToggleId( Toggle toggle ){
         return toggle.toString().split( "=" )[ 1 ].split( "," )[ 0 ];

@@ -92,6 +92,8 @@ public class Game{
         waitingForButton = true;
         gameWindow.setTableCardsActive( true );
         while( waitingForButton );
+        gameWindow.setTableCardsActive( false );
+        gameWindow.setTableCardsSelected( false );
         sendMsg( gameType, clickedCard );
         card = readMsgOnly();
         gameWindow.reverseCard( clickedCard, card.split( "_" )[ 0 ] );
