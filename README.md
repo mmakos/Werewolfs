@@ -76,3 +76,22 @@ void makeCopycat(){
 }
 ```
 ITD.
+
+
+## Funkcje klienta:
+
+**setPlayerCardActive( int playerIdx, boolean active )**<br>
+Funkcja ustawia karty gracza o indeksie *playerIdx*, jako możliwe do wyboru (kiedy active=true) i jako niemożliwe do wyboru w przciwnym wypadku.<br><br>
+
+**setPlayersCardsActive( boolean active )**<br>
+Funkcja ustawia karty wszystkich graczy, jako możliwe do wyboru (kiedy active=true) i jako niemożliwe do wyboru w przciwnym wypadku.<br><br>
+
+**setTableCardsActive( boolean active )**<br>
+To co wyżej tylko z 3 kartami na środku stołu.
+
+**setPlayersCardsSelected( boolean selected )**<br>
+Funkcja ustawia karty wszystkich graczy jako niewybrane kiedy *selected* jest *false*. Używa się tego do tego, aby po wybraniu przez gracza kard można było je wybrać później, jeszcze raz, np. przy głosowaniu.<br><br>
+
+**setTableCardsSelected( boolean selected )**<br>
+To co wyżej tylko z 3 kartami na środku stołu.<br><br>
+
