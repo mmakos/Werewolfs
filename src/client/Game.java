@@ -26,6 +26,9 @@ public class Game{
     private GameWindow gameWindow;
     public String nickname;
 
+    private final MediaPlayer wakeUpSignal;
+    private final MediaPlayer roleSignal;
+
     public BufferedReader input;
     public PrintWriter output;
     private Thread gameLogic;
@@ -33,6 +36,11 @@ public class Game{
     Game( Socket socket ) throws IOException{
         this.input = new BufferedReader( new InputStreamReader( socket.getInputStream() ) );
         this.output = new PrintWriter( socket.getOutputStream(), true );
+
+        Media media2 = new Media( new File( "src/audio/role.wav" ).toURI().toString() );
+        roleSignal = new MediaPlayer( media2 );
+        Media media = new Media( new File( "src/audio/wakeUp.mp3" ).toURI().toString() );
+        wakeUpSignal = new MediaPlayer( media );
     }
 
     public void run() throws IOException{
@@ -62,6 +70,8 @@ public class Game{
     }
 
     private void proceedCard(){
+        roleSignal.seek( Duration.ZERO );
+        roleSignal.play();
         switch( card.split( "_" )[ 0 ] ){
             case "Mystic wolf" -> makeMysticWolf();
             case "Minion" -> makeMinion();
@@ -127,7 +137,7 @@ public class Game{
         gameWindow.setStatementLabel( "City wakes up!" );
         gameWindow.setRoleInfo( "Now you need to connect with other players via outer application, such as Zoom, to establish who is who. " +
                 "When you will be ready, admin will press 'start vote' button and you'll be able to make your vote on person, you wish to be dead." );
-        gameWindow.playWakeUp();
+        wakeUpSignal.play();
     }
 
     void vote(){
