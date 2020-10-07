@@ -121,12 +121,16 @@ public class Game{
         s.sendGame( minionsId, werewolvesMsg );
         Thread.sleep( 5000 );
         s.cardsInGame.remove( "Minion" );
+
     }
 
-    void makeMysticWolf() throws InterruptedException{
-//        if(startRole( "MysticWolf" )<0) return;
-//        int idOfMysticWolf = ;
-        /*String cardToSee = s.receiveGame( idOfMysticWolf ).split( MSG_SPLITTER )[ 0 ];*/
+    void makeMysticWolf() throws InterruptedException, IOException {
+        if(startRole( "MysticWolf" )<0) return;
+        int idOfMysticWolf = startRole("MysticWolf");
+        String cardToSee = s.receiveGame( idOfMysticWolf ).split( MSG_SPLITTER )[ 0 ];
+        int cardToSeeId = s.getTableCardId(cardToSee);
+        s.sendGame( idOfMysticWolf, s.cardsInCenter[cardToSeeId] );
+        s.writeLog(s.cardsInCenter[cardToSeeId]);
     }
     void makeWitch() throws InterruptedException{
         if(startRole( "Witch" )<0) return;
@@ -143,6 +147,7 @@ public class Game{
         String insomniacNow;
         insomniacNow = s.cardsNow.get(s.cardsOnBegin.indexOf("Insomniac"));
         s.writeLog( "This card is " + insomniacNow );
+        s.sendGame(startRole("Insomniac"), insomniacNow );
         Thread.sleep( 5000 );
         s.cardsInGame.remove( "Insomniac" );
     }
