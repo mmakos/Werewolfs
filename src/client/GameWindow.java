@@ -4,10 +4,7 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Label;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -21,10 +18,13 @@ public class GameWindow{
 
     public void setGame( Game game ){ this.game = game; }
 
-    @FXML public void initialize(){
+    @FXML public void initialize(){ }
+
+    @FXML public void quit(){
+        quitButton.getScene().getWindow().hide();
     }
 
-    public void setCardButton( String str ){
+    public void setCardLabel( String str ){
        Platform.runLater( () -> cardLabel.setText( cardLabel.getText() + str ) );
     }
 
@@ -178,6 +178,7 @@ public class GameWindow{
     @FXML public Label statementLabel;
     @FXML private Label nicknameLabel;
     @FXML private Label roleInfo;
+    @FXML public Button quitButton;
     private static final int sceneWidth = 1280, sceneHeight = 820;
     private static final int cardWidth = 100, cardHeight = 72;
 

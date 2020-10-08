@@ -167,9 +167,9 @@ public class Server{
         LinkedList< String > temp = new LinkedList<>( cardsInGame );
 
         //todo to remove when not testing with one player
-        cardsOnBegin.add( "Copycat" );
+        cardsOnBegin.add( "Thing" );
         cardsNow.add( cardsOnBegin.get( 0 ) );
-        temp.remove( "Copycat" );
+        temp.remove( "Thing" );
 
         for( int i = 0; i < 3; ++i ){
             int randInt = rand.nextInt( temp.size() );
@@ -250,6 +250,10 @@ public class Server{
                 return player;
         }
         return null;
+    }
+
+    String getPlayersCard( String name ){
+        return cardsNow.get( players.indexOf( getPlayer( name ) ) );
     }
 
     @FXML private TextArea logField;

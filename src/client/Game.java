@@ -1,6 +1,5 @@
 package client;
 
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.media.Media;
@@ -65,9 +64,11 @@ public class Game{
                 }
                 gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " wakes up" );
                 if( msg.equals( card.split( "_" )[ 0 ].toUpperCase() ) ){
-                    gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " wakes  - YOUR TURN" );
+                    gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " wakes up - YOUR TURN" );
                     proceedCard();
                 }
+                if( msg.equals( "THING" ) )
+                    waitForTingsTouch();
             }
             if( readMsgOnly().equals( UNIQUE_CHAR + "VOTE" ) ){
                 gameWindow.setStatementLabel( "Vote" );
@@ -93,6 +94,8 @@ public class Game{
             case "Witch": makeWitch();
             case "Beholder": makeBeholder(); break;
             case "Seer": makeSeer(); break;
+            case "Thing": makeThing(); break;
+            case "Paranormal investigator": makeParanormal(); break;
         }
     }
 
@@ -118,11 +121,9 @@ public class Game{
         gameWindow.setTableCardsSelected( false );
         sendMsg( gameType, clickedCard );
         card = readMsgOnly();
+        gameWindow.setStatementLabel( "You became " + card );
         gameWindow.reverseCard( clickedCard, card.split( "_" )[ 0 ] );
-        gameWindow.setCardButton( " -> " + card.split( "_" )[ 0 ] );
-        try{
-            Thread.sleep( 2000 );
-        }catch( InterruptedException ignored ){}
+        gameWindow.setCardLabel( " -> " + card.split( "_" )[ 0 ] );
     }
 
     //TODO
@@ -192,6 +193,56 @@ public class Game{
         gameWindow.updateMyCard(nickname, "Dupa");
     }
 
+    void makeParanormal(){
+        waitingForButton = true;
+        for( int i = 0; i < 2; ++i ){
+            gameWindow.setPlayersCardsActive( true );
+            long start = System.currentTimeMillis();
+            while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
+            if( waitingForButton ){
+                clickedCard = players.get( ( players.indexOf( nickname ) + 1 ) % players.size() );
+                gameWindow.setRoleInfo( "Time's up. Card will be randomly selected." );
+                waitingForButton = false;
+            }
+            gameWindow.setPlayersCardsActive( false );
+            String msg = readMsgOnly();
+            if( !msg.equals( "AGAIN" ) ){
+                gameWindow.setCardLabel( " -> " + msg );
+                gameWindow.setStatementLabel( "You became " + msg );
+                //gameWindow.updateMyCard( card );
+                break;
+            }
+        }
+        gameWindow.setPlayersCardsSelected( false );
+    }
+
+    void makeThing(){
+        int myIndex = players.indexOf( nickname );
+        waitingForButton = true;
+        gameWindow.setPlayerCardActive( ( myIndex + 1 ) % players.size(), true );
+        if( myIndex == 0 )
+            gameWindow.setPlayerCardActive( players.size() - 1, true );
+        else
+            gameWindow.setPlayerCardActive( myIndex - 1, true );
+        long start = System.currentTimeMillis();
+        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
+        if( waitingForButton ){
+            clickedCard = players.get( ( myIndex + 1 ) % players.size() );
+            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected." );
+            waitingForButton = false;
+        }
+        gameWindow.setPlayersCardsActive( false );
+        gameWindow.setPlayersCardsSelected( false );
+        sendMsg( gameType, clickedCard );
+    }
+
+    void waitForTingsTouch(){
+        if( readMsgOnly().equals( "TOUCH" ) ){
+            gameWindow.setCardLabel( " -> you've been touched" );
+            gameWindow.setStatementLabel( "Thing touches you" );
+        }
+    }
+
     void wakeUp(){
         gameWindow.setStatementLabel( "City wakes up!" );
         gameWindow.setRoleInfo( "Now you need to connect with other players via outer application, such as Zoom, to establish who is who. " +
@@ -199,7 +250,7 @@ public class Game{
         try{
             wakeUpSignal.play();
         }
-        catch( NullPointerException ignored ){};
+        catch( NullPointerException ignored ){}
     }
 
     void vote(){
@@ -220,15 +271,28 @@ public class Game{
             vote();
         }
         else{
-            String killedPlayer = readMsgOnly();
-            String[] cardsNow = readMsgOnly().split( MSG_SPLITTER );
+            Vector< String > cardsNow = new Vector<>( Arrays.asList( readMsgOnly().split( MSG_SPLITTER ) ) );
             for( int i = 0; i < players.size(); ++i ){
-                gameWindow.reverseCard( players.get( i ), cardsNow[ i ] );
+                gameWindow.reverseCard( players.get( i ), cardsNow.get( i ) );
             }
-            if( killedPlayer.equals( nickname ) )
-                gameWindow.setStatementLabel( "You have been killed" );
+            if( voteResult.equals( nickname ) )
+                gameWindow.setStatementLabel( "You have been killed - " + whoWins( voteResult, cardsNow ) + "." );
             else
-                gameWindow.setStatementLabel( killedPlayer + " has been killed" );
+                gameWindow.setStatementLabel( voteResult + " has been killed - " + whoWins( voteResult, cardsNow ) + "." );
+            gameWindow.quitButton.setDisable( false );
+        }
+    }
+
+    private String whoWins( String player, Vector< String > cardsNow ){
+        if( cardsNow.get( players.indexOf( player ) ).equals( "Tanner" ) )
+            return "tanner wins";
+        if( cardsNow.get( players.indexOf( player ) ).split( "_" )[ 0 ].equals( "Werewolf" ) )
+            return "city wins";
+        else{
+            if( cardsNow.get( players.indexOf( player ) ).equals( "Minion" ) )
+                return "werewolves win";
+            else
+                return "werewolves and minion win";
         }
     }
 
@@ -240,7 +304,7 @@ public class Game{
         stage.initStyle( StageStyle.TRANSPARENT);
         stage.show();
         gameWindow = fxmlLoader.getController();
-        gameWindow.setCardButton( card.split( "_" )[ 0 ] );
+        gameWindow.setCardLabel( card.split( "_" )[ 0 ] );
         gameWindow.setGame( this );
         gameWindow.createPlayersCards();
         gameWindow.setNicknameLabel( nickname );
