@@ -43,6 +43,7 @@ public class Game{
                 case "Beholder": makeBeholder(); break;
                 case "Seer": makeSeer(); break;
                 case "Minion": makeMinion( werewolvesMsg ); break;
+                case "Tanner": makeTanner(); break;
             }
         }
         if( insomniac )
@@ -150,6 +151,10 @@ public class Game{
         s.sendGame(startRole("Insomniac"), insomniacNow );
         Thread.sleep( 5000 );
         s.cardsInGame.remove( "Insomniac" );
+    }
+
+    void makeTanner(){
+        s.cardsInGame.remove( "Tanner" );
     }
 
     //function does same begin of every role and returns id of player with this role, if role was not on the middle

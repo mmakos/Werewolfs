@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.media.Media;
+import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -12,6 +13,7 @@ import javafx.util.Duration;
 import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.Vector;
 
 public class Game{
@@ -22,13 +24,14 @@ public class Game{
     public static final String COM_SPLITTER = String.valueOf( ( char )28 );
     public final static String MSG_SPLITTER = String.valueOf( ( char )29 );
     public final static String UNIQUE_CHAR = String.valueOf( ( char )2 );
+    public final static int MAX_ROLE_TIME = 30;
     public Vector< String > players = new Vector<>();
     private String card;
     private GameWindow gameWindow;
     public String nickname;
 
-    private final MediaPlayer wakeUpSignal;
-    private final MediaPlayer roleSignal;
+    private MediaPlayer wakeUpSignal = null;
+    private MediaPlayer roleSignal = null;
 
     public BufferedReader input;
     public PrintWriter output;
@@ -37,11 +40,13 @@ public class Game{
     Game( Socket socket ) throws IOException{
         this.input = new BufferedReader( new InputStreamReader( socket.getInputStream() ) );
         this.output = new PrintWriter( socket.getOutputStream(), true );
-
-        Media media2 = new Media( new File( "audio/role.wav" ).toURI().toString() );
-        roleSignal = new MediaPlayer( media2 );
-        Media media = new Media( new File( "audio/wakeUp.mp3" ).toURI().toString() );
-        wakeUpSignal = new MediaPlayer( media );
+        try{
+            Media media2 = new Media( new File( "audio/role.wav" ).toURI().toString() );
+            Media media = new Media( new File( "audio/wakeUp.mp3" ).toURI().toString() );
+            roleSignal = new MediaPlayer( media2 );
+            wakeUpSignal = new MediaPlayer( media );
+        }
+        catch( MediaException ex ){}
     }
 
     public void run() throws IOException{
@@ -73,8 +78,12 @@ public class Game{
     }
 
     private void proceedCard(){
-        roleSignal.seek( Duration.ZERO );
-        roleSignal.play();
+        try{
+            roleSignal.seek( Duration.ZERO );
+            roleSignal.play();
+        }
+        catch( NullPointerException ignored ){};
+
         switch( card.split( "_" )[ 0 ] ){
             case "Mystic wolf": makeMysticWolf(); break;
             case "Minion": makeMinion(); break;
@@ -91,14 +100,29 @@ public class Game{
         gameWindow.setRoleInfo( "Choose one card from the middle. From this moment you will become the card you chose." );
         waitingForButton = true;
         gameWindow.setTableCardsActive( true );
-        while( waitingForButton );
+
+        // Waiting for clicked card, but with time limit of 30 seconds
+        long start = System.currentTimeMillis();
+        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
+        // If time is up, card will be selected randomly
+        if( waitingForButton ){
+            int rand = new Random().nextInt( 3 );
+            clickedCard = "card" + rand;
+            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected.\n" +
+                    "On the top left corner you can see which card you were, and which card you are now." );
+            waitingForButton = false;
+        }
+        else
+            gameWindow.setRoleInfo( "On the top left corner you can see which card you were, and which card you are now." );
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
         sendMsg( gameType, clickedCard );
         card = readMsgOnly();
         gameWindow.reverseCard( clickedCard, card.split( "_" )[ 0 ] );
         gameWindow.setCardButton( " -> " + card.split( "_" )[ 0 ] );
-        gameWindow.setRoleInfo( "On the top left corner you can see which card you were, and which card you are now." );
+        try{
+            Thread.sleep( 2000 );
+        }catch( InterruptedException ignored ){}
     }
 
     //TODO
@@ -142,7 +166,10 @@ public class Game{
         gameWindow.setStatementLabel( "City wakes up!" );
         gameWindow.setRoleInfo( "Now you need to connect with other players via outer application, such as Zoom, to establish who is who. " +
                 "When you will be ready, admin will press 'start vote' button and you'll be able to make your vote on person, you wish to be dead." );
-        wakeUpSignal.play();
+        try{
+            wakeUpSignal.play();
+        }
+        catch( NullPointerException ignored ){};
     }
 
     void vote(){

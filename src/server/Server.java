@@ -15,10 +15,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Random;
-import java.util.Vector;
+import java.util.*;
 
 public class Server{
     public Vector< Player > players = new Vector<>();
@@ -33,7 +30,7 @@ public class Server{
     private final String COM_SPLITTER = String.valueOf( ( char )28 );
     private final String UNIQUE_CHAR = String.valueOf( ( char )2 );
     private Vector< Thread > playerReaders = new Vector<>();
-    private int[] votes;
+    private Vector< Integer > votes = new Vector<>();
 
     @FXML public void initialize(){
         cardsInCenter = new String[ 3 ];
@@ -112,8 +109,9 @@ public class Server{
         endVotingButton.setVisible( true );
         endVotingButton.setDisable( false );
         sendGame( 0, UNIQUE_CHAR + "VOTE" );
-        votes = new int[ players.size() ];
-        Arrays.fill( votes, 0 );
+        votes.setSize( players.size() );
+        for( int i = 0; i < votes.size(); ++i )
+            votes.set( i, 0 );
         for( Player player: players ){
             playerReaders.add( new Thread( () -> {
                 String vote;
@@ -121,7 +119,7 @@ public class Server{
                     vote = receiveGame( player.id );
                     int votedPlayerIdx = players.indexOf( getPlayer( vote ) );
                     if( votedPlayerIdx != -1 ){
-                        ++votes[ votedPlayerIdx ];
+                        votes.set( votedPlayerIdx, votes.get( votedPlayerIdx ) + 1 );
                     }
                 }catch( IOException ignored ){}
             } ) );
@@ -138,14 +136,13 @@ public class Server{
     }
 
     private void countVotes(){
-        int max = Arrays.stream( votes ).max().getAsInt();
-        int maxIdx = Arrays.asList( votes ).indexOf( max );
+        int max = Collections.max( votes );
+        int maxIdx = votes.indexOf( max );
         boolean temp = true;
-        if( maxIdx != -1 ){      //no one voted
-            votes[ maxIdx ] = -1;
+        if( maxIdx == -1 )      //no one voted
             temp = false;
-        }
-        if( !temp || Arrays.stream( votes ).max().getAsInt() == max )       // same votes quantity
+        votes.set( maxIdx, -1 );
+        if( !temp || Collections.max( votes ) == max )       // same votes quantity
             orderVoting();                                          // vote again
         else{
             sendGame( 0, players.get( maxIdx ).name );
@@ -169,16 +166,16 @@ public class Server{
         LinkedList< String > temp = new LinkedList<>( cardsInGame );
 
         //todo to remove when not testing with one player
-//        cardsOnBegin.add( "Copycat" );
-//        cardsNow.add( cardsOnBegin.get( 0 ) );
-//        temp.remove( "Copycat" );
+        cardsOnBegin.add( "Copycat" );
+        cardsNow.add( cardsOnBegin.get( 0 ) );
+        temp.remove( "Copycat" );
 
         for( int i = 0; i < 3; ++i ){
             int randInt = rand.nextInt( temp.size() );
             cardsInCenter[ i ] = temp.get( randInt );
             temp.remove( randInt );
         }
-        for( int i = 0; i < players.size(); ++i ){      //todo to i=0 when not testing with one player
+        for( int i = 1; i < players.size(); ++i ){      //todo to i=0 when not testing with one player
             int randInt = rand.nextInt( temp.size() );
             cardsOnBegin.add( temp.get( randInt ) );
             cardsNow.add( cardsOnBegin.get( i ) );
