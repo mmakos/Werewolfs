@@ -57,8 +57,9 @@ public class GameWindow{
         toggle.setOpacity( 1.0 );
     }
     public void updateMyCard( String card ){
+        ToggleButton toggle = playersCards.get( game.players.indexOf( game.nickname ) );
+        game.displayedCard = card;
         Platform.runLater( () -> {
-            ToggleButton toggle = playersCards.get( game.players.indexOf( game.nickname ) );
             toggle.setStyle( "-fx-graphic: url(\"/img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" );
         } );
     }

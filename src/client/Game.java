@@ -26,6 +26,7 @@ public class Game{
     public final static int MAX_ROLE_TIME = 30;
     public Vector< String > players = new Vector<>();
     private String card;
+    public String displayedCard;        // When you are copycat or paranormal then its value is different than card line above
     private GameWindow gameWindow;
     public String nickname;
 
@@ -63,9 +64,9 @@ public class Game{
                     break;
                 }
                 gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " wakes up" );
-                if( msg.equals( card.split( "_" )[ 0 ].toUpperCase() ) ){
+                if( msg.equals( card.split( "_" )[ 0 ].toUpperCase() ) || ( msg.equals( "WEREWOLF" ) && card.equals( "Mystic wolf" ) ) ){
                     gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " wakes up - YOUR TURN" );
-                    proceedCard();
+                    proceedCard( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() );
                 }
                 if( msg.equals( "THING" ) )
                     waitForTingsTouch();
@@ -78,7 +79,7 @@ public class Game{
         gameLogic.start();
     }
 
-    private void proceedCard(){
+    private void proceedCard( String card ){
         try{
             roleSignal.seek( Duration.ZERO );
             roleSignal.play();
@@ -192,8 +193,8 @@ public class Game{
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
         sendMsg( gameType, clickedCard );
-        card = readMsgOnly();
-        gameWindow.reverseCard( clickedCard, card );
+        String chosenCard = readMsgOnly();
+        gameWindow.reverseCard( clickedCard, chosenCard );
     }
     void makeWitch(){}
     void makeBeholder(){}
@@ -247,7 +248,7 @@ public class Game{
         String msg2 = msg.split( "_" )[ 0 ];
         gameWindow.setCardLabel( " -> " + msg2 );
         gameWindow.setStatementLabel( "You became " + msg2 );
-        //gameWindow.reverseCard( clickedCard, gameWindow.getMyCardText() ); //TODO
+        gameWindow.reverseCard( clickedCard, displayedCard );
         gameWindow.updateMyCard( msg );
     }
 

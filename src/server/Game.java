@@ -29,6 +29,7 @@ public class Game{
                 break;
             }
         }
+        if( s.cardsInGame.contains( "Mystic wolf" ) ) isWerewolf = true;
         String werewolvesMsg = "";
         if( isWerewolf )
             werewolvesMsg = makeWerewolves();
@@ -114,7 +115,7 @@ public class Game{
             }
             int indexOfMystic = s.cardsOnBegin.indexOf( "Mystic wolf" );
             if( indexOfMystic != -1 ){
-                str.append( s.players.get( indexOfMystic ) ).append( MSG_SPLITTER );
+                str.append( s.players.get( indexOfMystic ).name ).append( MSG_SPLITTER );
                 werewolves.add( s.players.get( indexOfMystic ).id );
                 s.writeLog( "Mystic wolf is player " + s.players.get( indexOfMystic ).id );
             }
