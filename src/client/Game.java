@@ -121,6 +121,7 @@ public class Game{
         gameWindow.setTableCardsSelected( false );
         sendMsg( gameType, clickedCard );
         card = readMsgOnly();
+        gameWindow.setStatementLabel( "You became " + card );
         gameWindow.reverseCard( clickedCard, card.split( "_" )[ 0 ] );
         gameWindow.setCardLabel( " -> " + card.split( "_" )[ 0 ] );
     }
@@ -164,20 +165,25 @@ public class Game{
 
     void makeParanormal(){
         waitingForButton = true;
-        gameWindow.setPlayersCardsActive( true );
-        long start = System.currentTimeMillis();
-        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
-        if( waitingForButton ){
-            clickedCard = players.get( ( players.indexOf( nickname ) + 1 ) % players.size() );
-            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected." );
-            waitingForButton = false;
+        for( int i = 0; i < 2; ++i ){
+            gameWindow.setPlayersCardsActive( true );
+            long start = System.currentTimeMillis();
+            while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
+            if( waitingForButton ){
+                clickedCard = players.get( ( players.indexOf( nickname ) + 1 ) % players.size() );
+                gameWindow.setRoleInfo( "Time's up. Card will be randomly selected." );
+                waitingForButton = false;
+            }
+            gameWindow.setPlayersCardsActive( false );
+            String msg = readMsgOnly();
+            if( !msg.equals( "AGAIN" ) ){
+                gameWindow.setCardLabel( " -> " + msg );
+                gameWindow.setStatementLabel( "You became " + msg );
+                //gameWindow.updateMyCard( card );
+                break;
+            }
         }
-        String msg = readMsgOnly();
-        if( !msg.equals( "AGAIN" ) ){
-            gameWindow.setCardLabel( " -> " + msg );
-            gameWindow.setStatementLabel( "You became " + card );
-
-        }
+        gameWindow.setPlayersCardsSelected( false );
     }
 
     void makeThing(){
