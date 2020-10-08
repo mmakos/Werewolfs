@@ -45,6 +45,7 @@ public class Game{
                 case "Minion": makeMinion( werewolvesMsg ); break;
                 case "Tanner": makeTanner(); break;
                 case "Thing": makeThing(); break;
+                case "Paranormal investigator": makeParanormal(); break;
             }
         }
         if( insomniac )
@@ -59,14 +60,14 @@ public class Game{
         if( idOfCopycat < 0 ) return;
 
         //receive his moves, which is generally numbers splitted with (char)29 sign, here is one number, but for example Seer will send two numbers
-        String chosenCard = s.receiveGame( idOfCopycat ).split( MSG_SPLITTER )[ 0 ];     // first received number
+        String chosenCard = s.receiveGame( idOfCopycat );     // first received number
         s.writeLog( "Player chose card " + chosenCard );
         //send name of card, which player has become
         int chosenCardId = s.getTableCardId( chosenCard );
         s.sendGame( idOfCopycat, s.cardsInCenter[ chosenCardId ] );
         s.writeLog( "This card is " + s.cardsInCenter[ chosenCardId ] );
         //Change his card information on server
-        s.cardsNow.set( s.cardsOnBegin.indexOf( "Copycat" ), s.cardsInCenter[ chosenCardId ] );
+        //s.cardsNow.set( s.cardsOnBegin.indexOf( "Copycat" ), s.cardsInCenter[ chosenCardId ] );   - to chyba nie
         s.cardsOnBegin.set( s.cardsOnBegin.indexOf( "Copycat" ), s.cardsInCenter[ chosenCardId ] );
 
         //Remove this card from list of cards (we don't want to make copycat move again)
@@ -162,7 +163,7 @@ public class Game{
     void makeThing() throws InterruptedException, IOException{
         int thingId = startRole( "Thing" );
         if( thingId < 0 ) return;
-        String chosenCard = s.receiveGame( thingId ).split( MSG_SPLITTER )[ 0 ];
+        String chosenCard = s.receiveGame( thingId );
         for( Server.Player player: s.players ){
             if( player.name.equals( chosenCard ) )
                 s.sendGame( player.id, "TOUCH" );
@@ -171,6 +172,28 @@ public class Game{
         }
         Thread.sleep( 3000 );
         s.cardsInGame.remove( "Thing" );
+    }
+
+    void makeParanormal() throws InterruptedException, IOException{
+        int paranormalId = startRole( "Paranormal investigator" );
+        if( paranormalId < 0 ) return;
+        for( int i = 0; i < 2; ++i ){
+            String chosenCard = s.receiveGame( paranormalId );
+            String card = s.getPlayersCard( chosenCard );
+            if( card.split( "_" )[ 0 ].equals( "Tanner" ) || card.split( "_" )[ 0 ].equals( "Werewolf" ) ){
+                int chosenPlayerIdx = s.players.indexOf( s.getPlayer( chosenCard ) );
+                int paranormalIdx = s.players.indexOf( s.getPlayer( paranormalId ) );
+                String paranormalsCard = s.cardsNow.get( paranormalIdx );
+                s.cardsNow.set( paranormalIdx, card );
+                s.cardsNow.set( chosenPlayerIdx, paranormalsCard );
+                s.sendGame( paranormalId, card );
+                break;
+            }
+            else
+                s.sendGame( paranormalId, "AGAIN" );
+        }
+        Thread.sleep( 3000 );
+        s.cardsInGame.remove( "Paranormal investigator" );
     }
 
     //function does same begin of every role and returns id of player with this role, if role was not on the middle

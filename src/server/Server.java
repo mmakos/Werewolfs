@@ -252,6 +252,10 @@ public class Server{
         return null;
     }
 
+    String getPlayersCard( String name ){
+        return cardsNow.get( players.indexOf( getPlayer( name ) ) );
+    }
+
     @FXML private TextArea logField;
     @FXML private Button runServer;
     @FXML private Button startGame;

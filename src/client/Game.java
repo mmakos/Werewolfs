@@ -95,6 +95,7 @@ public class Game{
             case "Beholder": makeBeholder(); break;
             case "Seer": makeSeer(); break;
             case "Thing": makeThing(); break;
+            case "Paranormal investigator": makeParanormal(); break;
         }
     }
 
@@ -160,6 +161,24 @@ public class Game{
     void makeBeholder(){}
     void makeSeer(){}
     void makeInsomniac(){}
+
+    void makeParanormal(){
+        waitingForButton = true;
+        gameWindow.setPlayersCardsActive( true );
+        long start = System.currentTimeMillis();
+        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
+        if( waitingForButton ){
+            clickedCard = players.get( ( players.indexOf( nickname ) + 1 ) % players.size() );
+            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected." );
+            waitingForButton = false;
+        }
+        String msg = readMsgOnly();
+        if( !msg.equals( "AGAIN" ) ){
+            gameWindow.setCardLabel( " -> " + msg );
+            gameWindow.setStatementLabel( "You became " + card );
+
+        }
+    }
 
     void makeThing(){
         int myIndex = players.indexOf( nickname );
