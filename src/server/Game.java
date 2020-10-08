@@ -48,6 +48,7 @@ public class Game{
                 case "Tanner": makeTanner(); break;
                 case "Thing": makeThing(); break;
                 case "Paranormal investigator": makeParanormal(); break;
+                case "Robber": makeRobber(); break;
             }
         }
         if( insomniac )

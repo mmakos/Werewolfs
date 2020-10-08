@@ -96,6 +96,7 @@ public class Game{
             case "Seer": makeSeer(); break;
             case "Thing": makeThing(); break;
             case "Paranormal investigator": makeParanormal(); break;
+            case "Robber": makeRobber(); break;
         }
     }
 
@@ -199,7 +200,7 @@ public class Game{
         String insomniacNow = readMsgOnly();
         //String idOfInsomniac = readMsgOnly();       //TODO po co to?
         gameWindow.setCardLabel( " -> " + insomniacNow );
-        gameWindow.updateMyCard( "Dupa" );
+        gameWindow.updateMyCard( insomniacNow );
     }
 
     void makeParanormal(){
@@ -209,7 +210,7 @@ public class Game{
             long start = System.currentTimeMillis();
             while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
             if( waitingForButton ){
-                clickedCard = players.get( ( players.indexOf( nickname ) + i ) % players.size() );
+                clickedCard = getRandomPlayerCard();
                 gameWindow.setRoleInfo( "Time's up. Card will be randomly selected." );
                 waitingForButton = false;
             }
@@ -225,6 +226,27 @@ public class Game{
             }
         }
         gameWindow.setPlayersCardsSelected( false );
+    }
+
+    void makeRobber(){
+        waitingForButton = true;
+        gameWindow.setPlayersCardsActive( true );
+        long start = System.currentTimeMillis();
+        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
+        if( waitingForButton ){
+            clickedCard = getRandomPlayerCard();
+            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected." );
+            waitingForButton = false;
+        }
+        gameWindow.setPlayersCardsActive( false );
+        gameWindow.setPlayersCardsSelected( false );
+        sendMsg( gameType, clickedCard );
+        String msg = readMsgOnly();
+        msg = msg.split( "_" )[ 0 ];
+        gameWindow.setCardLabel( " -> " + msg );
+        gameWindow.setStatementLabel( "You became " + msg );
+        gameWindow.reverseCard( clickedCard, gameWindow.getMyCardText() );
+        gameWindow.updateMyCard( msg );
     }
 
     void makeThing(){
@@ -326,6 +348,12 @@ public class Game{
     private void getPlayers(){
         String[] playersTab = readMsgOnly().split( MSG_SPLITTER, 0 );
         players.addAll( Arrays.asList( playersTab ) );
+    }
+
+    private String getRandomPlayerCard(){
+        int rand = new Random().nextInt( players.size() - 1 );
+        if( rand == players.indexOf( nickname ) ) rand = players.size() - 1;
+        return players.get( rand );
     }
 
     private void getCard(){
