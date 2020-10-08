@@ -32,6 +32,8 @@ public class Game{
         String werewolvesMsg = "";
         if( isWerewolf )
             werewolvesMsg = makeWerewolves();
+        if( s.cardsInGame.contains( "Minion" ) )
+            makeMinion( werewolvesMsg );
         if( s.cardsInGame.contains( "Mystic wolf" ) )
             makeMysticWolf();
 
@@ -43,7 +45,6 @@ public class Game{
                 case "Witch": makeWitch(); break;
                 case "Beholder": makeBeholder(); break;
                 case "Seer": makeSeer(); break;
-                case "Minion": makeMinion( werewolvesMsg ); break;
                 case "Tanner": makeTanner(); break;
                 case "Thing": makeThing(); break;
                 case "Paranormal investigator": makeParanormal(); break;
@@ -82,7 +83,7 @@ public class Game{
         Thread.sleep( 2000 );
     }
 
-    String makeWerewolves() throws InterruptedException{
+    String makeWerewolves() throws InterruptedException, IOException{
         s.sendGame( 0, "WEREWOLF" );
         s.writeLog( "Werewolf" + "'s move" );
         StringBuilder str = new StringBuilder();
@@ -118,7 +119,13 @@ public class Game{
             }
             for( Integer werewolf: werewolves )
                 s.sendGame( werewolf, str.toString() );
-            Thread.sleep( 5000 );       //Not necessary, time for werewolves to meet together
+            // Lone werewolf
+            if( werewolves.size() == 1 ){
+                String cardToSee = s.receiveGame( werewolves.get( 0 ) ).split( MSG_SPLITTER )[ 0 ];
+                int cardToSeeId = s.getTableCardId(cardToSee);
+                s.sendGame( werewolves.get( 0 ), s.cardsInCenter[ cardToSeeId ] );
+            }
+            Thread.sleep( 3000 );       //Not necessary, time for werewolves to meet together
         }
         for( int i = 0; i < Card.werewolvesQuant; ++i )
             s.cardsInGame.remove( "Werewolf_" + i );

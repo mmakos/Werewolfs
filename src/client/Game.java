@@ -136,8 +136,22 @@ public class Game{
                 str.append( " " ).append( werewolf );
             }
         }
-        if( str.toString().isEmpty() )
-            gameWindow.setRoleInfo( "You are the only werewolf." );
+        if( str.toString().isEmpty() ){
+            gameWindow.setRoleInfo( "You are the only werewolf. Select one card from the middle you wish to see." );
+            long start1 = System.currentTimeMillis();
+            while( waitingForButton && System.currentTimeMillis() - start1 < MAX_ROLE_TIME * 1000 );
+            if( waitingForButton ){
+                int rand = new Random().nextInt( 3 );
+                clickedCard = "card" + rand;
+                gameWindow.setRoleInfo( "Time's up. Card will be randomly selected.\n" );
+                waitingForButton = false;
+            }
+            gameWindow.setTableCardsActive( false );
+            gameWindow.setTableCardsSelected( false );
+            sendMsg( gameType, clickedCard );
+            card = readMsgOnly();
+            gameWindow.reverseCard( clickedCard, card.split( "_" )[ 0 ] );
+        }
         else
             gameWindow.setRoleInfo( "Other werewolves are" + str.toString() + "." );
     }
@@ -169,12 +183,9 @@ public class Game{
         if( waitingForButton ){
             int rand = new Random().nextInt( 3 );
             clickedCard = "card" + rand;
-            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected.\n" +
-                    "On the top left corner you can see which card you saw" );
+            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected.\n" );
             waitingForButton = false;
         }
-        else
-            gameWindow.setRoleInfo( "On the top left corner you can see which card you saw" );
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
         sendMsg( gameType, clickedCard );
