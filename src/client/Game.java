@@ -121,7 +121,7 @@ public class Game{
         gameWindow.setTableCardsSelected( false );
         sendMsg( gameType, clickedCard );
         card = readMsgOnly();
-        gameWindow.setStatementLabel( "You became " + card );
+        gameWindow.setStatementLabel( "You became " + card.split( "_" )[ 0 ] );
         gameWindow.reverseCard( clickedCard, card.split( "_" )[ 0 ] );
         gameWindow.setCardLabel( " -> " + card.split( "_" )[ 0 ] );
     }
@@ -180,17 +180,15 @@ public class Game{
         sendMsg( gameType, clickedCard );
         card = readMsgOnly();
         gameWindow.reverseCard( clickedCard, card.split( "_" )[ 0 ] );
-        gameWindow.setCardButton( " -> " + card.split( "_" )[ 0 ] );
-
     }
     void makeWitch(){}
     void makeBeholder(){}
     void makeSeer(){}
     void makeInsomniac(){
         String insomniacNow = readMsgOnly();
-        String idOfInsomniac = readMsgOnly();
-        gameWindow.setRoleInfo(insomniacNow);
-        gameWindow.updateMyCard(nickname, "Dupa");
+        //String idOfInsomniac = readMsgOnly();       //TODO po co to?
+        gameWindow.setCardLabel( " -> " + insomniacNow );
+        gameWindow.updateMyCard( "Dupa" );
     }
 
     void makeParanormal(){
@@ -208,10 +206,10 @@ public class Game{
             sendMsg( gameType, clickedCard );
             String msg = readMsgOnly();
             if( !msg.equals( "AGAIN" ) ){
+                msg = msg.split( "_" )[ 0 ];
                 gameWindow.setCardLabel( " -> " + msg );
                 gameWindow.setStatementLabel( "You became " + msg );
-                gameWindow.reverseCard( clickedCard, card );
-                //gameWindow.updateMyCard( card );
+                gameWindow.reverseCard( clickedCard, msg );
                 break;
             }
         }
@@ -310,6 +308,7 @@ public class Game{
         gameWindow.setGame( this );
         gameWindow.createPlayersCards();
         gameWindow.setNicknameLabel( nickname );
+        gameWindow.updateMyCard( card );
         gameLogic();
     }
 

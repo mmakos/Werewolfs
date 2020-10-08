@@ -97,7 +97,7 @@ public class CardChooser{
 
     private int players = 0;
     private int selectedToggles = 0;
-    private static final int gridpaneWidth = 5;
+    private static final int gridpaneWidth = 6;
     private Vector< ToggleButton > toggles = new Vector<>();
     @FXML private GridPane gridpane;
     @FXML private Button dealButton;

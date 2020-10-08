@@ -5,7 +5,8 @@ import java.util.*;
 
 public class Game{
     private final Server s;
-    private int idOfCopycat;        // Needed to show on the end whowas copycat
+    private int idOfCopycat;        // Needed to show on the end who was copycat
+    private int paranormalId;       // --- || ---
     public final static String MSG_SPLITTER = String.valueOf( ( char )29 );
 
     Game( Server server ){
@@ -52,6 +53,12 @@ public class Game{
             makeInsomniac();
         s.sendGame( 0, "WakeUp" );
         s.voteButton.setDisable( false );
+        try{
+            s.cardsInGame.set( s.players.indexOf( s.getPlayer( idOfCopycat ) ), "Copycat" );
+        }catch( IndexOutOfBoundsException ignored ){}
+        try{
+            s.cardsInGame.set( s.players.indexOf( s.getPlayer( paranormalId ) ), "Paranormal investigator" );
+        }catch( IndexOutOfBoundsException ignored ){}
     }
 
     //new function copycat
@@ -129,12 +136,14 @@ public class Game{
     }
 
     void makeMysticWolf() throws InterruptedException, IOException {
-        int idOfMysticWolf = startRole("MysticWolf");
+        int idOfMysticWolf = startRole("Mystic wolf");
         if(idOfMysticWolf<0) return;
         String cardToSee = s.receiveGame( idOfMysticWolf ).split( MSG_SPLITTER )[ 0 ];
         int cardToSeeId = s.getTableCardId(cardToSee);
         s.sendGame( idOfMysticWolf, s.cardsInCenter[cardToSeeId] );
         s.writeLog(s.cardsInCenter[cardToSeeId]);
+        Thread.sleep( 3000 );
+        s.cardsInGame.remove( "Mystic wolf" );
     }
     void makeWitch() throws InterruptedException{
         if(startRole( "Witch" )<0) return;
@@ -152,8 +161,8 @@ public class Game{
         String insomniacNow = s.cardsNow.get(s.cardsOnBegin.indexOf("Insomniac"));
         s.writeLog( "This card is " + insomniacNow );
         s.sendGame(idOfInsomniac, insomniacNow );
-        String idOfInsomniacString = Integer.toString(idOfInsomniac);
-        s.sendGame(idOfInsomniac, idOfInsomniacString );
+//        String idOfInsomniacString = Integer.toString(idOfInsomniac);         // TODO po co to jest?
+//        s.sendGame(idOfInsomniac, idOfInsomniacString );
         Thread.sleep( 5000 );
         s.cardsInGame.remove( "Insomniac" );
     }
@@ -180,17 +189,14 @@ public class Game{
     }
 
     void makeParanormal() throws InterruptedException, IOException{
-        int paranormalId = startRole( "Paranormal investigator" );
+        paranormalId = startRole( "Paranormal investigator" );
         if( paranormalId < 0 ) return;
         for( int i = 0; i < 2; ++i ){
             String chosenCard = s.receiveGame( paranormalId );
             String card = s.getPlayersCard( chosenCard );
-            if( card.split( "_" )[ 0 ].equals( "Tanner" ) || card.split( "_" )[ 0 ].equals( "Werewolf" ) ){
-                int chosenPlayerIdx = s.players.indexOf( s.getPlayer( chosenCard ) );
+            if( card.split( "_" )[ 0 ].equals( "Tanner" ) || card.split( "_" )[ 0 ].equals( "Werewolf" ) || card.split( "_" )[ 0 ].equals( "Mystic wolf" ) ){
                 int paranormalIdx = s.players.indexOf( s.getPlayer( paranormalId ) );
-                String paranormalsCard = s.cardsNow.get( paranormalIdx );
-                s.cardsNow.set( paranormalIdx, card );
-                s.cardsNow.set( chosenPlayerIdx, paranormalsCard );
+                s.cardsOnBegin.set( paranormalIdx, card );
                 s.sendGame( paranormalId, card );
                 break;
             }
@@ -199,6 +205,21 @@ public class Game{
         }
         Thread.sleep( 3000 );
         s.cardsInGame.remove( "Paranormal investigator" );
+    }
+
+    void makeRobber() throws IOException, InterruptedException{
+        int robberId = startRole( "Robber" );
+        if( robberId < 0 ) return;
+        String chosenCard = s.receiveGame( robberId );
+        String card = s.getPlayersCard( chosenCard );
+        int chosenPlayerIdx = s.players.indexOf( s.getPlayer( chosenCard ) );
+        int paranormalIdx = s.players.indexOf( s.getPlayer( robberId ) );
+        String paranormalsCard = s.cardsNow.get( paranormalIdx );
+        s.cardsNow.set( paranormalIdx, card );
+        s.cardsNow.set( chosenPlayerIdx, paranormalsCard );
+        s.sendGame( robberId, card );
+        Thread.sleep( 3000 );
+        s.cardsInGame.remove( "Robber" );
     }
 
     //function does same begin of every role and returns id of player with this role, if role was not on the middle

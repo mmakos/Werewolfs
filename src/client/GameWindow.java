@@ -59,11 +59,16 @@ public class GameWindow{
         }
         toggle.setOpacity( 1.0 );
     }
-    public void updateMyCard(String nickname, String text){
-        ToggleButton toggle = playersCards.get( game.players.indexOf( nickname ) );
-        toggle.setText(text);
+    public void updateMyCard( String text ){
+        Platform.runLater( () -> {
+            ToggleButton toggle = playersCards.get( game.players.indexOf( game.nickname ) );
+            toggle.setText( text + "\n\n\n\n" + "You" );
+        } );
     }
 
+    public String getMyCardText(){
+        return playersCards.get( game.players.indexOf( game.nickname ) ).getText().split( "\n" )[ 0 ];
+    }
 
     public void createPlayersCards(){
         int a = 500, b = 280, p = game.players.size(), t = 360 / p;
