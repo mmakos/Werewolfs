@@ -126,8 +126,8 @@ public class Game{
     }
 
     void makeMysticWolf() throws InterruptedException, IOException {
-        if(startRole( "MysticWolf" )<0) return;
         int idOfMysticWolf = startRole("MysticWolf");
+        if(idOfMysticWolf<0) return;
         String cardToSee = s.receiveGame( idOfMysticWolf ).split( MSG_SPLITTER )[ 0 ];
         int cardToSeeId = s.getTableCardId(cardToSee);
         s.sendGame( idOfMysticWolf, s.cardsInCenter[cardToSeeId] );
@@ -144,11 +144,13 @@ public class Game{
 
     }
     void makeInsomniac() throws InterruptedException{
-        if(startRole( "Insomniac" )<0) return;
-        String insomniacNow;
-        insomniacNow = s.cardsNow.get(s.cardsOnBegin.indexOf("Insomniac"));
+        int idOfInsomniac = startRole( "Insomniac" );
+        if(idOfInsomniac<0) return;
+        String insomniacNow = s.cardsNow.get(s.cardsOnBegin.indexOf("Insomniac"));
         s.writeLog( "This card is " + insomniacNow );
-        s.sendGame(startRole("Insomniac"), insomniacNow );
+        s.sendGame(idOfInsomniac, insomniacNow );
+        String idOfInsomniacString = Integer.toString(idOfInsomniac);
+        s.sendGame(idOfInsomniac, idOfInsomniacString );
         Thread.sleep( 5000 );
         s.cardsInGame.remove( "Insomniac" );
     }

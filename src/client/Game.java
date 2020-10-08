@@ -156,11 +156,41 @@ public class Game{
             gameWindow.setRoleInfo( "Werewolves are" + str.toString() + "." );
     }
 
-    void makeMysticWolf(){}
+    void makeMysticWolf(){
+        gameWindow.setRoleInfo( "Choose one card to reverse" );
+        waitingForButton = true;
+        gameWindow.setTableCardsActive( true );
+
+        // Waiting for clicked card, but with time limit of 30 seconds
+        long start1 = System.currentTimeMillis();
+        while( waitingForButton && System.currentTimeMillis() - start1 < MAX_ROLE_TIME * 1000 );
+        // If time is up, card will be selected randomly
+        if( waitingForButton ){
+            int rand = new Random().nextInt( 3 );
+            clickedCard = "card" + rand;
+            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected.\n" +
+                    "On the top left corner you can see which card you saw" );
+            waitingForButton = false;
+        }
+        else
+            gameWindow.setRoleInfo( "On the top left corner you can see which card you saw" );
+        gameWindow.setTableCardsActive( false );
+        gameWindow.setTableCardsSelected( false );
+        sendMsg( gameType, clickedCard );
+        card = readMsgOnly();
+        gameWindow.reverseCard( clickedCard, card.split( "_" )[ 0 ] );
+        gameWindow.setCardButton( " -> " + card.split( "_" )[ 0 ] );
+
+    }
     void makeWitch(){}
     void makeBeholder(){}
     void makeSeer(){}
-    void makeInsomniac(){}
+    void makeInsomniac(){
+        String insomniacNow = readMsgOnly();
+        String idOfInsomniac = readMsgOnly();
+        gameWindow.setRoleInfo(insomniacNow);
+        gameWindow.updateMyCard(nickname, "Dupa");
+    }
 
     void wakeUp(){
         gameWindow.setStatementLabel( "City wakes up!" );

@@ -59,6 +59,11 @@ public class GameWindow{
         }
         toggle.setOpacity( 1.0 );
     }
+    public void updateMyCard(String nickname, String text){
+        ToggleButton toggle = playersCards.get( game.players.indexOf( nickname ) );
+        toggle.setText(text);
+    }
+
 
     public void createPlayersCards(){
         int a = 500, b = 280, p = game.players.size(), t = 360 / p;
