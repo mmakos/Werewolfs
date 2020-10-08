@@ -164,21 +164,23 @@ public class Game{
     void makeInsomniac(){}
 
     void makeParanormal(){
-        waitingForButton = true;
         for( int i = 0; i < 2; ++i ){
+            waitingForButton = true;
             gameWindow.setPlayersCardsActive( true );
             long start = System.currentTimeMillis();
             while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
             if( waitingForButton ){
-                clickedCard = players.get( ( players.indexOf( nickname ) + 1 ) % players.size() );
+                clickedCard = players.get( ( players.indexOf( nickname ) + i ) % players.size() );
                 gameWindow.setRoleInfo( "Time's up. Card will be randomly selected." );
                 waitingForButton = false;
             }
             gameWindow.setPlayersCardsActive( false );
+            sendMsg( gameType, clickedCard );
             String msg = readMsgOnly();
             if( !msg.equals( "AGAIN" ) ){
                 gameWindow.setCardLabel( " -> " + msg );
                 gameWindow.setStatementLabel( "You became " + msg );
+                gameWindow.reverseCard( clickedCard, card );
                 //gameWindow.updateMyCard( card );
                 break;
             }

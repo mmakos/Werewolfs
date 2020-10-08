@@ -167,9 +167,9 @@ public class Server{
         LinkedList< String > temp = new LinkedList<>( cardsInGame );
 
         //todo to remove when not testing with one player
-        cardsOnBegin.add( "Thing" );
+        cardsOnBegin.add( "Paranormal investigator" );
         cardsNow.add( cardsOnBegin.get( 0 ) );
-        temp.remove( "Thing" );
+        temp.remove( "Paranormal investigator" );
 
         for( int i = 0; i < 3; ++i ){
             int randInt = rand.nextInt( temp.size() );

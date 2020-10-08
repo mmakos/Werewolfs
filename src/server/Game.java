@@ -162,7 +162,10 @@ public class Game{
 
     void makeThing() throws InterruptedException, IOException{
         int thingId = startRole( "Thing" );
-        if( thingId < 0 ) return;
+        if( thingId < 0 ){
+            s.sendGame( 0, "NOTHING" );
+            return;
+        }
         String chosenCard = s.receiveGame( thingId );
         for( Server.Player player: s.players ){
             if( player.name.equals( chosenCard ) )
