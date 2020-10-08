@@ -44,6 +44,7 @@ public class Game{
                 case "Seer": makeSeer(); break;
                 case "Minion": makeMinion( werewolvesMsg ); break;
                 case "Tanner": makeTanner(); break;
+                case "Thing": makeThing(); break;
             }
         }
         if( insomniac )
@@ -70,6 +71,7 @@ public class Game{
 
         //Remove this card from list of cards (we don't want to make copycat move again)
         s.cardsInGame.remove( "Copycat" );
+        Thread.sleep( 2000 );
     }
 
     String makeWerewolves() throws InterruptedException{
@@ -155,6 +157,19 @@ public class Game{
 
     void makeTanner(){
         s.cardsInGame.remove( "Tanner" );
+    }
+
+    void makeThing() throws InterruptedException, IOException{
+        int thingId = startRole( "Thing" );
+        if( thingId < 0 ) return;
+        String chosenCard = s.receiveGame( thingId ).split( MSG_SPLITTER )[ 0 ];
+        for( Server.Player player: s.players ){
+            if( player.name.equals( chosenCard ) )
+                s.sendGame( player.id, "TOUCH" );
+            else
+                s.sendGame( player.id, "NOTHING" );
+        }
+        Thread.sleep( 5000 );
     }
 
     //function does same begin of every role and returns id of player with this role, if role was not on the middle
