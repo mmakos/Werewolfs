@@ -123,7 +123,7 @@ public class Game{
         sendMsg( gameType, clickedCard );
         card = readMsgOnly();
         gameWindow.setStatementLabel( "You became " + card.split( "_" )[ 0 ] );
-        gameWindow.reverseCard( clickedCard, card.split( "_" )[ 0 ] );
+        gameWindow.reverseCard( clickedCard, card );
         gameWindow.setCardLabel( " -> " + card.split( "_" )[ 0 ] );
     }
 
@@ -133,12 +133,14 @@ public class Game{
         String[] werewolves = readMsgOnly().split( MSG_SPLITTER );
         for( String werewolf: werewolves ){
             if( !werewolf.equals( nickname ) ){
-                gameWindow.reverseCard( werewolf, "Werewolf" );
+                gameWindow.reverseCard( werewolf, "Werewolf_0" );
                 str.append( " " ).append( werewolf );
             }
         }
         if( str.toString().isEmpty() ){
             gameWindow.setRoleInfo( "You are the only werewolf. Select one card from the middle you wish to see." );
+            waitingForButton = true;
+            gameWindow.setTableCardsActive( true );
             long start1 = System.currentTimeMillis();
             while( waitingForButton && System.currentTimeMillis() - start1 < MAX_ROLE_TIME * 1000 );
             if( waitingForButton ){
@@ -151,7 +153,7 @@ public class Game{
             gameWindow.setTableCardsSelected( false );
             sendMsg( gameType, clickedCard );
             card = readMsgOnly();
-            gameWindow.reverseCard( clickedCard, card.split( "_" )[ 0 ] );
+            gameWindow.reverseCard( clickedCard, card );
         }
         else
             gameWindow.setRoleInfo( "Other werewolves are" + str.toString() + "." );
@@ -162,7 +164,7 @@ public class Game{
         String[] werewolves = readMsgOnly().split( MSG_SPLITTER, 0 );
         if( !werewolves[ 0 ].equals( "" ) ){
             for( String werewolf : werewolves ){
-                gameWindow.reverseCard( werewolf, "Werewolf" );
+                gameWindow.reverseCard( werewolf, "Werewolf_0" );
                 str.append( " " ).append( werewolf );
             }
         }
@@ -191,7 +193,7 @@ public class Game{
         gameWindow.setTableCardsSelected( false );
         sendMsg( gameType, clickedCard );
         card = readMsgOnly();
-        gameWindow.reverseCard( clickedCard, card.split( "_" )[ 0 ] );
+        gameWindow.reverseCard( clickedCard, card );
     }
     void makeWitch(){}
     void makeBeholder(){}
@@ -242,10 +244,10 @@ public class Game{
         gameWindow.setPlayersCardsSelected( false );
         sendMsg( gameType, clickedCard );
         String msg = readMsgOnly();
-        msg = msg.split( "_" )[ 0 ];
-        gameWindow.setCardLabel( " -> " + msg );
-        gameWindow.setStatementLabel( "You became " + msg );
-        gameWindow.reverseCard( clickedCard, gameWindow.getMyCardText() );
+        String msg2 = msg.split( "_" )[ 0 ];
+        gameWindow.setCardLabel( " -> " + msg2 );
+        gameWindow.setStatementLabel( "You became " + msg2 );
+        //gameWindow.reverseCard( clickedCard, gameWindow.getMyCardText() ); //TODO
         gameWindow.updateMyCard( msg );
     }
 

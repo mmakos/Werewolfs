@@ -24,12 +24,13 @@ public class CardChooser{
 
     public void createToggles(){
         for( int i = 0; i < Card.card.length; ++i ){
-            ToggleButton toggle = new ToggleButton( "\n\n\n\n" + Card.card[ i ].split( "_" )[ 0 ] );
+            ToggleButton toggle = new ToggleButton();
             toggle.setId( Card.card[ i ] );
             toggle.setMinSize( 72, 100 );
             toggle.setMaxSize( 72, 100 );
-            final Image unselected = new Image( "/img/backCardSmallDark.png" );
-            final Image selected = new Image( "/img/backCardSmall.png" );
+            toggle.setWrapText( true );
+            final Image unselected = new Image( "/img/smallCards/frontCardBig" + Card.card[ i ].split( " " )[ 0 ] + "Dark.png" );
+            final Image selected = new Image( "/img/smallCards/frontCardBig" + Card.card[ i ].split( " " )[ 0 ] + ".png" );
             final ImageView toggleImage = new ImageView();
             toggleImage.setFitWidth( 72 );      // scaling
             toggleImage.setPreserveRatio( true );

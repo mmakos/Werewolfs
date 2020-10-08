@@ -46,23 +46,20 @@ public class GameWindow{
         }
         if( !game.players.contains( player ) ){
             Platform.runLater( () -> {
-                toggle.setText( card );
-                toggle.setTextFill( Color.WHITE );
-                toggle.setStyle( "-fx-background-image: url(\"/img/backCardSmall.png\")" );
+                toggle.setStyle( "-fx-background-image: url(\"/img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" );
             } );
         }
         else{
             Platform.runLater( () -> {
-                toggle.setText( card + "\n\n\n\n" + player );
-                toggle.setStyle( "-fx-graphic: url(\"/img/backCardSmall.png\")" );
+                toggle.setStyle( "-fx-graphic: url(\"/img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" );
             } );
         }
         toggle.setOpacity( 1.0 );
     }
-    public void updateMyCard( String text ){
+    public void updateMyCard( String card ){
         Platform.runLater( () -> {
             ToggleButton toggle = playersCards.get( game.players.indexOf( game.nickname ) );
-            toggle.setText( text + "\n\n\n\n" + "You" );
+            toggle.setStyle( "-fx-graphic: url(\"/img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" );
         } );
     }
 
@@ -77,11 +74,11 @@ public class GameWindow{
         int ourPos = game.players.indexOf( game.nickname );        //start drawing cadrs from ours
         ToggleButton toggle = getPlayerCard( "You" );
         toggle.setId( Game.UNIQUE_CHAR + "You" );
+        toggle.setText( "You\n\n\n\n\n." );
         double ti = Math.toRadians( -90 );
         toggle.setLayoutX( a * Math.cos( ti ) + ( sceneWidth / 2.0 ) - ( cardWidth / 2.0 ) + 20 );
         toggle.setLayoutY( -1 * ( b * Math.sin( ti ) ) + ( sceneHeight / 2.0 ) - ( cardHeight / 2.0 ) + 40 );
         toggle.setOpacity( 1.0 );
-        toggle.setStyle( "-fx-graphic: url(\"/img/backCardSmall.png\")" );
         playersCards.set( ourPos, toggle );
         gamePane.getChildren().add( toggle );
 
@@ -106,7 +103,7 @@ public class GameWindow{
     }
 
     private ToggleButton getPlayerCard( String nickname ){
-        ToggleButton toggle = new ToggleButton( "\n\n\n\n" + nickname );
+        ToggleButton toggle = new ToggleButton(  nickname + "\n\n\n\n\n." );
         toggle.setId( nickname );
         toggle.setMinSize( 72, 100 );
         toggle.setMaxSize( 72, 100 );
