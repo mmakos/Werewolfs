@@ -169,7 +169,8 @@ public class Game{
             else
                 s.sendGame( player.id, "NOTHING" );
         }
-        Thread.sleep( 5000 );
+        Thread.sleep( 3000 );
+        s.cardsInGame.remove( "Thing" );
     }
 
     //function does same begin of every role and returns id of player with this role, if role was not on the middle
