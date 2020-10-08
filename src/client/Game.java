@@ -46,7 +46,7 @@ public class Game{
             roleSignal = new MediaPlayer( media2 );
             wakeUpSignal = new MediaPlayer( media );
         }
-        catch( MediaException ex ){}
+        catch( MediaException ignored ){}
     }
 
     public void run() throws IOException{
@@ -175,6 +175,11 @@ public class Game{
     void vote(){
         gameWindow.setPlayersCardsActive( true );
         waitingForButton = true;
+        Thread voteEnd = new Thread( () -> {
+            if( readMsgOnly().equals( UNIQUE_CHAR + "VOTEEND" ) )
+                waitingForButton = false;
+        } );
+        voteEnd.start();
         while( waitingForButton );
         gameWindow.setPlayersCardsActive( false );
         gameWindow.setPlayersCardsSelected( false );

@@ -132,6 +132,7 @@ public class Server{
             t.interrupt();
         }
         playerReaders.removeAllElements();
+        sendGame( 0, UNIQUE_CHAR + "VOTEEND" );
         countVotes();
     }
 
