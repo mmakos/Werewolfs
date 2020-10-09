@@ -79,7 +79,7 @@ public class CardChooser{
                 server.sendCardsToPlayers();
                 Platform.runLater( () -> dealButton.getScene().getWindow().hide() );
                 server.startGame();
-            }catch( IOException | InterruptedException e ){
+            }catch( InterruptedException e ){
                 e.printStackTrace();
             }
         });

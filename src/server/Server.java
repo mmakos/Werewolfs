@@ -199,7 +199,7 @@ public class Server{
         sendGame( 0, playersList.toString() );
     }
 
-    void startGame() throws IOException, InterruptedException{
+    void startGame() throws InterruptedException{
         Game game = new Game( this );
         game.start();
     }
@@ -218,19 +218,23 @@ public class Server{
         else
             sendMsg( id, gameMsg + COM_SPLITTER + msg );     //send msg of type gameMsg
     }
+
     String receiveGame( int id ) throws IOException{
         AtomicReference< String > msg = null;
         AtomicBoolean read = new AtomicBoolean( false );
         new Thread( () -> {
             try{
+                assert false;
                 msg.set( receiveMsg( id ) );
                 read.set( true );
             }catch( IOException ignored ){}
         } ).start();
         long start = System.currentTimeMillis();
         while( System.currentTimeMillis() - start < MAX_READ_TIME * 1000 );
-        if( read.get() )
+        if( read.get() ){
+            assert false;
             return msg.get().split( COM_SPLITTER )[ 1 ];
+        }
         else
             throw new IOException( "Time's up, cannot read a message." );
     }

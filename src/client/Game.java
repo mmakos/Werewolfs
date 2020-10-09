@@ -35,7 +35,6 @@ public class Game{
 
     public BufferedReader input;
     public PrintWriter output;
-    private Thread gameLogic;
 
     Game( Socket socket ) throws IOException{
         this.input = new BufferedReader( new InputStreamReader( socket.getInputStream() ) );
@@ -56,7 +55,7 @@ public class Game{
     }
 
     public void gameLogic(){
-        gameLogic = new Thread( () -> {
+        Thread gameLogic = new Thread( () -> {
             while( true ){
                 String msg = readMsgOnly();
                 if( msg.equals( "WakeUp" ) ){
@@ -75,7 +74,7 @@ public class Game{
                 gameWindow.setStatementLabel( "Vote" );
                 vote();
             }
-        });
+        } );
         gameLogic.start();
     }
 
@@ -84,7 +83,7 @@ public class Game{
             roleSignal.seek( Duration.ZERO );
             roleSignal.play();
         }
-        catch( NullPointerException ignored ){};
+        catch( NullPointerException ignored ){}
 
         switch( card.split( "_" )[ 0 ] ){
             case "Mystic wolf": makeMysticWolf(); break;
