@@ -152,8 +152,8 @@ public class Game{
             gameWindow.setTableCardsActive( false );
             gameWindow.setTableCardsSelected( false );
             sendMsg( gameType, clickedCard );
-            card = readMsgOnly();
-            gameWindow.reverseCard( clickedCard, card );
+            String chosenCard = readMsgOnly();
+            gameWindow.reverseCard( clickedCard, chosenCard );
         }
         else
             gameWindow.setRoleInfo( "Other werewolves are" + str.toString() + "." );

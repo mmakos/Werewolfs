@@ -8,8 +8,10 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
 import java.util.Vector;
 
@@ -18,7 +20,23 @@ public class GameWindow{
 
     public void setGame( Game game ){ this.game = game; }
 
-    @FXML public void initialize(){ }
+    @FXML public void initialize(){ setOnDrag(); }
+
+    private void setOnDrag(){
+        gamePane.setOnMousePressed( mouseEvent -> {
+            x = mouseEvent.getSceneX();
+            y = mouseEvent.getSceneY();
+        } );
+
+        gamePane.setOnMouseDragged( mouseEvent -> {
+            Stage stage = ( Stage ) gamePane.getScene().getWindow();
+            stage.setX( mouseEvent.getScreenX() - x );
+            stage.setY( mouseEvent.getScreenY() - y );
+            stage.setOpacity( 0.9 );
+        } );
+
+        gamePane.setOnMouseReleased( mouseEvent -> gamePane.getScene().getWindow().setOpacity( 1.0 ) );
+    }
 
     @FXML public void quit(){
         quitButton.getScene().getWindow().hide();
@@ -184,6 +202,7 @@ public class GameWindow{
     @FXML public Button quitButton;
     private static final int sceneWidth = 1280, sceneHeight = 820;
     private static final int cardWidth = 100, cardHeight = 72;
+    private double x = 0, y = 0;
 
     public void setNicknameLabel( String nickname ){
         this.nicknameLabel.setText( nickname );
