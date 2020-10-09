@@ -5,8 +5,6 @@ import java.util.*;
 
 public class Game{
     private final Server s;
-    private int idOfCopycat;        // Needed to show on the end who was copycat
-    private int paranormalId;       // --- || ---
     public final static String MSG_SPLITTER = String.valueOf( ( char )29 );
 
     Game( Server server ){
@@ -68,7 +66,7 @@ public class Game{
                     case "Paranormal investigator": makeParanormal(); break;
                     case "Robber": makeRobber(); break;
                 }
-            } catch( IOException e ){
+            }catch( IOException e ){
                 s.writeLog( "No response from " + card + "." );
             }
         }
@@ -76,29 +74,23 @@ public class Game{
             makeInsomniac();
         s.sendGame( 0, "WakeUp" );
         s.voteButton.setDisable( false );
-        try{
-            s.cardsInGame.set( s.players.indexOf( s.getPlayer( idOfCopycat ) ), "Copycat" );
-        }catch( IndexOutOfBoundsException ignored ){}
-        try{
-            s.cardsInGame.set( s.players.indexOf( s.getPlayer( paranormalId ) ), "Paranormal investigator" );
-        }catch( IndexOutOfBoundsException ignored ){}
     }
 
     //new function copycat
     void makeCopycat() throws IOException, InterruptedException{
-        idOfCopycat = startRole( "Copycat" );
+        int idOfCopycat = startRole( "Copycat" );
         if( idOfCopycat < 0 ) return;
 
         //receive his moves, which is generally numbers splitted with (char)29 sign, here is one number, but for example Seer will send two numbers
         String chosenCard = s.receiveGame( idOfCopycat );     // first received number
         s.writeLog( "Player chose card " + chosenCard );
         //send name of card, which player has become
-        int chosenCardId = s.getTableCardId( chosenCard );
-        s.sendGame( idOfCopycat, s.cardsInCenter[ chosenCardId ] );
-        s.writeLog( "This card is " + s.cardsInCenter[ chosenCardId ] );
+        String cardName = s.cardsInCenter[ s.getTableCardId( chosenCard ) ];
+        s.realCopycat = cardName;
+        s.sendGame( idOfCopycat, cardName );
+        s.writeLog( "This card is " + cardName );
         //Change his card information on server
-        //s.cardsNow.set( s.cardsOnBegin.indexOf( "Copycat" ), s.cardsInCenter[ chosenCardId ] );   - to chyba nie
-        s.cardsOnBegin.set( s.cardsOnBegin.indexOf( "Copycat" ), s.cardsInCenter[ chosenCardId ] );
+        s.cardsOnBegin.set( s.cardsOnBegin.indexOf( "Copycat" ), cardName );
 
         //Remove this card from list of cards (we don't want to make copycat move again)
         s.cardsInGame.remove( "Copycat" );
@@ -218,14 +210,13 @@ public class Game{
     }
 
     void makeParanormal() throws InterruptedException, IOException{
-        paranormalId = startRole( "Paranormal investigator" );
+        int paranormalId = startRole( "Paranormal investigator" );
         if( paranormalId < 0 ) return;
         for( int i = 0; i < 2; ++i ){
             String chosenCard = s.receiveGame( paranormalId );
             String card = s.getPlayersCard( chosenCard );
             if( card.split( "_" )[ 0 ].equals( "Tanner" ) || card.split( "_" )[ 0 ].equals( "Werewolf" ) || card.split( "_" )[ 0 ].equals( "Mystic wolf" ) ){
-                int paranormalIdx = s.players.indexOf( s.getPlayer( paranormalId ) );
-                s.cardsOnBegin.set( paranormalIdx, card );
+                s.realParanormal = card;
                 s.sendGame( paranormalId, card );
                 break;
             }
@@ -268,5 +259,4 @@ public class Game{
             return idOfCard;
         }
     }
-
 }

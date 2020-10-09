@@ -24,6 +24,8 @@ public class Server{
     public Vector< String > cardsOnBegin = new Vector<>();
     public Vector< String > cardsNow = new Vector<>();
     public LinkedList< String > cardsInGame;
+    public String realCopycat;        // Needed to show on the end who was copycat
+    public String realParanormal;       // --- || ---
     private static final int gameMsg = 1;
     private static final int MAX_PLAYERS = Card.card.length;
     private static final int MIN_PLAYERS = 1;
@@ -159,6 +161,15 @@ public class Server{
         for( String cardNow: cardsNow )
             str.append( cardNow ).append( Game.MSG_SPLITTER );
         sendGame( 0, str.toString() );
+
+        StringBuilder str2 = new StringBuilder();
+        if( cardsNow.contains( "Paranormal activity" ) )
+            cardsNow.set( cardsNow.indexOf( "Paranormal activity" ), realParanormal );
+        if( cardsNow.contains( "Copycat" ) )
+            cardsNow.set( cardsNow.indexOf( "Copycat" ), realCopycat );
+        for( String cardNow: cardsNow )
+            str2.append( cardNow ).append( Game.MSG_SPLITTER );
+        sendGame( 0, str2.toString() );
     }
 
     public void setSelectedCards( LinkedList< String > selectedCards ){
@@ -170,9 +181,9 @@ public class Server{
         LinkedList< String > temp = new LinkedList<>( cardsInGame );
 
         //todo to remove when not testing with one player
-        cardsOnBegin.add( "Mystic wolf" );
+        cardsOnBegin.add( "Copycat" );
         cardsNow.add( cardsOnBegin.get( 0 ) );
-        temp.remove( "Mystic wolf" );
+        temp.remove( "Copycat" );
 
         for( int i = 0; i < 3; ++i ){
             int randInt = rand.nextInt( temp.size() );

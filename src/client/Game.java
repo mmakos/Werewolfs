@@ -307,13 +307,14 @@ public class Game{
         }
         else{
             Vector< String > cardsNow = new Vector<>( Arrays.asList( readMsgOnly().split( MSG_SPLITTER ) ) );
+            Vector< String > realCardsNow = new Vector<>( Arrays.asList( readMsgOnly().split( MSG_SPLITTER ) ) );
             for( int i = 0; i < players.size(); ++i ){
                 gameWindow.reverseCard( players.get( i ), cardsNow.get( i ) );
             }
             if( voteResult.equals( nickname ) )
-                gameWindow.setStatementLabel( "You have been killed - " + whoWins( voteResult, cardsNow ) + "." );
+                gameWindow.setStatementLabel( "You have been killed - " + whoWins( voteResult, realCardsNow ) + "." );
             else
-                gameWindow.setStatementLabel( voteResult + " has been killed - " + whoWins( voteResult, cardsNow ) + "." );
+                gameWindow.setStatementLabel( voteResult + " has been killed - " + whoWins( voteResult, realCardsNow ) + "." );
             gameWindow.quitButton.setDisable( false );
         }
     }
