@@ -13,15 +13,20 @@ public class Game{
         this.s = server;
     }
 
-    void start() throws IOException, InterruptedException{
+    void start() throws InterruptedException{
         s.writeLog( "Game started\n" );
         boolean insomniac = false;
         if( s.cardsInGame.contains( "Insomniac" ) ){
             insomniac = true;
             s.cardsInGame.remove( "Insomniac" );
         }
-        if( s.cardsInGame.contains( "Copycat" ) )
-            makeCopycat();
+        if( s.cardsInGame.contains( "Copycat" ) ){
+            try{
+                makeCopycat();
+            }catch( IOException e ){
+                s.writeLog( "No response from copycat." );
+            }
+        }
         boolean isWerewolf = false;
         for( int i = 0; i < Card.werewolvesQuant; ++i ){
             if( s.cardsInGame.contains( "Werewolf_" + i ) ){
@@ -31,25 +36,40 @@ public class Game{
         }
         if( s.cardsInGame.contains( "Mystic wolf" ) ) isWerewolf = true;
         String werewolvesMsg = "";
-        if( isWerewolf )
-            werewolvesMsg = makeWerewolves();
+        if( isWerewolf ){
+            try{
+                werewolvesMsg = makeWerewolves();
+            }catch( IOException e ){
+                s.writeLog( "No response from werewolves." );
+            }
+        }
         if( s.cardsInGame.contains( "Minion" ) )
             makeMinion( werewolvesMsg );
-        if( s.cardsInGame.contains( "Mystic wolf" ) )
-            makeMysticWolf();
+        if( s.cardsInGame.contains( "Mystic wolf" ) ){
+            try{
+                makeMysticWolf();
+            }catch( IOException e ){
+                s.writeLog( "No response from mystic wolf." );
+            }
+        }
 
         Random rand = new Random();
 
         // TODO main loop, here we have to put all the cards, and call theirs functions
         while( s.cardsInGame.size() > 0 ){
-            switch( s.cardsInGame.get( rand.nextInt( s.cardsInGame.size() ) ) ){
-                case "Witch": makeWitch(); break;
-                case "Beholder": makeBeholder(); break;
-                case "Seer": makeSeer(); break;
-                case "Tanner": makeTanner(); break;
-                case "Thing": makeThing(); break;
-                case "Paranormal investigator": makeParanormal(); break;
-                case "Robber": makeRobber(); break;
+            String card = s.cardsInGame.get( rand.nextInt( s.cardsInGame.size() ) );
+            try{
+                switch( card ){
+                    case "Witch": makeWitch(); break;
+                    case "Beholder": makeBeholder(); break;
+                    case "Seer": makeSeer(); break;
+                    case "Tanner": makeTanner(); break;
+                    case "Thing": makeThing(); break;
+                    case "Paranormal investigator": makeParanormal(); break;
+                    case "Robber": makeRobber(); break;
+                }
+            } catch( IOException e ){
+                s.writeLog( "No response from " + card + "." );
             }
         }
         if( insomniac )

@@ -16,6 +16,8 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Server{
     public Vector< Player > players = new Vector<>();
@@ -25,6 +27,7 @@ public class Server{
     private static final int gameMsg = 1;
     private static final int MAX_PLAYERS = Card.card.length;
     private static final int MIN_PLAYERS = 1;
+    private static final int MAX_READ_TIME = 45;
     private volatile boolean connecting = false;
     public String[] cardsInCenter;
     private final String COM_SPLITTER = String.valueOf( ( char )28 );
@@ -216,7 +219,20 @@ public class Server{
             sendMsg( id, gameMsg + COM_SPLITTER + msg );     //send msg of type gameMsg
     }
     String receiveGame( int id ) throws IOException{
-        return receiveMsg( id ).split( COM_SPLITTER )[ 1 ];
+        AtomicReference< String > msg = null;
+        AtomicBoolean read = new AtomicBoolean( false );
+        new Thread( () -> {
+            try{
+                msg.set( receiveMsg( id ) );
+                read.set( true );
+            }catch( IOException ignored ){}
+        } ).start();
+        long start = System.currentTimeMillis();
+        while( System.currentTimeMillis() - start < MAX_READ_TIME * 1000 );
+        if( read.get() )
+            return msg.get().split( COM_SPLITTER )[ 1 ];
+        else
+            throw new IOException( "Time's up, cannot read a message." );
     }
 
     void sendMsg( int id, String str ){
