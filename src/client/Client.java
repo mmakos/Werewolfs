@@ -11,7 +11,7 @@ public class Client extends Application{
 
     @Override
     public void start( Stage primaryStage ) throws Exception{
-        Parent root = FXMLLoader.load( getClass().getResource( "connectWindow.fxml" ) );
+        Parent root = FXMLLoader.load( getClass().getResource( "fxml/connectWindow.fxml" ) );
         primaryStage.setTitle( "Connect" );
         primaryStage.setScene( new Scene( root, 600, 400 ) );
         primaryStage.initStyle( StageStyle.TRANSPARENT );

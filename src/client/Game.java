@@ -75,14 +75,14 @@ public class Game{
                 }
                 gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " " + statements[ 0 ] );
                 if( msg.equals( card.split( "_" )[ 0 ].toUpperCase() ) || ( msg.equals( "WEREWOLF" ) && card.equals( "Mystic wolf" ) ) ){
-                    gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " " + statements[ 2 ] );
+                    gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " " + statements[ 1 ] );
                     proceedCard( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() );
                 }
                 if( msg.equals( "THING" ) )
                     waitForTingsTouch();
             }
             if( readMsgOnly().equals( UNIQUE_CHAR + "VOTE" ) ){
-                gameWindow.setStatementLabel( statements[ 3 ] );
+                gameWindow.setStatementLabel( statements[ 2 ] );
                 vote();
             }
         } );
@@ -358,7 +358,7 @@ public class Game{
 
     void wakeUp(){
         gameWindow.setStatementLabel( statements[ 14 ] );
-        gameWindow.setRoleInfo( statements[ 16 ] );
+        gameWindow.setRoleInfo( statements[ 15 ] );
         try{
             wakeUpSignal.play();
         }
@@ -410,7 +410,7 @@ public class Game{
     }
 
     private void gameWindow( Window connectWindow ) throws IOException{
-        FXMLLoader fxmlLoader = new FXMLLoader( getClass().getResource( "gameWindow.fxml" ) );
+        FXMLLoader fxmlLoader = new FXMLLoader( getClass().getResource( "fxml/gameWindow.fxml" ) );
         Stage stage = new Stage();
         stage.setTitle( "Werewolves" );
         stage.setScene( new Scene( fxmlLoader.load(), 1280, 820 ) );

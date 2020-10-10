@@ -93,7 +93,7 @@ public class Server{
         connecting = false;
         sendPlayersList();
         playersLabel.setText( "Starting game..." );
-        FXMLLoader fxmlLoader = new FXMLLoader( getClass().getResource( "cardChooser.fxml" ) );
+        FXMLLoader fxmlLoader = new FXMLLoader( getClass().getResource( "fxml/cardChooser.fxml" ) );
         Stage stage = new Stage();
         stage.setTitle( "Choose card" );
         stage.setScene( new Scene( fxmlLoader.load(), 720, 480 ) );

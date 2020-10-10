@@ -1,10 +1,10 @@
 package client;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
@@ -17,6 +17,13 @@ public class Connect{
     @FXML
     public void initialize(){
         setOnDrag();
+        langChoiceBox();
+    }
+
+    private void langChoiceBox(){
+        lang.getItems().add( "polski" );
+        lang.getItems().add( "english" );
+        lang.setValue( "polski" );
     }
 
     private void setOnDrag(){
@@ -73,7 +80,7 @@ public class Connect{
         } catch( NumberFormatException ignored ){        }
         try{
             socket = new Socket( ip, port );
-            Game game = new Game( socket, "english" );
+            Game game = new Game( socket, getLanguage() );
             game.sendNickname( loginField.getText() );
             String nickInfo = game.receiveMsg();
             if( nickInfo.equals( "0" + Game.COM_SPLITTER + "wrongNickname" ) ){
@@ -90,11 +97,16 @@ public class Connect{
         }
     }
 
+    private String getLanguage(){
+        return ( String )lang.getValue();
+    }
+
     @FXML private TextField loginField;
     @FXML private TextField ipField;
     @FXML private TextField portField;
     @FXML private Label infoLabel;
     @FXML private CheckBox defaultCheckBox;
     @FXML private GridPane dragField;
+    @FXML private ChoiceBox lang;
     private double x = 0, y = 0;
 }

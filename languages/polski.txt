@@ -1,0 +1,31 @@
+się budzi
+się budzi - TWÓJ RUCH
+Głosowanie
+Twoja postać to teraz
+Zostałeś dotknięty
+Thing dotknął cię
+Remis - głosuj ponownie
+Zostałeś zabity
+został zabity
+tanner wygrał
+miasto wygrało
+wilkołaki wygrały
+wilkołaki oraz minion wygrali
+Czas minął. Karta wybrana losowo.
+Miasto się budzi!
+Teraz, aby ustalić kto jest kim i kogo należy zabić, połącz się z graczami za pomocą platformy do komunikacji typu zoom itd. Kiedy będziecie gotowi, administrator gry rozpocznie głosowanie. Wybierz wtedy gracza,którego chcesz zabić.
+Wybierz jedną kartą ze środka. Od tego czasu będziesz grał jako postać z tej karty.@Copycat
+Po lewej na górze możesz zobaczyć kim teraz naprawdę jesteś.@Copycat
+Jesteś jedynym wilkołakiem. Wybierz jedną kartę ze środka, którą chcesz podejrzeć.@Werewolf
+Pozostałymi wilkołakami są@Werewolf
+Wśród graczy nie ma wilkołaków.@Minion
+Wilkołakami są:@Minion
+Wybierz jedną kartę ze środka, którą chcesz podejrzeć.@Mystic wolf
+Wybierz jedną kartę ze środka, którą chcesz podejrzeć oraz podarować innemu graczowi.Następnie wybierz tego gracza.@Witch
+Teraz wybierz gracza, któremu chceszpodarować tę kartę.@Witch
+Wybierz dwóch graczy, którym chcesz zamienić karty.@Troublemaker
+Wybierz drugiego gracza.@Troublemaker
+Wybierz kartę innego gracza. Jeśli jest to tanner lub wilkołak, od tej pory będziesz grał jako ta karta. Jeśli nie, wybierz kolejną kartę. Jeśli nadal jest to karta z miasta, dalej grasz jako paranormal investigator, czyli postaćz miasta.@Paranormal
+Możesz podejrzeć swoją kartę. Zobacz kim jesteś teraz.@Insomniac
+Wybierz gracza, którego kartę chcesz ukraść.@Robber
+Wybierz gracza, któego chcesz dotknąć. Gracz poczuje dotknięcie i będzdie mógł je potwierdzić w ciągu dnia.@Thing

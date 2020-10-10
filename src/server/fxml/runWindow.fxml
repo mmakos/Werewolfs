@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #2b2a4c;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="server.Server">
+   <children>
+      <Label fx:id="playersLabel" alignment="TOP_LEFT" prefHeight="318.0" prefWidth="601.0" text="Players: " textFill="WHITE">
+         <font>
+            <Font size="18.0" />
+         </font>
+         <padding>
+            <Insets left="30.0" right="30.0" top="20.0" />
+         </padding>
+      </Label>
+      <Button fx:id="runServer" layoutX="128.0" layoutY="345.0" mnemonicParsing="false" onAction="#connect" prefHeight="41.0" prefWidth="160.0" stylesheets="@../../styles/button.css" text="Run server">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <Button fx:id="startGame" disable="true" layoutX="311.0" layoutY="345.0" mnemonicParsing="false" onAction="#runGame" prefHeight="41.0" prefWidth="160.0" stylesheets="@../../styles/button.css" text="Start game">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <TextArea fx:id="logField" editable="false" layoutX="14.0" layoutY="14.0" prefHeight="318.0" prefWidth="573.0" style="-fx-background-color: #2b2a4c;" visible="false" wrapText="true" />
+      <Button fx:id="voteButton" disable="true" layoutX="221.0" layoutY="345.0" mnemonicParsing="false" onAction="#orderVoting" prefHeight="41.0" prefWidth="160.0" stylesheets="@../../styles/button.css" text="Order the voting">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <Button fx:id="endVotingButton" disable="true" layoutX="221.0" layoutY="345.0" mnemonicParsing="false" onAction="#endVoting" prefHeight="41.0" prefWidth="160.0" stylesheets="@../../styles/button.css" text="End voting">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>
