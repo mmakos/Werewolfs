@@ -7,6 +7,7 @@ import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 import javafx.util.Duration;
 
 import java.io.*;
@@ -48,10 +49,10 @@ public class Game{
         catch( MediaException ignored ){}
     }
 
-    public void run() throws IOException{
+    public void run( Window connectWindow ) throws IOException{
         getPlayers();
         getCard();
-        gameWindow();
+        gameWindow( connectWindow );
     }
 
     public void gameLogic(){
@@ -186,7 +187,7 @@ public class Game{
         if( waitingForButton ){
             int rand = new Random().nextInt( 3 );
             clickedCard = "card" + rand;
-            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected.\n" );
+            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected." );
             waitingForButton = false;
         }
         gameWindow.setTableCardsActive( false );
@@ -195,7 +196,42 @@ public class Game{
         String chosenCard = readMsgOnly();
         gameWindow.reverseCard( clickedCard, chosenCard );
     }
-    void makeWitch(){}
+    void makeWitch(){
+        gameWindow.setRoleInfo( "You can give a card from the middle to one of players. You will see this card. Choose one card from the middle and then select player whom you want to give this card to." );
+        waitingForButton = true;
+        gameWindow.setTableCardsActive( true );
+
+        // Waiting for clicked card, but with time limit of 30 seconds
+        long start = System.currentTimeMillis();
+        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
+        // If time is up, card will be selected randomly
+        if( waitingForButton ){
+            int rand = new Random().nextInt( 3 );
+            clickedCard = "card" + rand;
+            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected.\nNow choose player." );
+            waitingForButton = false;
+        }
+        gameWindow.setTableCardsActive( false );
+        gameWindow.setTableCardsSelected( false );
+        sendMsg( gameType, clickedCard );
+        card = readMsgOnly();
+        gameWindow.reverseCard( clickedCard, card );
+
+        waitingForButton = true;
+        gameWindow.setPlayersCardsActive( true );
+        start = System.currentTimeMillis();
+        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
+        if( waitingForButton ){
+            clickedCard = getRandomPlayerCard();
+            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected." );
+            waitingForButton = false;
+        }
+        gameWindow.setPlayersCardsActive( false );
+        gameWindow.setPlayersCardsSelected( false );
+        sendMsg( gameType, clickedCard );
+
+    }
+
     void makeBeholder(){}
     void makeSeer(){}
     void makeInsomniac(){
@@ -332,12 +368,13 @@ public class Game{
         }
     }
 
-    private void gameWindow() throws IOException{
+    private void gameWindow( Window connectWindow ) throws IOException{
         FXMLLoader fxmlLoader = new FXMLLoader( getClass().getResource( "gameWindow.fxml" ) );
         Stage stage = new Stage();
         stage.setTitle( "Werewolves" );
         stage.setScene( new Scene( fxmlLoader.load(), 1280, 820 ) );
         stage.initStyle( StageStyle.TRANSPARENT);
+        connectWindow.hide();
         stage.show();
         gameWindow = fxmlLoader.getController();
         gameWindow.setCardLabel( card.split( "_" )[ 0 ] );

@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="ASCII"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -26,6 +26,7 @@
         <GridPane minHeight="376.0" prefHeight="418.0" prefWidth="600.0" GridPane.rowIndex="1">
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints />
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints maxHeight="376.0" minHeight="10.0" prefHeight="376.0" vgrow="SOMETIMES" />
@@ -46,7 +47,7 @@
                                 <Insets bottom="20.0" left="30.0" right="30.0" top="19.0" />
                             </VBox.margin>
                             <children>
-                                <TextField fx:id="loginField" prefHeight="32.0" prefWidth="263.0" promptText="login" style="-fx-background-color: transparent; -fx-border-color: white; -fx-text-fill: white;">
+                                <TextField fx:id="loginField" prefHeight="32.0" prefWidth="263.0" promptText="nickname" style="-fx-background-color: transparent; -fx-border-color: white; -fx-text-fill: white;">
                                     <font>
                                         <Font size="14.0" />
                                     </font>
@@ -64,27 +65,30 @@
                                 <Insets left="30.0" right="30.0" />
                             </VBox.margin>
                             <children>
-                                <PasswordField fx:id="passwordField" prefHeight="32.0" prefWidth="255.0" promptText="password" style="-fx-background-color: transparent; -fx-border-color: white; -fx-text-fill: white;">
+                                <Button fx:id="loginButton" mnemonicParsing="false" onAction="#connect" prefHeight="32.0" prefWidth="309.0" stylesheets="@css/button.css" text="Log in" textFill="WHITE">
                                     <font>
                                         <Font size="14.0" />
                                     </font>
-                                </PasswordField>
+                                    <HBox.margin>
+                                        <Insets />
+                                    </HBox.margin>
+                                </Button>
                             </children>
                         </HBox>
                         <HBox prefHeight="100.0" prefWidth="200.0">
                             <VBox.margin>
                                 <Insets />
                             </VBox.margin>
-                            <children>
-                                <Button fx:id="loginButton" mnemonicParsing="false" onAction="#connect" prefHeight="32.0" prefWidth="309.0" stylesheets="@css/button.css" text="Log in" textFill="WHITE">
-                                    <font>
-                                        <Font size="14.0" />
-                                    </font>
-                                    <HBox.margin>
-                                        <Insets left="30.0" right="30.0" />
-                                    </HBox.margin>
-                                </Button>
-                            </children>
+                     <children>
+                        <Label fx:id="infoLabel" alignment="TOP_CENTER" prefHeight="172.0" prefWidth="503.0" textAlignment="CENTER" textFill="WHITE">
+                           <HBox.margin>
+                              <Insets left="30.0" right="30.0" />
+                           </HBox.margin>
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
                         </HBox>
                     </children>
                 </VBox>
@@ -92,7 +96,7 @@
                     <children>
                         <ImageView fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
                             <image>
-                                <Image url="@img/elka.png" />
+                                <Image url="@img/wolfHeadWhite.png" />
                             </image>
                             <VBox.margin>
                                 <Insets top="30.0" />

@@ -231,37 +231,29 @@ public class Server{
     }
 
     String receiveGame( int id ) throws IOException{
-//        AtomicReference< String > msg = null;
-//        AtomicBoolean read = new AtomicBoolean( false );
-//        new Thread( () -> {
-//            try{
-//                assert false;
-//                msg.set( receiveMsg( id ) );
-//                read.set( true );
-//            }catch( NullPointerException ignored ){}
-//        } ).start();
-//        long start = System.currentTimeMillis();
-//        while( System.currentTimeMillis() - start < MAX_READ_TIME * 1000 );
-//        if( read.get() ){
-//            assert false;
-//            return msg.get().split( COM_SPLITTER )[ 1 ];
-//        }
-//        else
-//            throw new IOException( "Time's up, cannot read a message." );
-        return receiveMsg( id ).split( COM_SPLITTER )[ 1 ];
+        AtomicReference< String > msg = new AtomicReference<>();
+        AtomicBoolean read = new AtomicBoolean( false );
+        new Thread( () -> {
+            try{
+                msg.set( receiveMsg( id ) );
+                read.set( true );
+            }catch( IOException ignored ){}
+        } ).start();
+        long start = System.currentTimeMillis();
+        while( !read.get() && System.currentTimeMillis() - start < MAX_READ_TIME * 1000 );
+        if( read.get() ){
+            return msg.get().split( COM_SPLITTER )[ 1 ];
+        }
+        else
+            throw new IOException( "Time's up, cannot read a message." );
     }
 
     void sendMsg( int id, String str ){
         players.get( id - 100 ).output.println( str );
     }
 
-    String receiveMsg( int id ){
-        try{
-            return players.get( id - 100 ).input.readLine();
-        }catch( IOException e ){
-            writeLog( "Cannot receive message from player" + id );
-        }
-        return "";
+    String receiveMsg( int id ) throws IOException{
+        return players.get( id - 100 ).input.readLine();
     }
 
     public int getTableCardId( String str ){

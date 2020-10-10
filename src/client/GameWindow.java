@@ -8,7 +8,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -63,31 +62,21 @@ public class GameWindow{
             default: toggle = playersCards.get( game.players.indexOf( player ) );
         }
         if( !game.players.contains( player ) ){
-            Platform.runLater( () -> {
-                toggle.setStyle( "-fx-background-image: url(\"/img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" );
-            } );
+            Platform.runLater( () -> toggle.setStyle( "-fx-background-image: url(\"/img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" ) );
         }
         else{
-            Platform.runLater( () -> {
-                toggle.setStyle( "-fx-graphic: url(\"/img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" );
-            } );
+            Platform.runLater( () -> toggle.setStyle( "-fx-graphic: url(\"/img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" ) );
         }
         toggle.setOpacity( 1.0 );
     }
     public void updateMyCard( String card ){
         ToggleButton toggle = playersCards.get( game.players.indexOf( game.nickname ) );
         game.displayedCard = card;
-        Platform.runLater( () -> {
-            toggle.setStyle( "-fx-graphic: url(\"/img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" );
-        } );
-    }
-
-    public String getMyCardText(){
-        return playersCards.get( game.players.indexOf( game.nickname ) ).getText().split( "\n" )[ 0 ];
+        Platform.runLater( () -> toggle.setStyle( "-fx-graphic: url(\"/img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" ) );
     }
 
     public void createPlayersCards(){
-        int a = 500, b = 280, p = game.players.size(), t = 360 / p;
+        int a = 500, b = 280, p = game.players.size();
 
         playersCards.setSize( p );
         int ourPos = game.players.indexOf( game.nickname );        //start drawing cadrs from ours

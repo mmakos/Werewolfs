@@ -166,8 +166,18 @@ public class Game{
         Thread.sleep( 3000 );
         s.cardsInGame.remove( "Mystic wolf" );
     }
-    void makeWitch() throws InterruptedException{
-        if(startRole( "Witch" )<0) return;
+
+    void makeWitch() throws InterruptedException, IOException{
+        int idOfWitch = startRole( "Witch" );
+        if( idOfWitch < 0 ) return;
+        String chosenCard = s.receiveGame( idOfWitch );
+        String cardName = s.cardsInCenter[ s.getTableCardId( chosenCard ) ];
+        s.sendGame( idOfWitch, cardName );
+        String chosenPlayer = s.receiveGame( idOfWitch );
+        int playersId = s.players.indexOf( s.getPlayer( chosenPlayer ) );
+        s.cardsInCenter[ s.getTableCardId( chosenCard ) ] = s.cardsNow.get( playersId );
+        s.cardsNow.set( playersId, cardName );
+        s.cardsInGame.remove( "Witch" );
     }
     void makeBeholder() throws InterruptedException{
         if(startRole( "Beholder" )<0) return;
