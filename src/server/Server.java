@@ -180,9 +180,9 @@ public class Server{
         LinkedList< String > temp = new LinkedList<>( cardsInGame );
 
         //todo to remove when not testing with one player
-        cardsOnBegin.add( "Copycat" );
+        cardsOnBegin.add( "Apprentice seer" );
         cardsNow.add( cardsOnBegin.get( 0 ) );
-        temp.remove( "Copycat" );
+        temp.remove( "Apprentice seer" );
 
         for( int i = 0; i < 3; ++i ){
             int randInt = rand.nextInt( temp.size() );

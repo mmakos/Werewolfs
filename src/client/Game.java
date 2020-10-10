@@ -109,6 +109,8 @@ public class Game{
             case "Paranormal investigator": makeParanormal(); break;
             case "Robber": makeRobber(); break;
             case "Troublemaker": makeTroublemaker(); break;
+            case "Apprentice seer": makeApprenticeSeer(); break;
+
         }
     }
 
@@ -207,6 +209,27 @@ public class Game{
         String chosenCard = readMsgOnly();
         gameWindow.reverseCard( clickedCard, chosenCard );
     }
+    void makeApprenticeSeer(){
+        gameWindow.setRoleInfo( statements[ 22 ] );
+        waitingForButton = true;
+        gameWindow.setTableCardsActive( true );
+
+        // Waiting for clicked card, but with time limit of 30 seconds
+        long start1 = System.currentTimeMillis();
+        while( waitingForButton && System.currentTimeMillis() - start1 < MAX_ROLE_TIME * 1000 );
+        // If time is up, card will be selected randomly
+        if( waitingForButton ){
+            int rand = new Random().nextInt( 3 );
+            clickedCard = "card" + rand;
+            gameWindow.setRoleInfo( statements[ 13 ] );
+            waitingForButton = false;
+        }
+        gameWindow.setTableCardsActive( false );
+        gameWindow.setTableCardsSelected( false );
+        sendMsg( gameType, clickedCard );
+        String chosenCard = readMsgOnly();
+        gameWindow.reverseCard( clickedCard, chosenCard );
+    }
     void makeWitch(){
         gameWindow.setRoleInfo( statements[ 23 ] );
         waitingForButton = true;
@@ -271,11 +294,11 @@ public class Game{
     }
 
     void makeBeholder(){}
-    void makeSeer(){}
+    void makeSeer(){
+    }
     void makeInsomniac(){
         gameWindow.setRoleInfo( statements[ 28 ] );
         String insomniacNow = readMsgOnly();
-        //String idOfInsomniac = readMsgOnly();       //TODO po co to?
         gameWindow.setCardLabel( " -> " + insomniacNow );
         gameWindow.updateMyCard( insomniacNow );
     }

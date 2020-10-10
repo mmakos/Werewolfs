@@ -136,6 +136,7 @@ public class GameWindow{
 
     @FXML private void toggleClicked( ActionEvent event ){
         String selected = ( ( ToggleButton )event.getSource() ).getId();
+        ( ( ToggleButton )event.getSource() ).setDisable(true);
         game.setClickedCard( selected );
         game.setWaitingForButton( false );
     }

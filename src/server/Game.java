@@ -66,6 +66,7 @@ public class Game{
                     case "Paranormal investigator": makeParanormal(); break;
                     case "Robber": makeRobber(); break;
                     case "Troublemaker": makeTroublemaker(); break;
+                    case "Apprentice seer": makeApprenticeSeer(); break;
                 }
             }catch( IOException e ){
                 s.writeLog( "No response from " + card + "." );
@@ -168,6 +169,17 @@ public class Game{
         s.cardsInGame.remove( "Mystic wolf" );
     }
 
+    void makeApprenticeSeer() throws InterruptedException, IOException {
+        int idOfApprenticeSeer = startRole("Apprentice seer");
+        if(idOfApprenticeSeer<0) return;
+        String cardToSee = s.receiveGame( idOfApprenticeSeer ).split( MSG_SPLITTER )[ 0 ];
+        int cardToSeeId = s.getTableCardId(cardToSee);
+        s.sendGame( idOfApprenticeSeer, s.cardsInCenter[cardToSeeId] );
+        s.writeLog(s.cardsInCenter[cardToSeeId]);
+        Thread.sleep( 3000 );
+        s.cardsInGame.remove( "Apprentice seer" );
+    }
+
     void makeWitch() throws InterruptedException, IOException{
         int idOfWitch = startRole( "Witch" );
         if( idOfWitch < 0 ) return;
@@ -192,9 +204,17 @@ public class Game{
     void makeBeholder() throws InterruptedException{
         if(startRole( "Beholder" )<0) return;
     }
-    void makeSeer() throws InterruptedException{
-        if(startRole( "Seer" )<0) return;
-
+    //TODO Dokończyć rano
+    void makeSeer() throws InterruptedException, IOException {
+        int idOfSeer = startRole("Seer");
+        if(idOfSeer<0) return;
+        String[] chosenCards = s.receiveGame( idOfSeer ).split( MSG_SPLITTER );
+        int chosenCard1 = s.getTableCardId(chosenCards[0]);
+        int chosenCard2 = s.getTableCardId(chosenCards[1]);
+        Integer.toString(chosenCard1);
+        Integer.toString(chosenCard2);
+        s.sendGame(idOfSeer,chosenCard1+MSG_SPLITTER+chosenCard2);
+        s.cardsInGame.remove( "Seer" );
     }
     void makeInsomniac() throws InterruptedException{
         int idOfInsomniac = startRole( "Insomniac" );
@@ -202,8 +222,6 @@ public class Game{
         String insomniacNow = s.cardsNow.get(s.cardsOnBegin.indexOf("Insomniac"));
         s.writeLog( "This card is " + insomniacNow );
         s.sendGame(idOfInsomniac, insomniacNow );
-//        String idOfInsomniacString = Integer.toString(idOfInsomniac);         // TODO po co to jest?
-//        s.sendGame(idOfInsomniac, idOfInsomniacString );
         Thread.sleep( 3000 );
         s.cardsInGame.remove( "Insomniac" );
     }

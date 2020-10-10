@@ -20,12 +20,13 @@ Jesteś jedynym wilkołakiem. Wybierz jedną kartę ze środka, którą chcesz p
 Pozostałymi wilkołakami są@Werewolf
 Wśród graczy nie ma wilkołaków.@Minion
 Wilkołakami są:@Minion
-Wybierz jedną kartę ze środka, którą chcesz podejrzeć.@Mystic wolf
+Wybierz jedną kartę ze środka, którą chcesz podejrzeć.@Mystic wolf,Apprentice seer
 Wybierz jedną kartę ze środka, którą chcesz podejrzeć oraz podarować innemu graczowi.Następnie wybierz tego gracza.@Witch
-Teraz wybierz gracza, któremu chceszpodarować tę kartę.@Witch
+Teraz wybierz gracza, któremu chcesz podarować tę kartę.@Witch
 Wybierz dwóch graczy, którym chcesz zamienić karty.@Troublemaker
 Wybierz drugiego gracza.@Troublemaker
 Wybierz kartę innego gracza. Jeśli jest to tanner lub wilkołak, od tej pory będziesz grał jako ta karta. Jeśli nie, wybierz kolejną kartę. Jeśli nadal jest to karta z miasta, dalej grasz jako paranormal investigator, czyli postaćz miasta.@Paranormal
 Możesz podejrzeć swoją kartę. Zobacz kim jesteś teraz.@Insomniac
 Wybierz gracza, którego kartę chcesz ukraść.@Robber
-Wybierz gracza, któego chcesz dotknąć. Gracz poczuje dotknięcie i będzdie mógł je potwierdzić w ciągu dnia.@Thing
+Wybierz gracza, którego chcesz dotknąć. Gracz poczuje dotknięcie i będzie mógł je potwierdzić w ciągu dnia.@Thing
+
