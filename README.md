@@ -1,78 +1,19 @@
-# Werewolves
-Online werewolves game for children for quarantine's time.
+#Wilkołaki
 
-Projekt powastaje, aby można było grać w ulubioną grę grupy wikingów z PR, czyli w wilkołaki, podczas kwarantanny i nie tylko bez wychodzenia z domu.
+##Opis gry
+Wilkołaki to wieloosobowa gra podobna do popularnej "Mafii", z tym że każdy ma swoją własną rolę, a cała akcja dzieje się podczas jednej doby. Niniejszy projekt jest przełożeniem tejże gry na wersję online.
 
-Architektura: klient - serwer
+##Instalacja
+Instalator można pobrać z... Następnie należy zainstalować grę podążając za wskazówkami instalatora. Dodatkowo konieczne jest posiadanie JRE (Java Runtine Environment) w wersji 8 - można je pobrać z <https://java.com/pl/download>.
 
-Serwer przeprowadza grę. Zawiera całą logikę gry itd.
-Klient łączy się z serwerem i jedynie zapewnia odpowiednią interakcję z graczem podczas jego tury.
+##Uruchomienie
 
-Główny wątek (serwer):
-1. Serwer nasłuchuje klientów tworząc wektor klientów (id klientów od 100 w górę), w wybranym momencie kończy nasłuchiwać i zaczyna grę.
-2. Wybieramy karty, które chcemy, żeby były w grze.
-3. Serwer "rozdaje" karty (przypisuje losowo do karty id klienta, lub jedną z trzech pozycji na środku stołu (0, 1, 2).
-4. Serwer wysyła do wszystkich klientów info z wektorem graczy (info o kartach tylko na serwerze) oraz karcie danego gracza.
-5. Logika gry po kolei.
-6. Po zakończeniu nocy wciskamy przycisk "Głosowanie". Serwer wysyła do klientów info, z prośbą o zagłosowanie na konkretnego gracza.
-7. Serwer "liczy głosy" i wysyła info kto zginął oraz odsłania wszystkie karty (wysyła info o kartach).
+###Klient (gracz)
+Aby dołączyć do gry jako klient, należy uruchomić aplikację **Werewolves.exe**. W pole *ip* należy wpisać adres IP serwera do którego chcemy dołączyć (podany przez administratora gry). W pole *port* należy wpisać numer portu, na którym serwer udostępnia usługę, czyli domyślnie **23000**. Po wciśnięciu przycisku *login*, allikacja wygląda jakby się zawiesiła, ale po prostu oczekuje na rozpoczęcie gry przez administratora.
 
-Logika gry:
-Serwer przechowuje 3 główne wektory: Wektor graczy (WG), wektor kart graczy na początku gry (WP) i wektor kart aktualnie (WA) i jeszcze może listę kart w grze (LK) (dla ułatwienia), jakąś tablicę kart na środku stołu (TC)
+### Serwer (administrator gry)
+Tu sprawa jest bardziej skomplikowana. Ja nie udostępniam żadnego serwera, więc aby zorganizować grę, należy na swoim komputerze postawić serwer. Jeśli stawialiscie kiedyś serwery w Minecrafcie to można skorzystać z jakichś darmowych VPN-ów typu Hamachi. Najlepiej jednak po prostu zalogować się do routera, wpisując w przeglądarkę swoje IP lub lokalne IP z końcówką *1* (czyli coś w stylu 192.168.1.1) - można to sprawdzić wpisując w command line polecenie *ipconfig*. Następnie należy na routerze ustawić przekierowanie portu (*Port Forwarding Rules*) 23000 (na tym.porcie serwer domyślnie wystawia usługę) z adresu IP komputera, na którym stawiamy serwer (można go również sprawdzić poleceniem *ipconfig*). W ogóle najlepiej to znaleźć jakiś tutorial na YT.<br><br>
+Następnie należy uruchomić aplikację *SerWerewolves.exe* oraz wcisnąć *Run Server*. Kiedy połączy się zadowalająca nas liczba graczy (gracze pojawiają nam się w okienku), wciskamy *Start game*, wybieramy karty i rozpoczynamy grę.
 
-Główna funkcja:
-Po kolei sprawdza czy jest dana funkcja, a potem robi odpowiednie rzeczy. Coś w stylu:
-
-```ruby
-void play(){
-	boolean insomniac = false;
-	//Wywalamy insomniaca bo on na końcu
-	if( LK.contains( "insomniac" ) ){
-		insomniac = true;
-		LK.remove( "insomniac" );
-	}
-	makeCopycat();
-	makeWerewolfs();
-	//Tu jakiś random
-	Random rand = new Random();
-	while( LK.length ){
-		// Losujemy postać
-		switch( LK[ rand.nextInt( LK.length ) ] ){
-			case "witch" -> makeWitch();
-			case "beholder" -> makeBeholder();
-			case "Seer" -> makeSeer();
-			//bez insomniaca, bo on na końcu
-		}
-	}
-	if( insomniac )
-		makeInsomniac();
-}
-```
-Logika pojedynczej postaci:
-
-COPYCAT:
-- serwer wysyła do copycata info o jego turze, coś w stylu "COPYCAT".
-- gdy klient odbierze "COPYCAT", to daje graczowi do wyboru jedną z trzech środkowych kart (UI - user interface)
-- Klient wysyla do serwera wiadomośc zwrotną, którą kartę wybrał, coś w stylu "2".
-- serwer wysyła do klienta info, jaką kartą się staje i podmienia u siebi odpowiednio w wektorze WP i WA.
-Przykładowy kod poniżej:
-
-```ruby
-void makeCopycat(){
-	if( LK.contains( "copycat" )
-		return;
-	//tu logika copycata
-	
-	int idOfCopycat = WG[ WP.indexOf( "copycat" ) ].id;		// Uzyskujemy id gracza copycata
-	
-	send( idOfCopycat, "COPYCAT" );			// Wysyłamy do gracza o danym id wiadomość "COPYCAT"	(to send to ja już ogarnę)
-	chosenCardId = receive( idOfCopycat );	// Odbieramy numer wybranej karty
-	send( idOfCopycat, TC[ chosenCardId ];	// Wysyłamy nazwę karty którą gracz się staje
-	WA[ WP.indexOf( "copycat" ) ] = TC[ chosenCardId;
-	WP[ WP.indexOf( "copycat" ) ] = TC[ chosenCardId;		// Podmieniamy karty
-	
-	//na koniec
-	LK.remove( "copycat" );
-}
-```
-ITD.
+##Rozgrywka
+W trakcie nocy czekaj na swoją kolej oraz wykonuj polecenia. Kiedy noc się skończy w celu ustalenia kto jest kim, trzeba połączyć się z graczami przez jakiegoś zooma czy coś. Następnie administrator włącza głosowanie i możemy głosować.
