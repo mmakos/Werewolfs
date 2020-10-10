@@ -1,5 +1,7 @@
 package client;
 
+import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.media.Media;
@@ -8,6 +10,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
 import java.io.*;
@@ -48,16 +51,12 @@ public class Game{
         }
         catch( MediaException ignored ){}
         try{
-            File f = new File( "languages/" + language + ".txt" );
-            Scanner s = new Scanner( f );
-            for( int i = 0; true; ++i ){
-                try{
-                    statements[ i ] = s.nextLine().split( "@" )[ 0 ];
-                }catch( NoSuchElementException ex ){
-                    break;
-                }
+            String line;
+            BufferedReader readFile = new BufferedReader( new InputStreamReader( new FileInputStream( "languages/" + language + ".txt" ), StandardCharsets.UTF_8 ) );
+            for( int i = 0; ( line = readFile.readLine() ) != null; ++i ){
+                statements[ i ] = line.split( "@" )[ 0 ];
             }
-        }catch( FileNotFoundException ignored ){}
+        }catch( IOException ignored ){}
     }
 
     public void run( Window connectWindow ) throws IOException{
@@ -418,6 +417,7 @@ public class Game{
         stage.initStyle( StageStyle.TRANSPARENT);
         connectWindow.hide();
         stage.show();
+        stage.getScene().getWindow().addEventFilter( WindowEvent.WINDOW_CLOSE_REQUEST, this::quit );
         gameWindow = fxmlLoader.getController();
         gameWindow.setCardLabel( card.split( "_" )[ 0 ] );
         gameWindow.setGame( this );
@@ -425,6 +425,11 @@ public class Game{
         gameWindow.setNicknameLabel( nickname );
         gameWindow.updateMyCard( card );
         gameLogic();
+    }
+
+    private < T extends Event > void quit( T t ){
+        Platform.exit();
+        System.exit( 0 );
     }
 
     private void getPlayers(){
