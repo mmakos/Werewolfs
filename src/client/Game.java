@@ -12,9 +12,7 @@ import javafx.util.Duration;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.Vector;
+import java.util.*;
 
 public class Game{
     private volatile boolean waitingForButton = false;
@@ -30,6 +28,7 @@ public class Game{
     public String displayedCard;        // When you are copycat or paranormal then its value is different than card line above
     private GameWindow gameWindow;
     public String nickname;
+    private String[] statements = new String[ 50 ];
 
     private MediaPlayer wakeUpSignal = null;
     private MediaPlayer roleSignal = null;
@@ -37,7 +36,7 @@ public class Game{
     public BufferedReader input;
     public PrintWriter output;
 
-    Game( Socket socket ) throws IOException{
+    Game( Socket socket, String language ) throws IOException{
         this.input = new BufferedReader( new InputStreamReader( socket.getInputStream() ) );
         this.output = new PrintWriter( socket.getOutputStream(), true );
         try{
@@ -47,6 +46,17 @@ public class Game{
             wakeUpSignal = new MediaPlayer( media );
         }
         catch( MediaException ignored ){}
+        try{
+            File f = new File( "languages/" + language + ".txt" );
+            Scanner s = new Scanner( f );
+            for( int i = 0; true; ++i ){
+                try{
+                    statements[ i ] = s.nextLine().split( "@" )[ 0 ];
+                }catch( NoSuchElementException ex ){
+                    break;
+                }
+            }
+        }catch( FileNotFoundException ignored ){}
     }
 
     public void run( Window connectWindow ) throws IOException{
@@ -63,16 +73,16 @@ public class Game{
                     wakeUp();
                     break;
                 }
-                gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " wakes up" );
+                gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " " + statements[ 0 ] );
                 if( msg.equals( card.split( "_" )[ 0 ].toUpperCase() ) || ( msg.equals( "WEREWOLF" ) && card.equals( "Mystic wolf" ) ) ){
-                    gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " wakes up - YOUR TURN" );
+                    gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " " + statements[ 2 ] );
                     proceedCard( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() );
                 }
                 if( msg.equals( "THING" ) )
                     waitForTingsTouch();
             }
             if( readMsgOnly().equals( UNIQUE_CHAR + "VOTE" ) ){
-                gameWindow.setStatementLabel( "Vote" );
+                gameWindow.setStatementLabel( statements[ 3 ] );
                 vote();
             }
         } );
@@ -98,11 +108,12 @@ public class Game{
             case "Thing": makeThing(); break;
             case "Paranormal investigator": makeParanormal(); break;
             case "Robber": makeRobber(); break;
+            case "Troublemaker": makeTroublemaker(); break;
         }
     }
 
     void makeCopycat(){
-        gameWindow.setRoleInfo( "Choose one card from the middle. From this moment you will become the card you chose." );
+        gameWindow.setRoleInfo( statements[ 16 ] );
         waitingForButton = true;
         gameWindow.setTableCardsActive( true );
 
@@ -113,17 +124,17 @@ public class Game{
         if( waitingForButton ){
             int rand = new Random().nextInt( 3 );
             clickedCard = "card" + rand;
-            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected.\n" +
-                    "On the top left corner you can see which card you were, and which card you are now." );
+            gameWindow.setRoleInfo( statements[ 13 ] + "\n" +
+                    statements[ 17 ] );
             waitingForButton = false;
         }
         else
-            gameWindow.setRoleInfo( "On the top left corner you can see which card you were, and which card you are now." );
+            gameWindow.setRoleInfo( statements[ 17 ] );
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
         sendMsg( gameType, clickedCard );
         card = readMsgOnly();
-        gameWindow.setStatementLabel( "You became " + card.split( "_" )[ 0 ] );
+        gameWindow.setStatementLabel( statements[ 3 ] + " " + card.split( "_" )[ 0 ] );
         gameWindow.reverseCard( clickedCard, card );
         gameWindow.setCardLabel( " -> " + card.split( "_" )[ 0 ] );
     }
@@ -139,7 +150,7 @@ public class Game{
             }
         }
         if( str.toString().isEmpty() ){
-            gameWindow.setRoleInfo( "You are the only werewolf. Select one card from the middle you wish to see." );
+            gameWindow.setRoleInfo( statements[ 18 ] );
             waitingForButton = true;
             gameWindow.setTableCardsActive( true );
             long start1 = System.currentTimeMillis();
@@ -147,7 +158,7 @@ public class Game{
             if( waitingForButton ){
                 int rand = new Random().nextInt( 3 );
                 clickedCard = "card" + rand;
-                gameWindow.setRoleInfo( "Time's up. Card will be randomly selected.\n" );
+                gameWindow.setRoleInfo( statements[ 13 ] );
                 waitingForButton = false;
             }
             gameWindow.setTableCardsActive( false );
@@ -157,7 +168,7 @@ public class Game{
             gameWindow.reverseCard( clickedCard, chosenCard );
         }
         else
-            gameWindow.setRoleInfo( "Other werewolves are" + str.toString() + "." );
+            gameWindow.setRoleInfo( statements[ 20 ] + str.toString() + "." );
     }
 
     void makeMinion(){
@@ -170,13 +181,13 @@ public class Game{
             }
         }
         if( str.toString().isEmpty() )
-            gameWindow.setRoleInfo( "There is no werewolves among the players." );
+            gameWindow.setRoleInfo( statements[ 20 ] );
         else
-            gameWindow.setRoleInfo( "Werewolves are" + str.toString() + "." );
+            gameWindow.setRoleInfo( statements[ 21 ] + str.toString() + "." );
     }
 
     void makeMysticWolf(){
-        gameWindow.setRoleInfo( "Choose one card to reverse" );
+        gameWindow.setRoleInfo( statements[ 22 ] );
         waitingForButton = true;
         gameWindow.setTableCardsActive( true );
 
@@ -187,7 +198,7 @@ public class Game{
         if( waitingForButton ){
             int rand = new Random().nextInt( 3 );
             clickedCard = "card" + rand;
-            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected." );
+            gameWindow.setRoleInfo( statements[ 13 ] );
             waitingForButton = false;
         }
         gameWindow.setTableCardsActive( false );
@@ -197,7 +208,7 @@ public class Game{
         gameWindow.reverseCard( clickedCard, chosenCard );
     }
     void makeWitch(){
-        gameWindow.setRoleInfo( "You can give a card from the middle to one of players. You will see this card. Choose one card from the middle and then select player whom you want to give this card to." );
+        gameWindow.setRoleInfo( statements[ 23 ] );
         waitingForButton = true;
         gameWindow.setTableCardsActive( true );
 
@@ -208,7 +219,7 @@ public class Game{
         if( waitingForButton ){
             int rand = new Random().nextInt( 3 );
             clickedCard = "card" + rand;
-            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected.\nNow choose player." );
+            gameWindow.setRoleInfo( statements[ 13 ] + "\n" + statements[ 24 ] );
             waitingForButton = false;
         }
         gameWindow.setTableCardsActive( false );
@@ -223,18 +234,46 @@ public class Game{
         while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
         if( waitingForButton ){
             clickedCard = getRandomPlayerCard();
-            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected." );
+            gameWindow.setRoleInfo( statements[ 13 ] );
             waitingForButton = false;
         }
         gameWindow.setPlayersCardsActive( false );
         gameWindow.setPlayersCardsSelected( false );
         sendMsg( gameType, clickedCard );
+    }
 
+    void makeTroublemaker(){
+        gameWindow.setRoleInfo( statements[ 25 ] );
+        waitingForButton = true;
+        gameWindow.setTableCardsActive( true );
+
+        // Waiting for clicked card, but with time limit of 30 seconds
+        long start = System.currentTimeMillis();
+        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
+        // If time is up, card will be selected randomly
+        if( waitingForButton ){
+            clickedCard = getRandomPlayerCard();
+            gameWindow.setRoleInfo( statements[ 13 ] + "\n" + statements[ 26 ] );
+            waitingForButton = false;
+        }
+        String cards = clickedCard + MSG_SPLITTER;
+        gameWindow.setPlayerCardSelected( players.indexOf( clickedCard ), true );
+        waitingForButton = true;
+        if( waitingForButton ){
+            clickedCard = getRandomPlayerCard();
+            gameWindow.setRoleInfo( statements[ 13 ] );
+            waitingForButton = false;
+        }
+        cards += clickedCard;
+        gameWindow.setTableCardsActive( false );
+        gameWindow.setTableCardsSelected( false );
+        sendMsg( gameType, cards );
     }
 
     void makeBeholder(){}
     void makeSeer(){}
     void makeInsomniac(){
+        gameWindow.setRoleInfo( statements[ 28 ] );
         String insomniacNow = readMsgOnly();
         //String idOfInsomniac = readMsgOnly();       //TODO po co to?
         gameWindow.setCardLabel( " -> " + insomniacNow );
@@ -242,6 +281,7 @@ public class Game{
     }
 
     void makeParanormal(){
+        gameWindow.setRoleInfo( statements[ 13 ] + "\n" + statements[ 27 ] );
         for( int i = 0; i < 2; ++i ){
             waitingForButton = true;
             gameWindow.setPlayersCardsActive( true );
@@ -249,7 +289,7 @@ public class Game{
             while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
             if( waitingForButton ){
                 clickedCard = getRandomPlayerCard();
-                gameWindow.setRoleInfo( "Time's up. Card will be randomly selected." );
+                gameWindow.setRoleInfo( statements[ 13 ] + "\n" + statements[ 13 ] );
                 waitingForButton = false;
             }
             gameWindow.setPlayersCardsActive( false );
@@ -258,7 +298,7 @@ public class Game{
             if( !msg.equals( "AGAIN" ) ){
                 msg = msg.split( "_" )[ 0 ];
                 gameWindow.setCardLabel( " -> " + msg );
-                gameWindow.setStatementLabel( "You became " + msg );
+                gameWindow.setStatementLabel( statements[ 3 ] + " " + msg );
                 gameWindow.reverseCard( clickedCard, msg );
                 break;
             }
@@ -267,13 +307,14 @@ public class Game{
     }
 
     void makeRobber(){
+        gameWindow.setRoleInfo( statements[ 13 ] + "\n" + statements[ 29 ] );
         waitingForButton = true;
         gameWindow.setPlayersCardsActive( true );
         long start = System.currentTimeMillis();
         while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
         if( waitingForButton ){
             clickedCard = getRandomPlayerCard();
-            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected." );
+            gameWindow.setRoleInfo( statements[ 13 ] );
             waitingForButton = false;
         }
         gameWindow.setPlayersCardsActive( false );
@@ -282,12 +323,13 @@ public class Game{
         String msg = readMsgOnly();
         String msg2 = msg.split( "_" )[ 0 ];
         gameWindow.setCardLabel( " -> " + msg2 );
-        gameWindow.setStatementLabel( "You became " + msg2 );
+        gameWindow.setStatementLabel( statements[ 3 ] + " " + msg2 );
         gameWindow.reverseCard( clickedCard, displayedCard );
         gameWindow.updateMyCard( msg );
     }
 
     void makeThing(){
+        gameWindow.setRoleInfo( statements[ 30 ] );
         int myIndex = players.indexOf( nickname );
         waitingForButton = true;
         gameWindow.setPlayerCardActive( ( myIndex + 1 ) % players.size(), true );
@@ -299,7 +341,7 @@ public class Game{
         while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
         if( waitingForButton ){
             clickedCard = players.get( ( myIndex + 1 ) % players.size() );
-            gameWindow.setRoleInfo( "Time's up. Card will be randomly selected." );
+            gameWindow.setRoleInfo( statements[ 13 ] );
             waitingForButton = false;
         }
         gameWindow.setPlayersCardsActive( false );
@@ -309,15 +351,14 @@ public class Game{
 
     void waitForTingsTouch(){
         if( readMsgOnly().equals( "TOUCH" ) ){
-            gameWindow.setCardLabel( " -> you've been touched" );
-            gameWindow.setStatementLabel( "Thing touches you" );
+            gameWindow.setCardLabel( " -> " + statements[ 4 ] );
+            gameWindow.setStatementLabel( statements[ 5 ] );
         }
     }
 
     void wakeUp(){
-        gameWindow.setStatementLabel( "City wakes up!" );
-        gameWindow.setRoleInfo( "Now you need to connect with other players via outer application, such as Zoom, to establish who is who. " +
-                "When you will be ready, admin will press 'start vote' button and you'll be able to make your vote on person, you wish to be dead." );
+        gameWindow.setStatementLabel( statements[ 14 ] );
+        gameWindow.setRoleInfo( statements[ 16 ] );
         try{
             wakeUpSignal.play();
         }
@@ -338,7 +379,7 @@ public class Game{
         sendMsg( gameType, clickedCard );
         String voteResult = readMsgOnly();
         if( voteResult.equals( UNIQUE_CHAR + "VOTE" ) ){      // vote again
-            gameWindow.setStatementLabel( "Vote again, decision must be unequivocal" );
+            gameWindow.setStatementLabel( statements[ 6 ] );
             vote();
         }
         else{
@@ -348,23 +389,23 @@ public class Game{
                 gameWindow.reverseCard( players.get( i ), cardsNow.get( i ) );
             }
             if( voteResult.equals( nickname ) )
-                gameWindow.setStatementLabel( "You have been killed - " + whoWins( voteResult, realCardsNow ) + "." );
+                gameWindow.setStatementLabel( statements[ 7 ] + " - " + whoWins( voteResult, realCardsNow ) + "." );
             else
-                gameWindow.setStatementLabel( voteResult + " has been killed - " + whoWins( voteResult, realCardsNow ) + "." );
+                gameWindow.setStatementLabel( voteResult + " " + statements[ 8 ] + " - " + whoWins( voteResult, realCardsNow ) + "." );
             gameWindow.quitButton.setDisable( false );
         }
     }
 
     private String whoWins( String player, Vector< String > cardsNow ){
         if( cardsNow.get( players.indexOf( player ) ).equals( "Tanner" ) )
-            return "tanner wins";
+            return statements[ 9 ];
         if( cardsNow.get( players.indexOf( player ) ).split( "_" )[ 0 ].equals( "Werewolf" ) )
-            return "city wins";
+            return statements[ 10 ];
         else{
             if( cardsNow.get( players.indexOf( player ) ).equals( "Minion" ) )
-                return "werewolves win";
+                return statements[ 11 ];
             else
-                return "werewolves and minion win";
+                return statements[ 12 ];
         }
     }
 

@@ -73,7 +73,7 @@ public class Connect{
         } catch( NumberFormatException ignored ){        }
         try{
             socket = new Socket( ip, port );
-            Game game = new Game( socket );
+            Game game = new Game( socket, "english" );
             game.sendNickname( loginField.getText() );
             String nickInfo = game.receiveMsg();
             if( nickInfo.equals( "0" + Game.COM_SPLITTER + "wrongNickname" ) ){

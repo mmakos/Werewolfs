@@ -80,7 +80,7 @@ public class GameWindow{
 
         playersCards.setSize( p );
         int ourPos = game.players.indexOf( game.nickname );        //start drawing cadrs from ours
-        ToggleButton toggle = getPlayerCard( "You" );
+        ToggleButton toggle = getPlayerCard( game.nickname );
         toggle.setId( Game.UNIQUE_CHAR + "You" );
         toggle.setText( "You\n\n\n\n\n." );
         double ti = Math.toRadians( -90 );
@@ -154,6 +154,9 @@ public class GameWindow{
 
     public void setPlayerCardActive( int playerIndex, boolean active ){
         playersCards.get( playerIndex ).setDisable( !active );
+    }
+    public void setPlayerCardSelected( int playerIndex, boolean selected ){
+        playersCards.get( playerIndex ).setSelected( selected );
     }
 
     public void setTableCardsSelected( boolean selected ){

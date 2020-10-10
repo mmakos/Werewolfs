@@ -65,6 +65,7 @@ public class Game{
                     case "Thing": makeThing(); break;
                     case "Paranormal investigator": makeParanormal(); break;
                     case "Robber": makeRobber(); break;
+                    case "Troublemaker": makeTroublemaker(); break;
                 }
             }catch( IOException e ){
                 s.writeLog( "No response from " + card + "." );
@@ -179,6 +180,15 @@ public class Game{
         s.cardsNow.set( playersId, cardName );
         s.cardsInGame.remove( "Witch" );
     }
+
+    void makeTroublemaker() throws InterruptedException, IOException{
+        int idOfTroublemaker = startRole( "Troublemaker" );
+        if( idOfTroublemaker < 0 ) return;
+        String[] chosenCards = s.receiveGame( idOfTroublemaker ).split( MSG_SPLITTER );
+        Collections.swap( s.cardsNow, s.cardsNow.indexOf( chosenCards[ 0 ] ), s.cardsNow.indexOf( chosenCards[ 1 ] ) );
+        s.cardsInGame.remove( "Troublemaker" );
+    }
+
     void makeBeholder() throws InterruptedException{
         if(startRole( "Beholder" )<0) return;
     }
@@ -194,7 +204,7 @@ public class Game{
         s.sendGame(idOfInsomniac, insomniacNow );
 //        String idOfInsomniacString = Integer.toString(idOfInsomniac);         // TODO po co to jest?
 //        s.sendGame(idOfInsomniac, idOfInsomniacString );
-        Thread.sleep( 5000 );
+        Thread.sleep( 3000 );
         s.cardsInGame.remove( "Insomniac" );
     }
 
