@@ -12,6 +12,7 @@ import javafx.util.Duration;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class Game{
@@ -37,8 +38,8 @@ public class Game{
     public PrintWriter output;
 
     Game( Socket socket, String language ) throws IOException{
-        this.input = new BufferedReader( new InputStreamReader( socket.getInputStream() ) );
-        this.output = new PrintWriter( socket.getOutputStream(), true );
+        this.input = new BufferedReader( new InputStreamReader( socket.getInputStream(), StandardCharsets.UTF_8 ) );
+        this.output = new PrintWriter( new OutputStreamWriter( socket.getOutputStream(), StandardCharsets.UTF_8 ), true );
         try{
             Media media2 = new Media( new File( "audio/role.wav" ).toURI().toString() );
             Media media = new Media( new File( "audio/wakeUp.mp3" ).toURI().toString() );

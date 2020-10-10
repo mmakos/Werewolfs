@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="gamePane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" prefHeight="820.0" prefWidth="1280.0" style="-fx-background-color: #2b2a4c; -fx-background-image: url( &quot;../../img/background.jpg&quot; );" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.GameWindow">
+<AnchorPane fx:id="gamePane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" prefHeight="820.0" prefWidth="1280.0" style="-fx-background-color: #2b2a4c; -fx-background-image: url( &quot;img/background.jpg&quot; );" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.GameWindow">
    <children>
       <HBox alignment="TOP_CENTER" layoutX="523.0" layoutY="310.0" prefHeight="100.0" prefWidth="210.0" AnchorPane.topAnchor="310.0">
          <children>

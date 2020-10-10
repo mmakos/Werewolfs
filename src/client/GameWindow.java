@@ -62,17 +62,17 @@ public class GameWindow{
             default: toggle = playersCards.get( game.players.indexOf( player ) );
         }
         if( !game.players.contains( player ) ){
-            Platform.runLater( () -> toggle.setStyle( "-fx-background-image: url(\"/img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" ) );
+            Platform.runLater( () -> toggle.setStyle( "-fx-background-image: url(\"img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" ) );
         }
         else{
-            Platform.runLater( () -> toggle.setStyle( "-fx-graphic: url(\"/img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" ) );
+            Platform.runLater( () -> toggle.setStyle( "-fx-graphic: url(\"img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" ) );
         }
         toggle.setOpacity( 1.0 );
     }
     public void updateMyCard( String card ){
         ToggleButton toggle = playersCards.get( game.players.indexOf( game.nickname ) );
         game.displayedCard = card;
-        Platform.runLater( () -> toggle.setStyle( "-fx-graphic: url(\"/img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" ) );
+        Platform.runLater( () -> toggle.setStyle( "-fx-graphic: url(\"img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" ) );
     }
 
     public void createPlayersCards(){
@@ -117,8 +117,8 @@ public class GameWindow{
         toggle.setMaxSize( 72, 100 );
         toggle.setFont( new Font( 12 ) );
         toggle.setDisable( true );
-        final Image unselected = new Image( "/img/backCardSmallDark.png" );
-        final Image selected = new Image( "/img/backCardSmall.png" );
+        final Image unselected = new Image( "img/backCardSmallDark.png" );
+        final Image selected = new Image( "img/backCardSmall.png" );
         final ImageView toggleImage = new ImageView();
         toggleImage.setFitWidth( 72 );      // scaling
         toggleImage.setPreserveRatio( true );
