@@ -213,10 +213,15 @@ public class Game{
     }
     void makeBeholder() throws InterruptedException {
         int idofBeholder = startRole("Beholder");
-        if(idofBeholder<0) return;
-        int idOfSeer = s.players.get( s.cardsOnBegin.indexOf( "Seer" ) ).id;
-        String idOfSeerStr = Integer.toString(idOfSeer);
-        s.sendGame(idofBeholder,idOfSeerStr);
+        if (idofBeholder < 0) return;
+        if( !s.cardsOnBegin.contains( "Seer" ) ) {
+            int idOfSeer = s.players.get(s.cardsOnBegin.indexOf("Seer")).id;
+            String idOfSeerStr = Integer.toString(idOfSeer);
+            s.sendGame(idofBeholder, idOfSeerStr);
+        }
+        else{
+            s.sendGame(idofBeholder,"NoSeer");
+        }
     }
     void makeInsomniac() throws InterruptedException{
         int idOfInsomniac = startRole( "Insomniac" );

@@ -299,8 +299,9 @@ public class Game{
 
     void makeBeholder(){
         gameWindow.setRoleInfo( statements[ 32 ] );
-        String seer = readMsgOnly();
-        gameWindow.reverseCard(seer,"Seer");
+        String msg = readMsgOnly();
+        if(msg=="NoSeer") gameWindow.setRoleInfo( "Seer jest na stole lub nie ma go w grze" );
+        else gameWindow.reverseCard(msg,"Seer");
     }
     void makeSeer() throws InterruptedException {
         gameWindow.setRoleInfo( statements[ 31 ] );
