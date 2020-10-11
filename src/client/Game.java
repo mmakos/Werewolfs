@@ -174,7 +174,7 @@ public class Game{
             gameWindow.reverseCard( clickedCard, chosenCard );
         }
         else
-            gameWindow.setRoleInfo( statements[ 20 ] + str.toString() + "." );
+            gameWindow.setRoleInfo( statements[ 19 ] + str.toString() + "." );
     }
 
     void makeMinion(){
