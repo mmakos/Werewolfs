@@ -21,7 +21,7 @@ Pozostałymi wilkołakami są@Werewolf
 Wśród graczy nie ma wilkołaków.@Minion
 Wilkołakami są:@Minion
 Wybierz jedną kartę ze środka, którą chcesz podejrzeć.@Mystic wolf,Apprentice seer
-Wybierz jedną kartę ze środka, którą chcesz podejrzeć oraz podarować innemu graczowi.Następnie wybierz tego gracza.@Witch
+Wybierz jedną kartę ze środka, którą chcesz podejrzeć oraz podarować innemu graczowi. Następnie wybierz tego gracza.@Witch
 Teraz wybierz gracza, któremu chcesz podarować tę kartę.@Witch
 Wybierz dwóch graczy, którym chcesz zamienić karty.@Troublemaker
 Wybierz drugiego gracza.@Troublemaker

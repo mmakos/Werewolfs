@@ -106,7 +106,7 @@ public class Game{
             case "Copycat": makeCopycat(); break;
             case "Insomniac": makeInsomniac(); break;
             case "Werewolf": makeWerewolf(); break;
-            case "Witch": makeWitch();
+            case "Witch": makeWitch(); break;
             case "Beholder": makeBeholder(); break;
             case "Seer": makeSeer(); break;
             case "Thing": makeThing(); break;
@@ -359,11 +359,11 @@ public class Game{
             gameWindow.setPlayersCardsActive( false );
             sendMsg( gameType, clickedCard );
             String msg = readMsgOnly();
-            if( !msg.equals( "AGAIN" ) ){
-                msg = msg.split( "_" )[ 0 ];
+            gameWindow.reverseCard( clickedCard, msg );
+            msg = msg.split( "_" )[ 0 ];
+            if( msg.equals( "Tanner" ) || msg.equals( "Werewolf" ) || msg.equals( "Mystic wolf" ) ){
                 gameWindow.setCardLabel( " -> " + msg );
                 gameWindow.setStatementLabel( statements[ 3 ] + " " + msg );
-                gameWindow.reverseCard( clickedCard, msg );
                 break;
             }
         }

@@ -253,13 +253,11 @@ public class Game{
         for( int i = 0; i < 2; ++i ){
             String chosenCard = s.receiveGame( paranormalId );
             String card = s.cardsOnBegin.get( s.players.indexOf( s.getPlayer( chosenCard ) ) );
+            s.sendGame( paranormalId, card );
             if( card.split( "_" )[ 0 ].equals( "Tanner" ) || card.split( "_" )[ 0 ].equals( "Werewolf" ) || card.split( "_" )[ 0 ].equals( "Mystic wolf" ) ){
                 s.realParanormal = card;
-                s.sendGame( paranormalId, card );
                 break;
             }
-            else
-                s.sendGame( paranormalId, "AGAIN" );
         }
         Thread.sleep( 3000 );
     }
