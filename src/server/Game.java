@@ -24,6 +24,7 @@ public class Game{
             }catch( IOException e ){
                 s.writeLog( "No response from copycat." );
             }
+            s.cardsInGame.remove( "Copycat" );
         }
         boolean isWerewolf = false;
         for( int i = 0; i < Card.werewolvesQuant; ++i ){
@@ -40,6 +41,8 @@ public class Game{
             }catch( IOException e ){
                 s.writeLog( "No response from werewolves." );
             }
+            for( int i = 0; i < Card.werewolvesQuant; ++i )
+                s.cardsInGame.remove( "Werewolf_" + i );
         }
         if( s.cardsInGame.contains( "Mystic wolf" ) ){
             try{
@@ -47,6 +50,7 @@ public class Game{
             }catch( IOException e ){
                 s.writeLog( "No response from mystic wolf." );
             }
+            s.cardsInGame.remove( "Mystic wolf" );
         }
         if( s.cardsInGame.contains( "Minion" ) )
             makeMinion( werewolvesMsg );
@@ -144,8 +148,6 @@ public class Game{
             }
             Thread.sleep( 3000 );       //Not necessary, time for werewolves to meet together
         }
-        for( int i = 0; i < Card.werewolvesQuant; ++i )
-            s.cardsInGame.remove( "Werewolf_" + i );
         s.writeLog( "Werewolves fall asleep" );
         return str.toString();
     }
@@ -156,7 +158,6 @@ public class Game{
         s.sendGame( minionsId, werewolvesMsg );
         Thread.sleep( 5000 );
         s.cardsInGame.remove( "Minion" );
-
     }
 
     void makeMysticWolf() throws InterruptedException, IOException {
@@ -167,7 +168,6 @@ public class Game{
         s.sendGame( idOfMysticWolf, s.cardsInCenter[cardToSeeId] );
         s.writeLog(s.cardsInCenter[cardToSeeId]);
         Thread.sleep( 3000 );
-        s.cardsInGame.remove( "Mystic wolf" );
     }
 
     void makeApprenticeSeer() throws InterruptedException, IOException {
