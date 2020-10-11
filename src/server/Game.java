@@ -213,13 +213,13 @@ public class Game{
     void makeBeholder() throws InterruptedException {
         int idOfBeholder = startRole("Beholder");
         if (idOfBeholder < 0) return;
-        if( s.cardsOnBegin.contains( "Seer" ) ) {
-            int idOfSeer = s.players.get(s.cardsOnBegin.indexOf("Seer")).id;
-            String idOfSeerStr = Integer.toString(idOfSeer);
-            s.sendGame(idOfBeholder, idOfSeerStr);
+        if( s.cardsOnBegin.contains( "Seer" ) ){
+            String seerName = s.players.get(s.cardsOnBegin.indexOf("Seer")).name;
+            s.sendGame(idOfBeholder, seerName);
         }
         else
             s.sendGame(idOfBeholder,"NoSeer");
+        Thread.sleep( 3000 );
     }
     void makeInsomniac() throws InterruptedException{
         int idOfInsomniac = startRole( "Insomniac" );
@@ -252,7 +252,7 @@ public class Game{
         if( paranormalId < 0 ) return;
         for( int i = 0; i < 2; ++i ){
             String chosenCard = s.receiveGame( paranormalId );
-            String card = s.getPlayersCard( chosenCard );
+            String card = s.cardsOnBegin.get( s.players.indexOf( s.getPlayer( chosenCard ) ) );
             if( card.split( "_" )[ 0 ].equals( "Tanner" ) || card.split( "_" )[ 0 ].equals( "Werewolf" ) || card.split( "_" )[ 0 ].equals( "Mystic wolf" ) ){
                 s.realParanormal = card;
                 s.sendGame( paranormalId, card );

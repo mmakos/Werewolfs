@@ -25,10 +25,11 @@ Wybierz jedną kartę ze środka, którą chcesz podejrzeć oraz podarować inne
 Teraz wybierz gracza, któremu chcesz podarować tę kartę.@Witch
 Wybierz dwóch graczy, którym chcesz zamienić karty.@Troublemaker
 Wybierz drugiego gracza.@Troublemaker
-Wybierz kartę innego gracza. Jeśli jest to tanner lub wilkołak, od tej pory będziesz grał jako ta karta. Jeśli nie, wybierz kolejną kartę. Jeśli nadal jest to karta z miasta, dalej grasz jako paranormal investigator, czyli postaćz miasta.@Paranormal
+Wybierz kartę innego gracza. Jeśli jest to tanner lub wilkołak, od tej pory będziesz grał jako ta karta. Jeśli nie, wybierz kolejną kartę. Jeśli nadal jest to karta z miasta, dalej grasz jako paranormal investigator, czyli postać z miasta.@Paranormal
 Możesz podejrzeć swoją kartę. Zobacz kim jesteś teraz.@Insomniac
 Wybierz gracza, którego kartę chcesz ukraść.@Robber
 Wybierz gracza, którego chcesz dotknąć. Gracz poczuje dotknięcie i będzie mógł je potwierdzić w ciągu dnia.@Thing
 Możesz teraz podejrzeć 2 karty ze środka.@Seer
 Zobaczysz teraz kto jest Seerem.@Beholder
 Seer jest na stole lub nie ma go w grze.@Beholder
+Wybierz kolejną kartę. Jeśli nadal jest to karta z miasta, dalej grasz jako paranormal investigator, czyli postać z miasta.@Paranormal

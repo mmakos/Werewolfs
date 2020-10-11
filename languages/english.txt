@@ -32,3 +32,4 @@ Choose player on your left or right, you want to touch. He feels your touch and 
 Choose two cards from the center you want to see.@Seer
 Now you will see who is a Seer.@Beholder
 Seer is in the center or it's not in the game at all.@Beholder
+You have to choose second card. If it's still not werewolf or tanner you play with city.

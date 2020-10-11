@@ -300,9 +300,10 @@ public class Game{
     void makeBeholder(){
         gameWindow.setRoleInfo( statements[ 32 ] );
         String msg = readMsgOnly();
-        if(msg.equals( "NoSeer" )) gameWindow.setRoleInfo( statements[ 33 ] );
+        if( msg.equals( "NoSeer" ) ) gameWindow.setRoleInfo( statements[ 33 ] );
         else gameWindow.reverseCard(msg,"Seer");
     }
+
     void makeSeer() throws InterruptedException {
         gameWindow.setRoleInfo( statements[ 31 ] );
         waitingForButton = true;
@@ -344,7 +345,7 @@ public class Game{
     }
 
     void makeParanormal(){
-        gameWindow.setRoleInfo( statements[ 13 ] + "\n" + statements[ 27 ] );
+        gameWindow.setRoleInfo( statements[ 27 ] );
         for( int i = 0; i < 2; ++i ){
             waitingForButton = true;
             gameWindow.setPlayersCardsActive( true );
@@ -352,7 +353,7 @@ public class Game{
             while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
             if( waitingForButton ){
                 clickedCard = getRandomPlayerCard();
-                gameWindow.setRoleInfo( statements[ 13 ] + "\n" + statements[ 13 ] );
+                gameWindow.setRoleInfo( statements[ 13 ] + "\n" + statements[ 34 ] );
                 waitingForButton = false;
             }
             gameWindow.setPlayersCardsActive( false );
