@@ -300,7 +300,7 @@ public class Game{
     void makeBeholder(){
         gameWindow.setRoleInfo( statements[ 32 ] );
         String msg = readMsgOnly();
-        if(msg=="NoSeer") gameWindow.setRoleInfo( "Seer jest na stole lub nie ma go w grze" );
+        if(msg.equals( "NoSeer" )) gameWindow.setRoleInfo( statements[ 33 ] );
         else gameWindow.reverseCard(msg,"Seer");
     }
     void makeSeer() throws InterruptedException {
