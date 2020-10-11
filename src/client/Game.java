@@ -373,7 +373,7 @@ public class Game{
     }
 
     void makeRobber(){
-        gameWindow.setRoleInfo( statements[ 13 ] + "\n" + statements[ 29 ] );
+        gameWindow.setRoleInfo( statements[ 29 ] );
         waitingForButton = true;
         gameWindow.setPlayersCardsActive( true );
         long start = System.currentTimeMillis();
