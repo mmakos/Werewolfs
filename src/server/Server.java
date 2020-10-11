@@ -178,11 +178,11 @@ public class Server{
     void drawCards(){   // Randomly give cards to players and 3 on the table
         Random rand = new Random();
         LinkedList< String > temp = new LinkedList<>( cardsInGame );
-
-        //todo to remove when not testing with one player
-        cardsOnBegin.add( "Seer" );
-        cardsNow.add( cardsOnBegin.get( 0 ) );
-        temp.remove( "Seer" );
+//
+//        //todo to remove when not testing with one player
+//        cardsOnBegin.add( "Seer" );
+//        cardsNow.add( cardsOnBegin.get( 0 ) );
+//        temp.remove( "Seer" );
 
         for( int i = 0; i < 3; ++i ){
             int randInt = rand.nextInt( temp.size() );
