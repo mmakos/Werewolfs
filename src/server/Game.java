@@ -200,11 +200,6 @@ public class Game{
         Collections.swap( s.cardsNow, s.cardsNow.indexOf( chosenCards[ 0 ] ), s.cardsNow.indexOf( chosenCards[ 1 ] ) );
         s.cardsInGame.remove( "Troublemaker" );
     }
-
-    void makeBeholder() throws InterruptedException{
-        if(startRole( "Beholder" )<0) return;
-    }
-    //TODO Dokończyć rano
     void makeSeer() throws InterruptedException, IOException {
         int idOfSeer = startRole("Seer");
         if(idOfSeer<0) return;
@@ -215,6 +210,13 @@ public class Game{
         String chosenCard2 = s.cardsInCenter[chosenCard2ID];
         s.sendGame(idOfSeer,chosenCard1+MSG_SPLITTER+chosenCard2);
         s.cardsInGame.remove( "Seer" );
+    }
+    void makeBeholder() throws InterruptedException {
+        int idofBeholder = startRole("Beholder");
+        if(idofBeholder<0) return;
+        int idOfSeer = s.players.get( s.cardsOnBegin.indexOf( "Seer" ) ).id;
+        String idOfSeerStr = Integer.toString(idOfSeer);
+        s.sendGame(idofBeholder,idOfSeerStr);
     }
     void makeInsomniac() throws InterruptedException{
         int idOfInsomniac = startRole( "Insomniac" );

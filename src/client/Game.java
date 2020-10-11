@@ -297,7 +297,11 @@ public class Game{
         sendMsg( gameType, cards );
     }
 
-    void makeBeholder(){}
+    void makeBeholder(){
+        gameWindow.setRoleInfo( statements[ 32 ] );
+        String seer = readMsgOnly();
+        gameWindow.reverseCard(seer,"Seer");
+    }
     void makeSeer() throws InterruptedException {
         gameWindow.setRoleInfo( statements[ 31 ] );
         waitingForButton = true;
@@ -313,7 +317,7 @@ public class Game{
             waitingForButton = false;
         }
         String cards = clickedCard + MSG_SPLITTER;
-        gameWindow.setCenterCardSelected(clickedCard,true);
+        gameWindow.setCenterCardSelected(clickedCard,false);
         waitingForButton = true;
         while( waitingForButton && System.currentTimeMillis() - start1 < MAX_ROLE_TIME * 1000 );
         if( waitingForButton ){
@@ -325,7 +329,7 @@ public class Game{
         sendMsg(gameType,cards);
         String cardsInCenter[] = readMsgOnly().split(MSG_SPLITTER);
         String clickedCards[] = cards.split(MSG_SPLITTER);
-        gameWindow.setCenterCardSelected(clickedCard,true);
+        gameWindow.setCenterCardSelected(clickedCard,false);
         gameWindow.reverseCard(clickedCards[0],cardsInCenter[0]);
         gameWindow.reverseCard(clickedCards[1],cardsInCenter[1]);
         gameWindow.setTableCardsActive( false );
