@@ -4,7 +4,7 @@
 Wilkołaki to wieloosobowa gra podobna do popularnej "Mafii", z tym że każdy ma swoją własną rolę, a cała akcja dzieje się podczas jednej doby. Niniejszy projekt jest przełożeniem tejże gry na wersję online.
 
 ## Instalacja
-Instalator można pobrać z... Następnie należy zainstalować grę podążając za wskazówkami instalatora. Dodatkowo konieczne jest posiadanie JRE (Java Runtine Environment) w wersji 8 - można je pobrać z <https://java.com/pl/download>.
+Instalator można pobrać z ![dysku google](https://drive.google.com/file/d/1SMHpkUvDWzyb7l4HTEqGTbKZkDLDBVxt/view?usp=sharing). Następnie należy zainstalować grę podążając za wskazówkami instalatora. Dodatkowo konieczne jest posiadanie JRE (Java Runtine Environment) w wersji 8 - można je pobrać z <https://java.com/pl/download>.
 
 ## Uruchomienie
 
