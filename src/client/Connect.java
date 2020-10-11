@@ -8,16 +8,44 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 public class Connect{
     public static final int MAX_LOGIN_LENGTH = 8;
+    private int port = 23000;
+    private String ip = "localhost";
+
     @FXML
     public void initialize(){
         setOnDrag();
         langChoiceBox();
+        getDefaultSettings();
+    }
+
+    private void getDefaultSettings(){
+        try{
+            Scanner scan = new Scanner( new File( "default.cfg" ) );
+            String[] config = scan.nextLine().split( ":" );
+            port = Integer.parseInt( config[ 1 ] );
+            ip = config[ 0 ];
+            scan.close();
+        }catch( IOException | IndexOutOfBoundsException | NumberFormatException ignored ){}
+        portField.setText( Integer.toString( port ) );
+        ipField.setText( ip );
+    }
+
+    private void saveDefault(){
+        try{
+            if( !ipField.getText().equals( ip ) || !portField.getText().equals( Integer.toString( port ) ) ){
+                FileWriter wr = new FileWriter( "default.cfg" );
+                wr.write( ipField.getText() + ":" + portField.getText() );
+                wr.close();
+            }
+        }catch( IOException | NumberFormatException ignored ){}
     }
 
     private void langChoiceBox(){
@@ -50,9 +78,9 @@ public class Connect{
 
     @FXML protected void setDefault(){
         if( defaultCheckBox.isSelected() ){
-            ipField.setText( "185.20.175.81" );
+            ipField.setText( ip );
             ipField.setDisable( true );
-            portField.setText( "23000" );
+            portField.setText( Integer.toString( port ) );
             portField.setDisable( true );
         } else{
             ipField.setText( "" );
@@ -77,7 +105,8 @@ public class Connect{
         int port = 23000;
         try{
             port = Integer.parseInt( portField.getText() );
-        } catch( NumberFormatException ignored ){        }
+        } catch( NumberFormatException ignored ){}
+        saveDefault();
         try{
             socket = new Socket( ip, port );
             Game game = new Game( socket, getLanguage() );
