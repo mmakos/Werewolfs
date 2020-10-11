@@ -29,4 +29,5 @@ Wybierz kartę innego gracza. Jeśli jest to tanner lub wilkołak, od tej pory b
 Możesz podejrzeć swoją kartę. Zobacz kim jesteś teraz.@Insomniac
 Wybierz gracza, którego kartę chcesz ukraść.@Robber
 Wybierz gracza, którego chcesz dotknąć. Gracz poczuje dotknięcie i będzie mógł je potwierdzić w ciągu dnia.@Thing
+Możesz teraz podejrzeć 2 karty ze środka@Seer
 

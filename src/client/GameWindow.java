@@ -159,7 +159,14 @@ public class GameWindow{
     public void setPlayerCardSelected( int playerIndex, boolean selected ){
         playersCards.get( playerIndex ).setSelected( selected );
     }
-
+    public void setCenterCardSelected(String cardID,boolean selected){
+        switch (cardID){
+            case "card0": card0.setSelected( selected ); break;
+            case "card1": card1.setSelected( selected ); break;
+            case "card2": card2.setSelected( selected ); break;
+            default: break;
+        }
+    }
     public void setTableCardsSelected( boolean selected ){
         card0.setSelected( selected );
         card1.setSelected( selected );

@@ -76,7 +76,11 @@ public class Game{
                 gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " " + statements[ 0 ] );
                 if( msg.equals( card.split( "_" )[ 0 ].toUpperCase() ) || ( msg.equals( "WEREWOLF" ) && card.equals( "Mystic wolf" ) ) ){
                     gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " " + statements[ 1 ] );
-                    proceedCard( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() );
+                    try {
+                        proceedCard( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() );
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
                 if( msg.equals( "THING" ) )
                     waitForTingsTouch();
@@ -89,7 +93,7 @@ public class Game{
         gameLogic.start();
     }
 
-    private void proceedCard( String card ){
+    private void proceedCard( String card ) throws InterruptedException {
         try{
             roleSignal.seek( Duration.ZERO );
             roleSignal.play();
@@ -294,7 +298,38 @@ public class Game{
     }
 
     void makeBeholder(){}
-    void makeSeer(){
+    void makeSeer() throws InterruptedException {
+        gameWindow.setRoleInfo( statements[ 31 ] );
+        waitingForButton = true;
+        gameWindow.setTableCardsActive( true );
+
+        // Waiting for clicked card, but with time limit of 30 seconds
+        long start1 = System.currentTimeMillis();
+        while( waitingForButton && System.currentTimeMillis() - start1 < MAX_ROLE_TIME * 1000 );
+        // If time is up, card will be selected randomly
+        if( waitingForButton ){
+            int rand = new Random().nextInt( 3 );
+            clickedCard = "card" + rand;
+            waitingForButton = false;
+        }
+        String cards = clickedCard + MSG_SPLITTER;
+        gameWindow.setCenterCardSelected(clickedCard,true);
+        waitingForButton = true;
+        while( waitingForButton && System.currentTimeMillis() - start1 < MAX_ROLE_TIME * 1000 );
+        if( waitingForButton ){
+            int rand = new Random().nextInt( 3 );
+            clickedCard = "card" + rand;
+            waitingForButton = false;
+        }
+        cards += clickedCard;
+        sendMsg(gameType,cards);
+        String cardsInCenter[] = readMsgOnly().split(MSG_SPLITTER);
+        String clickedCards[] = cards.split(MSG_SPLITTER);
+        gameWindow.setCenterCardSelected(clickedCard,true);
+        gameWindow.reverseCard(clickedCards[0],cardsInCenter[0]);
+        gameWindow.reverseCard(clickedCards[1],cardsInCenter[1]);
+        gameWindow.setTableCardsActive( false );
+        gameWindow.setTableCardsSelected( false );
     }
     void makeInsomniac(){
         gameWindow.setRoleInfo( statements[ 28 ] );

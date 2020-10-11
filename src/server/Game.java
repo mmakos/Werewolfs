@@ -209,10 +209,10 @@ public class Game{
         int idOfSeer = startRole("Seer");
         if(idOfSeer<0) return;
         String[] chosenCards = s.receiveGame( idOfSeer ).split( MSG_SPLITTER );
-        int chosenCard1 = s.getTableCardId(chosenCards[0]);
-        int chosenCard2 = s.getTableCardId(chosenCards[1]);
-        Integer.toString(chosenCard1);
-        Integer.toString(chosenCard2);
+        int chosenCard1ID = s.getTableCardId(chosenCards[0]);
+        int chosenCard2ID = s.getTableCardId(chosenCards[1]);
+        String chosenCard1 = s.cardsInCenter[chosenCard1ID];
+        String chosenCard2 = s.cardsInCenter[chosenCard2ID];
         s.sendGame(idOfSeer,chosenCard1+MSG_SPLITTER+chosenCard2);
         s.cardsInGame.remove( "Seer" );
     }
