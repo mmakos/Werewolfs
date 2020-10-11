@@ -1,106 +1,21 @@
-# Werewolves
-Online werewolves game for children for quarantine's time.
+# Wilkołaki
 
-Projekt powastaje, aby można było grać w ulubioną grę grupy wikingów z PR, czyli w wilkołaki, podczas kwarantanny i nie tylko bez wychodzenia z domu.
+## Opis gry
+Wilkołaki to wieloosobowa gra podobna do popularnej "Mafii", z tym że każdy ma swoją własną rolę, a cała akcja dzieje się podczas jednej doby. Niniejszy projekt jest przełożeniem tejże gry na wersję online.
 
-Architektura: klient - serwer
+## Instalacja
+Instalator można pobrać z [dysku google](https://drive.google.com/file/d/1SMHpkUvDWzyb7l4HTEqGTbKZkDLDBVxt/view?usp=sharing). Następnie należy zainstalować grę podążając za wskazówkami instalatora. Dodatkowo konieczne jest posiadanie JRE (Java Runtine Environment) w wersji 8 - można je pobrać z <https://java.com/pl/download>.
 
-Serwer przeprowadza grę. Zawiera całą logikę gry itd.
-Klient łączy się z serwerem i jedynie zapewnia odpowiednią interakcję z graczem podczas jego tury.
+## Uruchomienie
 
-Główny wątek (serwer):
-1. Serwer nasłuchuje klientów tworząc wektor klientów (id klientów od 100 w górę), w wybranym momencie kończy nasłuchiwać i zaczyna grę.
-2. Wybieramy karty, które chcemy, żeby były w grze.
-3. Serwer "rozdaje" karty (przypisuje losowo do karty id klienta, lub jedną z trzech pozycji na środku stołu (0, 1, 2).
-4. Serwer wysyła do wszystkich klientów info z wektorem graczy (info o kartach tylko na serwerze) oraz karcie danego gracza.
-5. Logika gry po kolei.
-6. Po zakończeniu nocy wciskamy przycisk "Głosowanie". Serwer wysyła do klientów info, z prośbą o zagłosowanie na konkretnego gracza.
-7. Serwer "liczy głosy" i wysyła info kto zginął oraz odsłania wszystkie karty (wysyła info o kartach).
+### Klient (gracz)
+Aby dołączyć do gry jako klient, należy uruchomić aplikację **Werewolves.exe**. W pole *ip* należy wpisać adres IP serwera do którego chcemy dołączyć (podany przez administratora gry). W pole *port* należy wpisać numer portu, na którym serwer udostępnia usługę, czyli domyślnie **23000**. Po wciśnięciu przycisku *login*, allikacja wygląda jakby się zawiesiła, ale po prostu oczekuje na rozpoczęcie gry przez administratora.
 
-Logika gry:
-Serwer przechowuje 3 główne wektory: Wektor graczy (WG), wektor kart graczy na początku gry (WP) i wektor kart aktualnie (WA) i jeszcze może listę kart w grze (LK) (dla ułatwienia), jakąś tablicę kart na środku stołu (TC)
+### Serwer (administrator gry)
+Tu sprawa jest bardziej skomplikowana. Ja nie udostępniam żadnego serwera, więc aby zorganizować grę, należy na swoim komputerze postawić serwer. Jeśli stawialiscie kiedyś serwery w Minecrafcie to można skorzystać z jakichś darmowych VPN-ów typu Hamachi. Najlepiej jednak po prostu zalogować się do routera, wpisując w przeglądarkę adres routera, czyli swoje IP lub lokalny adres IP z końcówką *1*, czyli albo sprawdzamy swoje IP np. na stronie <https://www.moje-ip.eu/> i wpisujemy go jako adres internetowy w przeglądarce albo sprawdzamy lokalny adres komputera wpisując w *cmd* (command line) plecenie *ipconfig* i jeżeli adres komputera jest np. *192.168.100.11* to wpisujemy w przeglądarce *192.168.100.**1*** - adres braby domyślnej. Następnie należy na routerze ustawić przekierowanie portu (będzie to pocja *Port Forwarding Rules*, *forwarding* lub coś z serwerem). Na kżdym routerze wugląda to inaczej ale ważne żeby porty usawić na *23000* a adres IP na nasze IP (jak na poniższym screenie). A w ogóle najlepiej to znaleźć jakiś tutorial na YT jak postawić serwer na routerze.<br><br>
+Następnie należy uruchomić aplikację *SerWerewolves.exe* oraz wcisnąć *Run Server*. Kiedy połączy się zadowalająca nas liczba graczy (gracze pojawiają nam się w okienku), wciskamy *Start game*, wybieramy karty i rozpoczynamy grę.
 
-Główna funkcja:
-Po kolei sprawdza czy jest dana funkcja, a potem robi odpowiednie rzeczy. Coś w stylu:
+![Server instruction](https://lh3.googleusercontent.com/fife/ABSRlIoENTgQX3nmef-2z-g4rvtSfd1RXM6gb59A_8QcYkkE-DjHtih8teSC-TzmEApKg689wyxtInuwMUPCfK6a8LzXwt_EKq2RzjEFdbsRP-KH-iqyliEVM70zr8hndDKz-oYXTr3ajcrDKveG1YLvZwdd0JlTh3nCHOqYZHM1EmVVlY289Di0fdyjI3p1AQGqFCPFyILbw4wAf1rhFAWPjjQo6YN_Q1Cpgr53ahAZOLrJaj1CiOhFXY3K_yPzuEBReFKDSoAmqbNoa9EA4HbhxaHohd4yuIOO-kyROnurJLrm7f6xqI32IicixtYHz-tS796ZBofM5rn8UkGhcMCrRY3AiOMHwBZYQkexYUkxe-qY2u6J5Wl2ClBFLDUpfDxW4dr-F-nuqUzGvN7dvg_-1iZ8W2F2BNGNPP-_m1kCs4pqzqmuinV00cnTtPuZuKc537889eeIaj_y5yYFqKctHie-N0i6coUb29TEgt8cJo28GnESaRTIi-Kp7tnp2SakCTHp2XjgrwN8dzE-CvfAouoeK5VKBI8jUqoRGR6WtcoTrXN_CrCAvb1umkGhPig79oiiHBOeuQ1Ty6lznLUsWkVLuJ6p2Wsk4HPIl5uwhyrsWd15gFgvRhL-qWQM53UXhP3Y5GpU1FPKLTPMyTPAJAqtNqoTc8mMrIoNoyQYWcKTlSIrkngYznA8eH0_I0KjopEI6k3L7mh43kAK0ExLSx9_spjeEMEMBg=w1600-h828-ft)
 
-```ruby
-void play(){
-	boolean insomniac = false;
-	//Wywalamy insomniaca bo on na końcu
-	if( LK.contains( "insomniac" ) ){
-		insomniac = true;
-		LK.remove( "insomniac" );
-	}
-	makeCopycat();
-	makeWerewolfs();
-	//Tu jakiś random
-	Random rand = new Random();
-	while( LK.length ){
-		// Losujemy postać
-		switch( LK[ rand.nextInt( LK.length ) ] ){
-			case "witch" -> makeWitch();
-			case "beholder" -> makeBeholder();
-			case "Seer" -> makeSeer();
-			//bez insomniaca, bo on na końcu
-		}
-	}
-	if( insomniac )
-		makeInsomniac();
-}
-```
-Logika pojedynczej postaci:
-
-COPYCAT:
-- serwer wysyła do copycata info o jego turze, coś w stylu "COPYCAT".
-- gdy klient odbierze "COPYCAT", to daje graczowi do wyboru jedną z trzech środkowych kart (UI - user interface)
-- Klient wysyla do serwera wiadomośc zwrotną, którą kartę wybrał, coś w stylu "2".
-- serwer wysyła do klienta info, jaką kartą się staje i podmienia u siebi odpowiednio w wektorze WP i WA.
-Przykładowy kod poniżej:
-
-```ruby
-void makeCopycat(){
-	if( LK.contains( "copycat" )
-		return;
-	//tu logika copycata
-	
-	int idOfCopycat = WG[ WP.indexOf( "copycat" ) ].id;		// Uzyskujemy id gracza copycata
-	
-	send( idOfCopycat, "COPYCAT" );			// Wysyłamy do gracza o danym id wiadomość "COPYCAT"	(to send to ja już ogarnę)
-	chosenCardId = receive( idOfCopycat );	// Odbieramy numer wybranej karty
-	send( idOfCopycat, TC[ chosenCardId ];	// Wysyłamy nazwę karty którą gracz się staje
-	WA[ WP.indexOf( "copycat" ) ] = TC[ chosenCardId;
-	WP[ WP.indexOf( "copycat" ) ] = TC[ chosenCardId;		// Podmieniamy karty
-	
-	//na koniec
-	LK.remove( "copycat" );
-}
-```
-ITD.
-
-
-## Funkcje klienta:
-
-**setPlayerCardActive( int playerIdx, boolean active )**<br>
-Funkcja ustawia karty gracza o indeksie *playerIdx*, jako możliwe do wyboru (kiedy active=true) i jako niemożliwe do wyboru w przciwnym wypadku.
-
-**setPlayersCardsActive( boolean active )**<br>
-Funkcja ustawia karty wszystkich graczy, jako możliwe do wyboru (kiedy active=true) i jako niemożliwe do wyboru w przciwnym wypadku.
-
-**setTableCardsActive( boolean active )**<br>
-To co wyżej tylko z 3 kartami na środku stołu.
-
-**setPlayersCardsSelected( boolean selected )**<br>
-Funkcja ustawia karty wszystkich graczy jako niewybrane kiedy *selected* jest *false*. Używa się tego do tego, aby po wybraniu przez gracza kard można było je wybrać później, jeszcze raz, np. przy głosowaniu.
-
-**setTableCardsSelected( boolean selected )**<br>
-To co wyżej tylko z 3 kartami na środku stołu.
-
-**reverseCard( String clickedCard, String card )**
-Odwraca kartę gracza o nazwie *clickedCard* lub jedną z 3 środkowych kard jeśli *clickedCard* jest "card0", "card1" lub "card2". *card* to nazwa karty, jaka ukaże się po odwróceniu (nsomniac, warewolf itd.).
-
-Przykład:
-* Aby gracz wybrał kartę spośród grczy należy najpierw ustawić zmienną *waitingForButton* na wartość true oraz ustawić karty graczy na active (*gameWindow.setPlayersCardsActive( true )*).<br>
-* Następnie w pętli czekamy, aż gracz naciśnie jakąś kartę ("while( waitingForButton );"). Możemy pobrać ze zmiennej *clickedCard* nazwę gracza, którego kartazostała wybrana, lub w przypadku 3 środkowych kard odpowiednio "card0", "card1" i "card2".<br>
-* Potem można pobrać kolejną klikniętą kartę powtarzając powyższe kroki (oprócz *gameWindow.setPlayersCardsActive( true )*), nic się nie stanie, ale nie ma to sensu.<br>
-* Na koniec należy pamiętać o sezaktywowaniu kart (*gameWindow.setPlayersCardsActive( false )*) oraz o odznaczeniu wszystkich kard (*gameWindow.setPlayersCardsSelected( false )*).<br>
-* Potem już tylko odwrócić kartę i wyświetlić odpowiednie napisy.<br>
+## Rozgrywka
+W trakcie nocy czekaj na swoją kolej oraz wykonuj polecenia. Kiedy noc się skończy w celu ustalenia kto jest kim, trzeba połączyć się z graczami przez jakiegoś zooma czy coś. Następnie administrator włącza głosowanie i możemy głosować.
