@@ -190,13 +190,15 @@ public class Game{
         int playersId = s.players.indexOf( s.getPlayer( chosenPlayer ) );
         s.cardsInCenter[ s.getTableCardId( chosenCard ) ] = s.cardsNow.get( playersId );
         s.cardsNow.set( playersId, cardName );
+        Thread.sleep( 3000 );
     }
 
     void makeTroublemaker() throws InterruptedException, IOException{
         int idOfTroublemaker = startRole( "Troublemaker" );
         if( idOfTroublemaker < 0 ) return;
         String[] chosenCards = s.receiveGame( idOfTroublemaker ).split( MSG_SPLITTER );
-        Collections.swap( s.cardsNow, s.cardsNow.indexOf( chosenCards[ 0 ] ), s.cardsNow.indexOf( chosenCards[ 1 ] ) );
+        Collections.swap( s.cardsNow, s.players.indexOf( s.getPlayer( chosenCards[ 0 ] ) ), s.players.indexOf( s.getPlayer( chosenCards[ 1 ] ) ) );
+        Thread.sleep( 3000 );
     }
 
     void makeSeer() throws InterruptedException, IOException {
@@ -208,6 +210,7 @@ public class Game{
         String chosenCard1 = s.cardsInCenter[chosenCard1ID];
         String chosenCard2 = s.cardsInCenter[chosenCard2ID];
         s.sendGame(idOfSeer,chosenCard1+MSG_SPLITTER+chosenCard2);
+        Thread.sleep( 3000 );
     }
 
     void makeBeholder() throws InterruptedException {

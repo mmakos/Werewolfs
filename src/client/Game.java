@@ -252,8 +252,7 @@ public class Game{
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
         sendMsg( gameType, clickedCard );
-        card = readMsgOnly();
-        gameWindow.reverseCard( clickedCard, card );
+        String chosenCard = readMsgOnly();
 
         waitingForButton = true;
         gameWindow.setPlayersCardsActive( true );
@@ -264,6 +263,7 @@ public class Game{
             gameWindow.setRoleInfo( statements[ 13 ] );
             waitingForButton = false;
         }
+        gameWindow.reverseCard( clickedCard, chosenCard );
         gameWindow.setPlayersCardsActive( false );
         gameWindow.setPlayersCardsSelected( false );
         sendMsg( gameType, clickedCard );
@@ -272,7 +272,7 @@ public class Game{
     void makeTroublemaker(){
         gameWindow.setRoleInfo( statements[ 25 ] );
         waitingForButton = true;
-        gameWindow.setTableCardsActive( true );
+        gameWindow.setPlayersCardsActive( true );
 
         // Waiting for clicked card, but with time limit of 30 seconds
         long start = System.currentTimeMillis();
@@ -284,16 +284,18 @@ public class Game{
             waitingForButton = false;
         }
         String cards = clickedCard + MSG_SPLITTER;
-        gameWindow.setPlayerCardSelected( players.indexOf( clickedCard ), true );
+        gameWindow.setPlayerCardActive( players.indexOf( clickedCard ), false );
         waitingForButton = true;
+        start = System.currentTimeMillis();
+        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
         if( waitingForButton ){
             clickedCard = getRandomPlayerCard();
             gameWindow.setRoleInfo( statements[ 13 ] );
             waitingForButton = false;
         }
         cards += clickedCard;
-        gameWindow.setTableCardsActive( false );
-        gameWindow.setTableCardsSelected( false );
+        gameWindow.setPlayersCardsActive( false );
+        gameWindow.setPlayersCardsSelected( false );
         sendMsg( gameType, cards );
     }
 

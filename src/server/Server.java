@@ -27,7 +27,7 @@ public class Server{
     public String realParanormal;       // --- || ---
     private static final int gameMsg = 1;
     private static final int MAX_PLAYERS = Card.card.length;
-    private static final int MIN_PLAYERS = 1;
+    private static final int MIN_PLAYERS = 3;
     private static final int MAX_READ_TIME = 45;
     private volatile boolean connecting = false;
     public String[] cardsInCenter;
@@ -180,9 +180,9 @@ public class Server{
         LinkedList< String > temp = new LinkedList<>( cardsInGame );
 
 //        //todo to remove when not testing with one player
-//        cardsOnBegin.add( "Witch" );
+//        cardsOnBegin.add( "Troublemaker" );
 //        cardsNow.add( cardsOnBegin.get( 0 ) );
-//        temp.remove( "Witch" );
+//        temp.remove( "Troublemaker" );
 
         for( int i = 0; i < 3; ++i ){
             int randInt = rand.nextInt( temp.size() );
