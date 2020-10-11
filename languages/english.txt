@@ -29,3 +29,5 @@ Choose other player's card. If it is tanner or werewolf, you became that card (b
 You can see, what card you are on the end.@Insomniac
 Choose player, whose card you want to robb.@Robber
 Choose player on your left or right, you want to touch. He feels your touch and can confirm it during day.@Thing
+Choose two cards from the center you want to see.@Seer
+Now you will see who is a Seer.@Beholder

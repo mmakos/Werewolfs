@@ -41,8 +41,6 @@ public class Game{
                 s.writeLog( "No response from werewolves." );
             }
         }
-        if( s.cardsInGame.contains( "Minion" ) )
-            makeMinion( werewolvesMsg );
         if( s.cardsInGame.contains( "Mystic wolf" ) ){
             try{
                 makeMysticWolf();
@@ -50,6 +48,8 @@ public class Game{
                 s.writeLog( "No response from mystic wolf." );
             }
         }
+        if( s.cardsInGame.contains( "Minion" ) )
+            makeMinion( werewolvesMsg );
 
         Random rand = new Random();
 
@@ -61,7 +61,7 @@ public class Game{
                     case "Witch": makeWitch(); break;
                     case "Beholder": makeBeholder(); break;
                     case "Seer": makeSeer(); break;
-                    case "Tanner": makeTanner(); break;
+                    case "Tanner": break;
                     case "Thing": makeThing(); break;
                     case "Paranormal investigator": makeParanormal(); break;
                     case "Robber": makeRobber(); break;
@@ -71,6 +71,7 @@ public class Game{
             }catch( IOException e ){
                 s.writeLog( "No response from " + card + "." );
             }
+            s.cardsInGame.remove( card );
         }
         if( insomniac )
             makeInsomniac();
@@ -177,7 +178,6 @@ public class Game{
         s.sendGame( idOfApprenticeSeer, s.cardsInCenter[cardToSeeId] );
         s.writeLog(s.cardsInCenter[cardToSeeId]);
         Thread.sleep( 3000 );
-        s.cardsInGame.remove( "Apprentice seer" );
     }
 
     void makeWitch() throws InterruptedException, IOException{
@@ -190,7 +190,6 @@ public class Game{
         int playersId = s.players.indexOf( s.getPlayer( chosenPlayer ) );
         s.cardsInCenter[ s.getTableCardId( chosenCard ) ] = s.cardsNow.get( playersId );
         s.cardsNow.set( playersId, cardName );
-        s.cardsInGame.remove( "Witch" );
     }
 
     void makeTroublemaker() throws InterruptedException, IOException{
@@ -198,8 +197,8 @@ public class Game{
         if( idOfTroublemaker < 0 ) return;
         String[] chosenCards = s.receiveGame( idOfTroublemaker ).split( MSG_SPLITTER );
         Collections.swap( s.cardsNow, s.cardsNow.indexOf( chosenCards[ 0 ] ), s.cardsNow.indexOf( chosenCards[ 1 ] ) );
-        s.cardsInGame.remove( "Troublemaker" );
     }
+
     void makeSeer() throws InterruptedException, IOException {
         int idOfSeer = startRole("Seer");
         if(idOfSeer<0) return;
@@ -209,8 +208,8 @@ public class Game{
         String chosenCard1 = s.cardsInCenter[chosenCard1ID];
         String chosenCard2 = s.cardsInCenter[chosenCard2ID];
         s.sendGame(idOfSeer,chosenCard1+MSG_SPLITTER+chosenCard2);
-        s.cardsInGame.remove( "Seer" );
     }
+
     void makeBeholder() throws InterruptedException {
         int idofBeholder = startRole("Beholder");
         if (idofBeholder < 0) return;
@@ -219,9 +218,8 @@ public class Game{
             String idOfSeerStr = Integer.toString(idOfSeer);
             s.sendGame(idofBeholder, idOfSeerStr);
         }
-        else{
+        else
             s.sendGame(idofBeholder,"NoSeer");
-        }
     }
     void makeInsomniac() throws InterruptedException{
         int idOfInsomniac = startRole( "Insomniac" );
@@ -231,10 +229,6 @@ public class Game{
         s.sendGame(idOfInsomniac, insomniacNow );
         Thread.sleep( 3000 );
         s.cardsInGame.remove( "Insomniac" );
-    }
-
-    void makeTanner(){
-        s.cardsInGame.remove( "Tanner" );
     }
 
     void makeThing() throws InterruptedException, IOException{
@@ -251,7 +245,6 @@ public class Game{
                 s.sendGame( player.id, "NOTHING" );
         }
         Thread.sleep( 3000 );
-        s.cardsInGame.remove( "Thing" );
     }
 
     void makeParanormal() throws InterruptedException, IOException{
@@ -269,7 +262,6 @@ public class Game{
                 s.sendGame( paranormalId, "AGAIN" );
         }
         Thread.sleep( 3000 );
-        s.cardsInGame.remove( "Paranormal investigator" );
     }
 
     void makeRobber() throws IOException, InterruptedException{
@@ -284,7 +276,6 @@ public class Game{
         s.cardsNow.set( chosenPlayerIdx, paranormalsCard );
         s.sendGame( robberId, card );
         Thread.sleep( 3000 );
-        s.cardsInGame.remove( "Robber" );
     }
 
     //function does same begin of every role and returns id of player with this role, if role was not on the middle
