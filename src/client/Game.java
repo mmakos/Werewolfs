@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
@@ -479,6 +480,7 @@ public class Game{
         FXMLLoader fxmlLoader = new FXMLLoader( getClass().getResource( "fxml/gameWindow.fxml" ) );
         Stage stage = new Stage();
         stage.setTitle( "Werewolves" );
+        stage.getIcons().add( new Image( this.getClass().getResourceAsStream( "/img/icon.png" ) ) );
         stage.setScene( new Scene( fxmlLoader.load(), 1280, 820 ) );
         stage.initStyle( StageStyle.TRANSPARENT);
         connectWindow.hide();

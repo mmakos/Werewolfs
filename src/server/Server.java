@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -95,6 +96,7 @@ public class Server{
         FXMLLoader fxmlLoader = new FXMLLoader( getClass().getResource( "fxml/cardChooser.fxml" ) );
         Stage stage = new Stage();
         stage.setTitle( "Choose card" );
+        stage.getIcons().add( new Image( this.getClass().getResourceAsStream( "/img/sericon.png" ) ) );
         stage.setScene( new Scene( fxmlLoader.load(), 720, 480 ) );
         stage.show();
         CardChooser cardChooser = fxmlLoader.getController();
