@@ -19,7 +19,11 @@ public class GameWindow{
 
     public void setGame( Game game ){ this.game = game; }
 
-    @FXML public void initialize(){ setOnDrag(); }
+    @FXML public void initialize(){ setOnDrag();
+        card0.setId( Game.UNIQUE_CHAR + "card0" );
+        card1.setId( Game.UNIQUE_CHAR + "card1" );
+        card2.setId( Game.UNIQUE_CHAR + "card2" );
+    }
 
     private void setOnDrag(){
         gamePane.setOnMousePressed( mouseEvent -> {
@@ -56,9 +60,9 @@ public class GameWindow{
     public void reverseCard( String player, String card ){
         ToggleButton toggle;
         switch( player ){
-            case "card0": toggle = card0; break;
-            case "card1": toggle = card1; break;
-            case "card2": toggle = card2; break;
+            case ( char )2 + "card0": toggle = card0; break;
+            case ( char )2 + "card1": toggle = card1; break;
+            case ( char )2 + "card2": toggle = card2; break;
             default: toggle = playersCards.get( game.players.indexOf( player ) );
         }
         if( !game.players.contains( player ) ){
@@ -161,9 +165,9 @@ public class GameWindow{
     }
     public void setCenterCardSelected(String cardID,boolean selected){
         switch (cardID){
-            case "card0": card0.setSelected( selected ); break;
-            case "card1": card1.setSelected( selected ); break;
-            case "card2": card2.setSelected( selected ); break;
+            case ( char )2 + "card0": card0.setSelected( selected ); break;
+            case ( char )2 + "card1": card1.setSelected( selected ); break;
+            case ( char )2 + "card2": card2.setSelected( selected ); break;
             default: break;
         }
     }

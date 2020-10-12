@@ -28,6 +28,7 @@ public class Game{
     public final static String MSG_SPLITTER = String.valueOf( ( char )29 );
     public final static String UNIQUE_CHAR = String.valueOf( ( char )2 );
     public final static int MAX_ROLE_TIME = 30;
+    private boolean minionWinsWhenHeDies = false;
     public Vector< String > players = new Vector<>();
     private String card;
     public String displayedCard;        // When you are copycat or paranormal then its value is different than card line above
@@ -58,6 +59,11 @@ public class Game{
                 statements[ i ] = line.split( "@" )[ 0 ];
             }
         }catch( IOException ignored ){}
+        try{
+            Scanner line = new Scanner( new File( "settings.cfg" ) );
+            if( line.nextLine().split( "=" )[ 1 ].equals( "true" ) );
+                minionWinsWhenHeDies = true;
+        }catch( IOException | IndexOutOfBoundsException ignored ){}
     }
 
     public void run( Window connectWindow ) throws IOException{
@@ -130,7 +136,7 @@ public class Game{
         // If time is up, card will be selected randomly
         if( waitingForButton ){
             int rand = new Random().nextInt( 3 );
-            clickedCard = "card" + rand;
+            clickedCard = UNIQUE_CHAR + "card" + rand;
             gameWindow.setRoleInfo( statements[ 13 ] + "\n" +
                     statements[ 17 ] );
             waitingForButton = false;
@@ -164,7 +170,7 @@ public class Game{
             while( waitingForButton && System.currentTimeMillis() - start1 < MAX_ROLE_TIME * 1000 );
             if( waitingForButton ){
                 int rand = new Random().nextInt( 3 );
-                clickedCard = "card" + rand;
+                clickedCard = UNIQUE_CHAR + "card" + rand;
                 gameWindow.setRoleInfo( statements[ 13 ] );
                 waitingForButton = false;
             }
@@ -204,7 +210,7 @@ public class Game{
         // If time is up, card will be selected randomly
         if( waitingForButton ){
             int rand = new Random().nextInt( 3 );
-            clickedCard = "card" + rand;
+            clickedCard = UNIQUE_CHAR + "card" + rand;
             gameWindow.setRoleInfo( statements[ 13 ] );
             waitingForButton = false;
         }
@@ -225,7 +231,7 @@ public class Game{
         // If time is up, card will be selected randomly
         if( waitingForButton ){
             int rand = new Random().nextInt( 3 );
-            clickedCard = "card" + rand;
+            clickedCard = UNIQUE_CHAR + "card" + rand;
             gameWindow.setRoleInfo( statements[ 13 ] );
             waitingForButton = false;
         }
@@ -246,7 +252,7 @@ public class Game{
         // If time is up, card will be selected randomly
         if( waitingForButton ){
             int rand = new Random().nextInt( 3 );
-            clickedCard = "card" + rand;
+            clickedCard = UNIQUE_CHAR + "card" + rand;
             gameWindow.setRoleInfo( statements[ 13 ] + "\n" + statements[ 24 ] );
             waitingForButton = false;
         }
@@ -318,7 +324,7 @@ public class Game{
         // If time is up, card will be selected randomly
         if( waitingForButton ){
             int rand = new Random().nextInt( 3 );
-            clickedCard = "card" + rand;
+            clickedCard = UNIQUE_CHAR + "card" + rand;
             waitingForButton = false;
         }
         String cards = clickedCard + MSG_SPLITTER;
@@ -327,7 +333,7 @@ public class Game{
         while( waitingForButton && System.currentTimeMillis() - start1 < MAX_ROLE_TIME * 1000 );
         if( waitingForButton ){
             int rand = new Random().nextInt( 3 );
-            clickedCard = "card" + rand;
+            clickedCard = UNIQUE_CHAR + "card" + rand;
             waitingForButton = false;
         }
         cards += clickedCard;
@@ -434,6 +440,7 @@ public class Game{
 
     void vote(){
         gameWindow.setPlayersCardsActive( true );
+        gameWindow.setTableCardsActive( true );
         waitingForButton = true;
         Thread voteEnd = new Thread( () -> {
             if( readMsgOnly().equals( UNIQUE_CHAR + "VOTEEND" ) )
@@ -443,6 +450,10 @@ public class Game{
         while( waitingForButton );
         gameWindow.setPlayersCardsActive( false );
         gameWindow.setPlayersCardsSelected( false );
+        gameWindow.setTableCardsActive( false );
+        gameWindow.setTableCardsSelected( false );
+        if( clickedCard.substring( 0, 1 ).equals( UNIQUE_CHAR ) )
+            clickedCard = UNIQUE_CHAR + "table";
         sendMsg( gameType, clickedCard );
         String voteResult = readMsgOnly();
         if( voteResult.equals( UNIQUE_CHAR + "VOTE" ) ){      // vote again
@@ -455,7 +466,10 @@ public class Game{
             for( int i = 0; i < players.size(); ++i ){
                 gameWindow.reverseCard( players.get( i ), cardsNow.get( i ) );
             }
-            if( voteResult.equals( nickname ) )
+            if( voteResult.equals( UNIQUE_CHAR + "table" ) ){
+                gameWindow.setStatementLabel( statements[ 35 ] + " - " + whoWins( voteResult, realCardsNow ) + "." );
+            }
+            else if( voteResult.equals( nickname ) )
                 gameWindow.setStatementLabel( statements[ 7 ] + " - " + whoWins( voteResult, realCardsNow ) + "." );
             else
                 gameWindow.setStatementLabel( voteResult + " " + statements[ 8 ] + " - " + whoWins( voteResult, realCardsNow ) + "." );
@@ -464,12 +478,19 @@ public class Game{
     }
 
     private String whoWins( String player, Vector< String > cardsNow ){
+        if( player.equals( UNIQUE_CHAR + "table" ) ){
+            if( cardsNow.contains( "Werewolf_0" ) || cardsNow.contains( "Werewolf_1" ) ||
+                    cardsNow.contains( "Werewolf_2" ) || cardsNow.contains( "Mystic wolf" ) )
+                return statements[ 12 ];
+            else
+                return statements[ 10 ];
+        }
         if( cardsNow.get( players.indexOf( player ) ).equals( "Tanner" ) )
             return statements[ 9 ];
         if( cardsNow.get( players.indexOf( player ) ).split( "_" )[ 0 ].equals( "Werewolf" ) )
             return statements[ 10 ];
         else{
-            if( cardsNow.get( players.indexOf( player ) ).equals( "Minion" ) )
+            if( cardsNow.get( players.indexOf( player ) ).equals( "Minion" ) && !minionWinsWhenHeDies )
                 return statements[ 11 ];
             else
                 return statements[ 12 ];

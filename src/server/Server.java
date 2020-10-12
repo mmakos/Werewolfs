@@ -115,7 +115,7 @@ public class Server{
         endVotingButton.setVisible( true );
         endVotingButton.setDisable( false );
         sendGame( 0, UNIQUE_CHAR + "VOTE" );
-        votes.setSize( players.size() );
+        votes.setSize( players.size() + 1 );    //last element is table
         for( int i = 0; i < votes.size(); ++i )
             votes.set( i, 0 );
         for( Player player: players ){
@@ -123,9 +123,13 @@ public class Server{
                 String vote;
                 try{
                     vote = receiveGame( player.id );
-                    int votedPlayerIdx = players.indexOf( getPlayer( vote ) );
-                    if( votedPlayerIdx != -1 ){
-                        votes.set( votedPlayerIdx, votes.get( votedPlayerIdx ) + 1 );
+                    if( vote.equals( UNIQUE_CHAR + "table" ) )
+                        votes.set( votes.size() - 1, votes.lastElement() + 1 );
+                    else{
+                        int votedPlayerIdx = players.indexOf( getPlayer( vote ) );
+                        if( votedPlayerIdx != -1 ){
+                            votes.set( votedPlayerIdx, votes.get( votedPlayerIdx ) + 1 );
+                        }
                     }
                 }catch( IOException ignored ){}
             } ) );
@@ -152,7 +156,10 @@ public class Server{
         if( !temp || Collections.max( votes ) == max )       // same votes quantity
             orderVoting();                                          // vote again
         else{
-            sendGame( 0, players.get( maxIdx ).name );
+            if( maxIdx == votes.size() - 1 )
+                sendGame( 0, UNIQUE_CHAR + "table" );
+            else
+                sendGame( 0, players.get( maxIdx ).name );
             sendAllPlayers();
         }
     }
@@ -259,9 +266,9 @@ public class Server{
 
     public int getTableCardId( String str ){
         switch( str ){
-            case "card0": return 0;
-            case "card1": return 1;
-            case "card2": return 2;
+            case ( char )2 + "card0": return 0;
+            case ( char )2 + "card1": return 1;
+            case ( char )2 + "card2": return 2;
         }
         return -1;
     }
