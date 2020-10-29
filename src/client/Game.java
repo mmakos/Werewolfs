@@ -66,10 +66,18 @@ public class Game{
         }catch( IOException | IndexOutOfBoundsException ignored ){}
     }
 
-    public void run( Window connectWindow ) throws IOException{
-        getPlayers();
-        getCard();
-        gameWindow( connectWindow );
+    public void run( Window connectWindow ){
+        new Thread( () -> {
+            getPlayers();
+            getCard();
+            Platform.runLater( () -> {
+                try{
+                    gameWindow( connectWindow );
+                } catch( IOException e ){
+                    e.printStackTrace();
+                }
+            } );
+        } ).start();
     }
 
     public void gameLogic(){

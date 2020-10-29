@@ -117,7 +117,13 @@ public class Connect{
                 return;
             }
             if( !nickInfo.equals( "0" + Game.COM_SPLITTER + "ok" ) ) return;
-            Platform.runLater( () -> infoLabel.setText( "CONNECTED\nWaiting for other players to join - game will start soon." ) );
+            Platform.runLater( () -> {
+                infoLabel.setText( "Game will start soon. Please don't close this window." );
+                loginButton.setDisable( true );
+                loginButton.setText( "Connected" );
+                quitButton.setDisable( true );
+                quitButton.setVisible( false );
+            } );
             game.run( loginField.getScene().getWindow() );
         }catch( UnknownHostException e ){
             infoLabel.setText( "Cannot connect to " + ip + " on port " + port );
@@ -137,5 +143,7 @@ public class Connect{
     @FXML private CheckBox defaultCheckBox;
     @FXML private GridPane dragField;
     @FXML private ChoiceBox lang;
+    @FXML private Button quitButton;
+    @FXML private Button loginButton;
     private double x = 0, y = 0;
 }

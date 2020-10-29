@@ -15,14 +15,15 @@ public class Client extends Application{
 
     @Override
     public void start( Stage primaryStage ) throws Exception{
-        Parent root = FXMLLoader.load( getClass().getResource( "fxml/connectWindow.fxml" ) );
+        FXMLLoader root = new FXMLLoader( getClass().getResource( "fxml/connectWindow.fxml" ) );
         primaryStage.setTitle( "Connect" );
         primaryStage.getIcons().add( new Image( this.getClass().getResourceAsStream( "/img/icon.png" ) ) );
-        primaryStage.setScene( new Scene( root, 600, 400 ) );
+        primaryStage.setScene( new Scene( root.load(), 600, 400 ) );
         primaryStage.initStyle( StageStyle.TRANSPARENT );
         primaryStage.setResizable( false );
         primaryStage.show();
         primaryStage.getScene().getWindow().addEventFilter( WindowEvent.WINDOW_CLOSE_REQUEST, this::quit );
+        Connect c = root.getController();
     }
 
     private < T extends Event > void quit( T t ){
