@@ -36,4 +36,4 @@ You have to choose second card. If it's still not werewolf or tanner you play wi
 Nobody has been killed
 Hide card names
 Show card names
-Your card
+You are

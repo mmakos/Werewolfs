@@ -300,7 +300,8 @@ public class GameWindow{
     }
 
     public void clearArrows(){
-        Platform.runLater( () -> lines.forEach( ( line ) -> gamePane.getChildren().remove( line ) ) );
+            lines.forEach( ( line ) -> gamePane.getChildren().remove( line ) );
+            System.out.println( "cleared" );
         lines.removeAllElements();
     }
 

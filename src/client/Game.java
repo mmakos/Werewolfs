@@ -482,8 +482,8 @@ public class Game{
         String voteResult = readMsgOnly();
         if( voteResult.equals( UNIQUE_CHAR + "VOTE" ) ){      // vote again
             gameWindow.setStatementLabel( statements[ 6 ] );
-            gameWindow.clearArrows();
-            System.out.println( "clear" );
+            Thread t = new Thread( () -> Platform.runLater( () -> gameWindow.clearArrows() ) );
+            t.start();
             return -1;
         }
         Vector< String > cardsNow = new Vector<>( Arrays.asList( readMsgOnly().split( MSG_SPLITTER ) ) );
