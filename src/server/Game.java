@@ -80,6 +80,7 @@ public class Game{
         if( insomniac )
             makeInsomniac();
         s.sendGame( 0, "WakeUp" );
+        s.writeLog( "City wakes up.\nWhen you are ready for voting, press \"Order voting\" button." );
         s.voteButton.setDisable( false );
     }
 
@@ -202,42 +203,40 @@ public class Game{
         if( idOfTroublemaker < 0 ) return;
         String[] chosenCards = s.receiveGame( idOfTroublemaker ).split( MSG_SPLITTER );
         Collections.swap( s.cardsNow, s.players.indexOf( s.getPlayer( chosenCards[ 0 ] ) ), s.players.indexOf( s.getPlayer( chosenCards[ 1 ] ) ) );
-        Thread.sleep( 3000 );
         s.writeLog( "Troublemaker falls asleep" );
     }
 
     void makeSeer() throws InterruptedException, IOException {
-        int idOfSeer = startRole("Seer");
-        if(idOfSeer<0) return;
+        int idOfSeer = startRole( "Seer" );
+        if( idOfSeer < 0 ) return;
         String[] chosenCards = s.receiveGame( idOfSeer ).split( MSG_SPLITTER );
-        int chosenCard1ID = s.getTableCardId(chosenCards[0]);
-        int chosenCard2ID = s.getTableCardId(chosenCards[1]);
-        String chosenCard1 = s.cardsInCenter[chosenCard1ID];
-        String chosenCard2 = s.cardsInCenter[chosenCard2ID];
-        s.sendGame(idOfSeer,chosenCard1+MSG_SPLITTER+chosenCard2);
+        int chosenCard1ID = s.getTableCardId( chosenCards[ 0 ] );
+        int chosenCard2ID = s.getTableCardId( chosenCards[ 1 ] );
+        String chosenCard1 = s.cardsInCenter[ chosenCard1ID ];
+        String chosenCard2 = s.cardsInCenter[ chosenCard2ID ];
+        s.sendGame( idOfSeer, chosenCard1 + MSG_SPLITTER + chosenCard2 );
         Thread.sleep( 3000 );
         s.writeLog( "Seer falls asleep" );
     }
 
     void makeBeholder() throws InterruptedException {
-        int idOfBeholder = startRole("Beholder");
-        if (idOfBeholder < 0) return;
+        int idOfBeholder = startRole( "Beholder" );
+        if( idOfBeholder < 0 ) return;
         if( s.cardsOnBegin.contains( "Seer" ) ){
-            String seerName = s.players.get(s.cardsOnBegin.indexOf("Seer")).name;
-            s.sendGame(idOfBeholder, seerName);
-        }
-        else
-            s.sendGame(idOfBeholder,"NoSeer");
-        Thread.sleep( 3000 );
+            String seerName = s.players.get( s.cardsOnBegin.indexOf( "Seer" ) ).name;
+            s.sendGame( idOfBeholder, seerName );
+        } else
+            s.sendGame( idOfBeholder, "NoSeer" );
+        Thread.sleep( 5000 );
         s.writeLog( "Beholder falls asleep" );
     }
     void makeInsomniac() throws InterruptedException{
         int idOfInsomniac = startRole( "Insomniac" );
-        if(idOfInsomniac<0) return;
-        String insomniacNow = s.cardsNow.get(s.cardsOnBegin.indexOf("Insomniac"));
+        if( idOfInsomniac < 0 ) return;
+        String insomniacNow = s.cardsNow.get( s.cardsOnBegin.indexOf( "Insomniac" ) );
         //s.writeLog( "This card is " + insomniacNow );
-        s.sendGame(idOfInsomniac, insomniacNow );
-        Thread.sleep( 3000 );
+        s.sendGame( idOfInsomniac, insomniacNow );
+        Thread.sleep( 5000 );
         s.cardsInGame.remove( "Insomniac" );
         s.writeLog( "Insomniac falls asleep" );
     }
@@ -296,7 +295,7 @@ public class Game{
         s.writeLog( card + "'s move" );
         if( !s.cardsOnBegin.contains( card ) ){
             //s.writeLog( card + " is on table" );
-            Thread.sleep( new Random().nextInt( 10000 ) + 10000 );
+            Thread.sleep( 7000 );
             s.cardsInGame.remove( card );
             s.writeLog( card + " falls asleep" );
             return -1;

@@ -9,14 +9,17 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Random;
+import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Server{
@@ -36,6 +39,7 @@ public class Server{
     private final String UNIQUE_CHAR = String.valueOf( ( char )2 );
     private Vector< Thread > playerReaders = new Vector<>();
     private Vector< Integer > votes = new Vector<>();
+    private AtomicInteger votesQuant = new AtomicInteger();
 
     @FXML public void initialize(){
         cardsInCenter = new String[ 3 ];
@@ -116,6 +120,8 @@ public class Server{
         endVotingButton.setDisable( false );
         sendGame( 0, UNIQUE_CHAR + "VOTE" );
         writeLog( "Voting ordered" );
+        votes.removeAllElements();
+        votesQuant.set( 0 );
         votes.setSize( players.size() + 1 );    //last element is table
         for( int i = 0; i < votes.size(); ++i )
             votes.set( i, 0 );
@@ -135,6 +141,9 @@ public class Server{
                             votes.set( votedPlayerIdx, votes.get( votedPlayerIdx ) + 1 );
                         }
                     }
+                    votesQuant.incrementAndGet();
+                    if( votesQuant.get() == players.size() )
+                        writeLog( "Everyone has already voted. Press \"End voting\" button" );
                 }catch( IOException ignored ){}
             } ) );
             playerReaders.lastElement().start();
@@ -142,8 +151,9 @@ public class Server{
     }
 
     @FXML void endVoting(){
+        endVotingButton.setDisable( true );
         for( Thread t: playerReaders ){
-            t.interrupt();
+            t.stop();
         }
         playerReaders.removeAllElements();
         sendGame( 0, UNIQUE_CHAR + "VOTEEND" );
@@ -152,29 +162,36 @@ public class Server{
     }
 
     private void countVotes(){
-        for( int i = 0; i < players.size(); ++i )
-            writeLog( players.get( i ).name + " got " + votes.get( i ) + " votes." );
-        writeLog( "Table got " + votes.lastElement() + " votes." );
-        int max = Collections.max( votes );
-        int maxIdx = votes.indexOf( max );
-        boolean temp = true;
-        if( maxIdx == -1 )      //no one voted
-            temp = false;
-        votes.set( maxIdx, -1 );
-        if( !temp || Collections.max( votes ) == max ){       // same votes quantity
-            orderVoting();                                          // vote again
-            writeLog( "Unequivocal vote result. Voting will be repeated." );
-        }
-        else{
-            if( maxIdx == votes.size() - 1 ){
-                sendGame( 0, UNIQUE_CHAR + "table" );
-                writeLog( "Nobody has been killed." );
+        if( votesQuant.get() == 0 ){
+            writeLog( "No one has voted yet. Voting will be repeated.\nPress vote button again." );
+            endVotingButton.setVisible( false );
+            voteButton.setVisible( true );
+            voteButton.setDisable( false );
+        } else{
+            for( int i = 0; i < players.size(); ++i )
+                writeLog( players.get( i ).name + " got " + votes.get( i ) + " votes." );
+            writeLog( "Table got " + votes.lastElement() + " votes." );
+            int max = Collections.max( votes );
+            int maxIdx = votes.indexOf( max );
+            boolean temp = true;
+            if( maxIdx == -1 )      //no one voted
+                temp = false;
+            votes.set( maxIdx, -1 );
+            if( !temp || Collections.max( votes ) == max ){       // same votes quantity
+                writeLog( "Unequivocal vote result. Voting will be repeated.\nPress vote button again." );
+                endVotingButton.setVisible( false );
+                voteButton.setVisible( true );
+                voteButton.setDisable( false );
+            } else{
+                if( maxIdx == votes.size() - 1 ){
+                    sendGame( 0, UNIQUE_CHAR + "table" );
+                    writeLog( "Nobody has been killed." );
+                } else{
+                    sendGame( 0, players.get( maxIdx ).name );
+                    writeLog( players.get( maxIdx ).name + " has been killed." );
+                }
+                sendAllPlayers();
             }
-            else{
-                sendGame( 0, players.get( maxIdx ).name );
-                writeLog( players.get( maxIdx ).name + " has been killed.");
-            }
-            sendAllPlayers();
         }
     }
 
@@ -239,15 +256,17 @@ public class Server{
     }
 
     public void writeLog( String log ){
-        Platform.runLater( () -> logField.setText( logField.getText() + "\n" + log ) );
+        Platform.runLater( () -> {
+            logField.setText( logField.getText() + "\n" + log );
+            logField.positionCaret( logField.getText().length() );
+        } );
     }
 
     //Comunication
     void sendGame( int id, String msg ){
         if( id == 0 ){
-            for( Player player : players ){
+            for( Player player : players )
                 sendMsg( player.id, gameMsg + COM_SPLITTER + msg );
-            }
         }
         else
             sendMsg( id, gameMsg + COM_SPLITTER + msg );     //send msg of type gameMsg

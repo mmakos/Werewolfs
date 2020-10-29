@@ -451,6 +451,7 @@ public class Game{
         } );
         voteEnd.start();
         while( waitingForButton );
+        voteEnd.interrupt();
         gameWindow.setPlayersCardsActive( false );
         gameWindow.setPlayersCardsSelected( false );
         gameWindow.setTableCardsActive( false );
@@ -459,6 +460,8 @@ public class Game{
             clickedCard = UNIQUE_CHAR + "table";
         sendMsg( gameType, clickedCard );
         String voteResult = readMsgOnly();
+        if( voteResult.equals( UNIQUE_CHAR + "VOTEEND" ) )
+            voteResult = readMsgOnly();
         if( voteResult.equals( UNIQUE_CHAR + "VOTE" ) ){      // vote again
             gameWindow.setStatementLabel( statements[ 6 ] );
             vote();
