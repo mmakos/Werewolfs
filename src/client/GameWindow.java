@@ -305,10 +305,6 @@ public class GameWindow{
         lines.removeAllElements();
     }
 
-    private String getToggleId( Toggle toggle ){
-        return toggle.toString().split( "=" )[ 1 ].split( "," )[ 0 ];
-    }
-
     @FXML private AnchorPane gamePane;
     @FXML private ToggleButton card0;
     @FXML private ToggleButton card1;

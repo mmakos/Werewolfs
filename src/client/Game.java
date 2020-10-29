@@ -161,7 +161,6 @@ public class Game{
         gameWindow.setCardLabel( " -> " + card.split( "_" )[ 0 ] );
     }
 
-    //TODO
     void makeWerewolf(){
         StringBuilder str = new StringBuilder();
         String[] werewolves = readMsgOnly().split( MSG_SPLITTER );

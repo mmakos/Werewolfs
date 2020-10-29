@@ -117,6 +117,7 @@ public class Server{
         voteButton.setDisable( true );
         voteButton.setVisible( false );
         endVotingButton.setVisible( true );
+        endVotingButton.setDisable( false );
         sendGame( 0, UNIQUE_CHAR + "VOTE" );
         writeLog( "Voting ordered" );
         votes.removeAllElements();
@@ -143,7 +144,6 @@ public class Server{
                     }
                     sendGame( 0, player.name + Game.MSG_SPLITTER + vote );
                     votesQuant.incrementAndGet();
-                    endVotingButton.setDisable( false );
                     if( votesQuant.get() == players.size() )
                         writeLog( "Everyone has already voted. Press \"End voting\" button" );
                 }catch( IOException ignored ){}
@@ -216,16 +216,16 @@ public class Server{
         LinkedList< String > temp = new LinkedList<>( cardsInGame );
 
 //        //todo to remove when not testing with one player
-        cardsOnBegin.add( "Paranormal investigator" );
-        cardsNow.add( cardsOnBegin.get( 0 ) );
-        temp.remove( "Paranormal investigator" );
+//        cardsOnBegin.add( "Paranormal investigator" );
+//        cardsNow.add( cardsOnBegin.get( 0 ) );
+//        temp.remove( "Paranormal investigator" );
 
         for( int i = 0; i < 3; ++i ){
             int randInt = rand.nextInt( temp.size() );
             cardsInCenter[ i ] = temp.get( randInt );
             temp.remove( randInt );
         }
-        for( int i = 1; i < players.size(); ++i ){      //todo to i=0 when not testing with one player
+        for( int i = 0; i < players.size(); ++i ){      //todo to i=0 when not testing with one player
             int randInt = rand.nextInt( temp.size() );
             cardsOnBegin.add( temp.get( randInt ) );
             cardsNow.add( cardsOnBegin.get( i ) );
