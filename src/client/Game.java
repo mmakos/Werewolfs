@@ -18,6 +18,7 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Game{
     private volatile boolean waitingForButton = false;
@@ -102,7 +103,7 @@ public class Game{
             }
             if( readMsgOnly().equals( UNIQUE_CHAR + "VOTE" ) ){
                 gameWindow.setStatementLabel( statements[ 2 ] );
-                vote();
+                while( vote() != 0 );
             }
         } );
         gameLogic.start();
@@ -366,9 +367,9 @@ public class Game{
 
     void makeParanormal(){
         gameWindow.setRoleInfo( statements[ 27 ] );
+        gameWindow.setPlayersCardsActive( true );
         for( int i = 0; i < 2; ++i ){
             waitingForButton = true;
-            gameWindow.setPlayersCardsActive( true );
             long start = System.currentTimeMillis();
             while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
             if( waitingForButton ){
@@ -376,7 +377,7 @@ public class Game{
                 gameWindow.setRoleInfo( statements[ 13 ] + "\n" + statements[ 34 ] );
                 waitingForButton = false;
             }
-            gameWindow.setPlayersCardsActive( false );
+            gameWindow.setPlayersCardsSelected( false );
             sendMsg( gameType, clickedCard );
             String msg = readMsgOnly();
             gameWindow.reverseCard( clickedCard, msg );
@@ -387,7 +388,7 @@ public class Game{
                 break;
             }
         }
-        gameWindow.setPlayersCardsSelected( false );
+        gameWindow.setPlayersCardsActive( false );
     }
 
     void makeRobber(){
@@ -449,49 +450,58 @@ public class Game{
         catch( NullPointerException ignored ){}
     }
 
-    void vote(){
+    private int vote(){
         gameWindow.setPlayersCardsActive( true );
         gameWindow.setTableCardsActive( true );
         waitingForButton = true;
-        Thread voteEnd = new Thread( () -> {
-            if( readMsgOnly().equals( UNIQUE_CHAR + "VOTEEND" ) )
-                waitingForButton = false;
+        AtomicBoolean voteNotEnded = new AtomicBoolean( true );
+        Thread votes = new Thread( () -> {
+            while( true ){
+                String vote = readMsgOnly();
+                if( vote.equals( UNIQUE_CHAR + "VOTEEND"  ) ){
+                    voteNotEnded.set( false );
+                    break;
+                }
+                Platform.runLater( () -> gameWindow.drawArrow( vote.split( MSG_SPLITTER )[ 0 ], vote.split( MSG_SPLITTER )[ 1 ] ) );
+            }
         } );
-        voteEnd.start();
-        while( waitingForButton );
-        voteEnd.interrupt();
+        votes.start();
+        while( waitingForButton && voteNotEnded.get() );
         gameWindow.setPlayersCardsActive( false );
         gameWindow.setPlayersCardsSelected( false );
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
-        if( clickedCard.substring( 0, 1 ).equals( UNIQUE_CHAR ) )
-            clickedCard = UNIQUE_CHAR + "table";
-        sendMsg( gameType, clickedCard );
+        if( !waitingForButton ){
+            if( clickedCard.substring( 0, 1 ).equals( UNIQUE_CHAR ) )
+                clickedCard = UNIQUE_CHAR + "table";
+            sendMsg( gameType, clickedCard );
+        }
+        waitingForButton = false;
+        while( voteNotEnded.get() );
         String voteResult = readMsgOnly();
-        if( voteResult.equals( UNIQUE_CHAR + "VOTEEND" ) )
-            voteResult = readMsgOnly();
         if( voteResult.equals( UNIQUE_CHAR + "VOTE" ) ){      // vote again
             gameWindow.setStatementLabel( statements[ 6 ] );
-            vote();
+            gameWindow.clearArrows();
+            System.out.println( "clear" );
+            return -1;
         }
-        else{
-            Vector< String > cardsNow = new Vector<>( Arrays.asList( readMsgOnly().split( MSG_SPLITTER ) ) );
-            Vector< String > realCardsNow = new Vector<>( Arrays.asList( readMsgOnly().split( MSG_SPLITTER ) ) );
-            for( int i = 0; i < players.size(); ++i ){
-                if( players.get( i ).equals( nickname ) )
-                    gameWindow.updateMyCard( cardsNow.get( i ) );
-                else
-                    gameWindow.reverseCard( players.get( i ), cardsNow.get( i ) );
-            }
-            if( voteResult.equals( UNIQUE_CHAR + "table" ) ){
-                gameWindow.setStatementLabel( statements[ 35 ] + " - " + whoWins( voteResult, realCardsNow ) + "." );
-            }
-            else if( voteResult.equals( nickname ) )
-                gameWindow.setStatementLabel( statements[ 7 ] + " - " + whoWins( voteResult, realCardsNow ) + "." );
+        Vector< String > cardsNow = new Vector<>( Arrays.asList( readMsgOnly().split( MSG_SPLITTER ) ) );
+        Vector< String > realCardsNow = new Vector<>( Arrays.asList( readMsgOnly().split( MSG_SPLITTER ) ) );
+        for( int i = 0; i < players.size(); ++i ){
+            if( players.get( i ).equals( nickname ) )
+                gameWindow.updateMyCard( cardsNow.get( i ) );
             else
-                gameWindow.setStatementLabel( voteResult + " " + statements[ 8 ] + " - " + whoWins( voteResult, realCardsNow ) + "." );
-            gameWindow.quitButton.setDisable( false );
+                gameWindow.reverseCard( players.get( i ), cardsNow.get( i ) );
         }
+        if( voteResult.equals( UNIQUE_CHAR + "table" ) ){
+            gameWindow.setStatementLabel( statements[ 35 ] + " - " + whoWins( voteResult, realCardsNow ) + "." );
+        }
+        else if( voteResult.equals( nickname ) )
+            gameWindow.setStatementLabel( statements[ 7 ] + " - " + whoWins( voteResult, realCardsNow ) + "." );
+        else
+            gameWindow.setStatementLabel( voteResult + " " + statements[ 8 ] + " - " + whoWins( voteResult, realCardsNow ) + "." );
+        gameWindow.quitButton.setDisable( false );
+        return 0;
     }
 
     private String whoWins( String player, Vector< String > cardsNow ){

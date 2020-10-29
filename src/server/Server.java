@@ -141,6 +141,7 @@ public class Server{
                             votes.set( votedPlayerIdx, votes.get( votedPlayerIdx ) + 1 );
                         }
                     }
+                    sendGame( 0, player.name + Game.MSG_SPLITTER + vote );
                     votesQuant.incrementAndGet();
                     if( votesQuant.get() == players.size() )
                         writeLog( "Everyone has already voted. Press \"End voting\" button" );
@@ -221,9 +222,9 @@ public class Server{
         LinkedList< String > temp = new LinkedList<>( cardsInGame );
 
 //        //todo to remove when not testing with one player
-        cardsOnBegin.add( "Copycat" );
+        cardsOnBegin.add( "Paranormal investigator" );
         cardsNow.add( cardsOnBegin.get( 0 ) );
-        temp.remove( "Copycat" );
+        temp.remove( "Paranormal investigator" );
 
         for( int i = 0; i < 3; ++i ){
             int randInt = rand.nextInt( temp.size() );

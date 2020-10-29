@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
@@ -83,15 +84,15 @@ public class GameWindow{
 
     @FXML public void hideShowCardNames(){
         if( reverseCardButton.getText().equals( game.statements[ 36 ] ) ){
-            card0.setStyle( "-fx-background-image: url(\"img/backCardSmallDark.png\")" );
-            card1.setStyle( "-fx-background-image: url(\"img/backCardSmallDark.png\")" );
-            card2.setStyle( "-fx-background-image: url(\"img/backCardSmallDark.png\")" );
+            card0.setStyle( "-fx-background-image: url(\"img/backCardSmall.png\")" );
+            card1.setStyle( "-fx-background-image: url(\"img/backCardSmall.png\")" );
+            card2.setStyle( "-fx-background-image: url(\"img/backCardSmall.png\")" );
             if( card0.isDisabled() ) card0.setOpacity( 0.5 );
             if( card1.isDisabled() ) card1.setOpacity( 0.5 );
             if( card2.isDisabled() ) card2.setOpacity( 0.5 );
             for( int i = 0; i < playersCards.size(); ++i ){
                 if( knownCards.get( i ) != null ){
-                    playersCards.get( i ).setStyle( "-fx-graphic: url(\"img/backCardSmallDark.png\")" );
+                    playersCards.get( i ).setStyle( "-fx-graphic: url(\"img/backCardSmall.png\")" );
                     if( playersCards.get( i ).isDisabled() ) playersCards.get( i ).setOpacity( 0.5 );
                 }
             }
@@ -118,7 +119,7 @@ public class GameWindow{
             case ( char )2 + "card2": toggle = card2; idx = knownCards.size() - 1; break;
             default: return;
         }
-        toggle.setStyle( "-fx-background-image: url(\"img/backCardSmallDark.png\")" );
+        toggle.setStyle( "-fx-background-image: url(\"img/backCardSmall.png\")" );
         toggle.setOpacity( 0.5 );
         knownCards.set( idx, null );
     }
@@ -173,7 +174,7 @@ public class GameWindow{
         toggle.setMaxSize( 72, 100 );
         toggle.setFont( new Font( 12 ) );
         toggle.setDisable( true );
-        final Image unselected = new Image( "img/backCardSmallDark.png" );
+        final Image unselected = new Image( "img/backCardSmall.png" );
         final Image selected = new Image( "img/backCardSmall.png" );
         final ImageView toggleImage = new ImageView();
         toggleImage.setFitWidth( 72 );      // scaling
@@ -201,7 +202,8 @@ public class GameWindow{
         for( ToggleButton toggle: playersCards ){
             if( !toggle.getId().equals( Game.UNIQUE_CHAR + "You" ) ){
                 toggle.setDisable( !active );
-                toggle.setOpacity( active ? 1.0 : 0.5 );
+                if( reverseCardButton.getText().equals( game.statements[ 37 ] ) || knownCards.get( playersCards.indexOf( toggle ) ) == null )
+                    toggle.setOpacity( active ? 1.0 : 0.5 );
             }
         }
     }
@@ -213,7 +215,8 @@ public class GameWindow{
 
     public void setPlayerCardActive( int playerIndex, boolean active ){
         playersCards.get( playerIndex ).setDisable( !active );
-        playersCards.get( playerIndex ).setOpacity( active ? 1.0 : 0.5 );
+        if( reverseCardButton.getText().equals( game.statements[ 37 ] ) || knownCards.get( playerIndex ) == null )
+            playersCards.get( playerIndex ).setOpacity( active ? 1.0 : 0.5 );
     }
 
     public void setPlayerCardSelected( int playerIndex, boolean selected ){
@@ -250,6 +253,57 @@ public class GameWindow{
 //        game.setWaitingForButton( false );
 //    }
 
+    public void drawArrow( String from, String to ){
+        ToggleButton fromToggle = playersCards.get( game.players.indexOf( from ) );
+        double x1, y1, toLayoutX, toLayoutY;
+        x1 = fromToggle.getLayoutX() + 36;
+        y1 = fromToggle.getLayoutY() + 50;
+        if( to.equals( Game.UNIQUE_CHAR + "table" ) ){
+            toLayoutX = ( double )sceneWidth / 2;
+            toLayoutY = ( double )sceneHeight / 2 - 50;
+        }
+        else{
+            ToggleButton toToggle = playersCards.get( game.players.indexOf( to ) );
+            int a = 62;
+            double x2 = toToggle.getLayoutX() + 36;
+            double y2 = toToggle.getLayoutY() + 50;
+            double dist = Math.hypot( x2 - x1, y2 - y1 );
+            toLayoutX = x2 - ( a * ( x2 - x1 ) / dist );
+            toLayoutY = y2 - ( a * ( y2 - y1 ) / dist );
+        }
+        Vector< Line > v = getArrow( x1, toLayoutX, y1, toLayoutY );
+        lines.addAll( v );
+        gamePane.getChildren().add( lines.get( lines.size() - 3 ) );
+        gamePane.getChildren().add( lines.get( lines.size() - 2 ) );
+        gamePane.getChildren().add( lines.get( lines.size() - 1 ) );
+    }
+
+    private Vector< Line > getArrow( double fromX, double toX, double fromY, double toY ){
+        Vector< Line > v = new Vector<>();
+        Line line = new Line( fromX, fromY, toX, toY );
+        line.setStroke( Color.RED );
+        v.add( line );
+        double hypo = Math.hypot( fromX - toX, fromY - toY );
+        double factor = 20 / hypo;
+        double factorO = 7 / hypo;
+        double dx = ( fromX - toX ) * factor;
+        double dy = ( fromY - toY ) * factor;
+        double ox = ( fromX - toX ) * factorO;
+        double oy = ( fromY - toY ) * factorO;
+        line = new Line( toX + dx - oy, toY + dy + ox, toX, toY );
+        line.setStroke( Color.RED );
+        v.add( line );
+        line = new Line( toX + dx + oy, toY + dy - ox, toX, toY );
+        line.setStroke( Color.RED );
+        v.add( line );
+        return v;
+    }
+
+    public void clearArrows(){
+        Platform.runLater( () -> lines.forEach( ( line ) -> gamePane.getChildren().remove( line ) ) );
+        lines.removeAllElements();
+    }
+
     private String getToggleId( Toggle toggle ){
         return toggle.toString().split( "=" )[ 1 ].split( "," )[ 0 ];
     }
@@ -259,6 +313,7 @@ public class GameWindow{
     @FXML private ToggleButton card1;
     @FXML private ToggleButton card2;
     private Vector< ToggleButton > playersCards = new Vector<>();
+    private Vector< Line > lines = new Vector<>();
     public Vector< String > knownCards = new Vector<>();
     @FXML private Label cardLabel;
     @FXML public Label statementLabel;

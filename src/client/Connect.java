@@ -1,17 +1,16 @@
 package client;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import jdk.nashorn.internal.parser.JSONParser;
 
-import java.io.*;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.*;
 import java.util.Scanner;
 
 public class Connect{
