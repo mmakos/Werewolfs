@@ -458,7 +458,7 @@ public class Game{
         Thread votes = new Thread( () -> {
             while( true ){
                 String vote = readMsgOnly();
-                if( vote.equals( UNIQUE_CHAR + "VOTEEND"  ) ){
+                if( vote.equals( UNIQUE_CHAR + "VOTEEND" ) ){
                     voteNotEnded.set( false );
                     break;
                 }
@@ -475,6 +475,7 @@ public class Game{
             if( clickedCard.substring( 0, 1 ).equals( UNIQUE_CHAR ) )
                 clickedCard = UNIQUE_CHAR + "table";
             sendMsg( gameType, clickedCard );
+            System.out.println( "card clicked: " + clickedCard );
         }
         waitingForButton = false;
         while( voteNotEnded.get() );

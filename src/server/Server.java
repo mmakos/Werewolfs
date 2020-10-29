@@ -117,7 +117,6 @@ public class Server{
         voteButton.setDisable( true );
         voteButton.setVisible( false );
         endVotingButton.setVisible( true );
-        endVotingButton.setDisable( false );
         sendGame( 0, UNIQUE_CHAR + "VOTE" );
         writeLog( "Voting ordered" );
         votes.removeAllElements();
@@ -129,6 +128,7 @@ public class Server{
             playerReaders.add( new Thread( () -> {
                 String vote;
                 try{
+                    while( !player.input.ready() );
                     vote = receiveGame( player.id );
                     if( vote.equals( UNIQUE_CHAR + "table" ) ){
                         writeLog( "Player " + player.name + " voted for the table." );
@@ -143,6 +143,7 @@ public class Server{
                     }
                     sendGame( 0, player.name + Game.MSG_SPLITTER + vote );
                     votesQuant.incrementAndGet();
+                    endVotingButton.setDisable( false );
                     if( votesQuant.get() == players.size() )
                         writeLog( "Everyone has already voted. Press \"End voting\" button" );
                 }catch( IOException ignored ){}
@@ -163,38 +164,31 @@ public class Server{
     }
 
     private void countVotes(){
-        if( votesQuant.get() == 0 ){
-            writeLog( "No one has voted yet. Voting will be repeated.\nPress vote button again." );
+        for( int i = 0; i < players.size(); ++i )
+            writeLog( players.get( i ).name + " got " + votes.get( i ) + " votes." );
+        writeLog( "Table got " + votes.lastElement() + " votes." );
+        int max = Collections.max( votes );
+        int maxIdx = votes.indexOf( max );
+        boolean temp = true;
+        if( maxIdx == -1 )      //no one voted
+            temp = false;
+        votes.set( maxIdx, -1 );
+        if( !temp || Collections.max( votes ) == max ){       // same votes quantity
+            writeLog( "Unequivocal vote result. Voting will be repeated.\nPress vote button again." );
             endVotingButton.setVisible( false );
             voteButton.setVisible( true );
             voteButton.setDisable( false );
         } else{
-            for( int i = 0; i < players.size(); ++i )
-                writeLog( players.get( i ).name + " got " + votes.get( i ) + " votes." );
-            writeLog( "Table got " + votes.lastElement() + " votes." );
-            int max = Collections.max( votes );
-            int maxIdx = votes.indexOf( max );
-            boolean temp = true;
-            if( maxIdx == -1 )      //no one voted
-                temp = false;
-            votes.set( maxIdx, -1 );
-            if( !temp || Collections.max( votes ) == max ){       // same votes quantity
-                writeLog( "Unequivocal vote result. Voting will be repeated.\nPress vote button again." );
-                endVotingButton.setVisible( false );
-                voteButton.setVisible( true );
-                voteButton.setDisable( false );
+            if( maxIdx == votes.size() - 1 ){
+                sendGame( 0, UNIQUE_CHAR + "table" );
+                writeLog( "Nobody has been killed." );
             } else{
-                if( maxIdx == votes.size() - 1 ){
-                    sendGame( 0, UNIQUE_CHAR + "table" );
-                    writeLog( "Nobody has been killed." );
-                } else{
-                    sendGame( 0, players.get( maxIdx ).name );
-                    writeLog( players.get( maxIdx ).name + " has been killed." );
-                }
-                sendAllPlayers();
+                sendGame( 0, players.get( maxIdx ).name );
+                writeLog( players.get( maxIdx ).name + " has been killed." );
             }
+            sendAllPlayers();
         }
-    }
+}
 
     private void sendAllPlayers(){
         StringBuilder str = new StringBuilder();
