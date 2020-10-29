@@ -101,7 +101,7 @@ public class Game{
 
         //Remove this card from list of cards (we don't want to make copycat move again)
         s.cardsInGame.remove( "Copycat" );
-        Thread.sleep( 2000 );
+        Thread.sleep( 3000 );
     }
 
     String makeWerewolves() throws InterruptedException, IOException{
@@ -120,7 +120,7 @@ public class Game{
         }
         if( !isAnyoneWerewolf ){
             s.writeLog( "All werewolves are on table" );
-            Thread.sleep( 5000 );
+            Thread.sleep( 7000 );
         }
         else{
             Vector< Integer > werewolves = new Vector<>();
@@ -146,7 +146,7 @@ public class Game{
                 int cardToSeeId = s.getTableCardId(cardToSee);
                 s.sendGame( werewolves.get( 0 ), s.cardsInCenter[ cardToSeeId ] );
             }
-            Thread.sleep( 3000 );       //Not necessary, time for werewolves to meet together
+            Thread.sleep( 7000 );       //Not necessary, time for werewolves to meet together
         }
         s.writeLog( "Werewolves fall asleep" );
         return str.toString();
@@ -156,7 +156,7 @@ public class Game{
         int minionsId = startRole( "Minion" );
         if( minionsId < 0 ) return;
         s.sendGame( minionsId, werewolvesMsg );
-        Thread.sleep( 5000 );
+        Thread.sleep( 7000 );
         s.cardsInGame.remove( "Minion" );
     }
 
@@ -167,7 +167,7 @@ public class Game{
         int cardToSeeId = s.getTableCardId(cardToSee);
         s.sendGame( idOfMysticWolf, s.cardsInCenter[cardToSeeId] );
         s.writeLog(s.cardsInCenter[cardToSeeId]);
-        Thread.sleep( 3000 );
+        Thread.sleep( 7000 );
     }
 
     void makeApprenticeSeer() throws InterruptedException, IOException {
@@ -255,7 +255,7 @@ public class Game{
         if( paranormalId < 0 ) return;
         for( int i = 0; i < 2; ++i ){
             String chosenCard = s.receiveGame( paranormalId );
-            String card = s.cardsOnBegin.get( s.players.indexOf( s.getPlayer( chosenCard ) ) );
+            String card = s.cardsNow.get( s.players.indexOf( s.getPlayer( chosenCard ) ) );
             s.sendGame( paranormalId, card );
             if( card.split( "_" )[ 0 ].equals( "Tanner" ) || card.split( "_" )[ 0 ].equals( "Werewolf" ) || card.split( "_" )[ 0 ].equals( "Mystic wolf" ) ){
                 s.realParanormal = card;
@@ -285,7 +285,7 @@ public class Game{
         s.writeLog( card + "'s move" );
         if( !s.cardsOnBegin.contains( card ) ){
             s.writeLog( card + " is on table" );
-            Thread.sleep( 5000 );
+            Thread.sleep( 10000 );
             s.cardsInGame.remove( card );
             s.writeLog( card + " falls asleep" );
             return -1;

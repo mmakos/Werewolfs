@@ -34,3 +34,6 @@ Zobaczysz teraz kto jest Seerem.@Beholder
 Seer jest na stole lub nie ma go w grze.@Beholder
 Wybierz kolejną kartę. Jeśli nadal jest to karta z miasta, dalej grasz jako paranormal investigator, czyli postać z miasta.@Paranormal
 Nikt nie został zabity
+Ukryj nazwy kart
+Pokaż nazwy kart
+Twoja karta to

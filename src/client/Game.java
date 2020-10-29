@@ -34,7 +34,7 @@ public class Game{
     public String displayedCard;        // When you are copycat or paranormal then its value is different than card line above
     private GameWindow gameWindow;
     public String nickname;
-    private String[] statements = new String[ 50 ];
+    public String[] statements = new String[ 50 ];
 
     private MediaPlayer wakeUpSignal = null;
     private MediaPlayer roleSignal = null;
@@ -80,11 +80,11 @@ public class Game{
                     wakeUp();
                     break;
                 }
-                gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " " + statements[ 0 ] );
+                gameWindow.setStatementLabel( msg.charAt( 0) + msg.substring( 1 ).toLowerCase() + " " + statements[ 0 ] );
                 if( msg.equals( card.split( "_" )[ 0 ].toUpperCase() ) || ( msg.equals( "WEREWOLF" ) && card.equals( "Mystic wolf" ) ) ){
-                    gameWindow.setStatementLabel( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() + " " + statements[ 1 ] );
+                    gameWindow.setStatementLabel( msg.charAt( 0) + msg.substring( 1 ).toLowerCase() + " " + statements[ 1 ] );
                     try {
-                        proceedCard( msg.substring( 0, 1 ) + msg.substring( 1 ).toLowerCase() );
+                        proceedCard( msg.charAt( 0) + msg.substring( 1 ).toLowerCase() );
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -260,6 +260,8 @@ public class Game{
         gameWindow.setTableCardsSelected( false );
         sendMsg( gameType, clickedCard );
         String chosenCard = readMsgOnly();
+        gameWindow.reverseCard( clickedCard, chosenCard );
+        String firstClickedCard = clickedCard;
 
         waitingForButton = true;
         gameWindow.setPlayersCardsActive( true );
@@ -270,9 +272,10 @@ public class Game{
             gameWindow.setRoleInfo( statements[ 13 ] );
             waitingForButton = false;
         }
-        gameWindow.reverseCard( clickedCard, chosenCard );
         gameWindow.setPlayersCardsActive( false );
         gameWindow.setPlayersCardsSelected( false );
+        gameWindow.hideCenterCard( firstClickedCard );
+        gameWindow.reverseCard( clickedCard, chosenCard );
         sendMsg( gameType, clickedCard );
     }
 
@@ -341,10 +344,10 @@ public class Game{
         String cardsInCenter[] = readMsgOnly().split(MSG_SPLITTER);
         String clickedCards[] = cards.split(MSG_SPLITTER);
         gameWindow.setCenterCardSelected(clickedCard,false);
-        gameWindow.reverseCard(clickedCards[0],cardsInCenter[0]);
-        gameWindow.reverseCard(clickedCards[1],cardsInCenter[1]);
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
+        gameWindow.reverseCard(clickedCards[0],cardsInCenter[0]);
+        gameWindow.reverseCard(clickedCards[1],cardsInCenter[1]);
     }
     void makeInsomniac(){
         gameWindow.setRoleInfo( statements[ 28 ] );
@@ -464,7 +467,10 @@ public class Game{
             Vector< String > cardsNow = new Vector<>( Arrays.asList( readMsgOnly().split( MSG_SPLITTER ) ) );
             Vector< String > realCardsNow = new Vector<>( Arrays.asList( readMsgOnly().split( MSG_SPLITTER ) ) );
             for( int i = 0; i < players.size(); ++i ){
-                gameWindow.reverseCard( players.get( i ), cardsNow.get( i ) );
+                if( players.get( i ).equals( nickname ) )
+                    gameWindow.updateMyCard( cardsNow.get( i ) );
+                else
+                    gameWindow.reverseCard( players.get( i ), cardsNow.get( i ) );
             }
             if( voteResult.equals( UNIQUE_CHAR + "table" ) ){
                 gameWindow.setStatementLabel( statements[ 35 ] + " - " + whoWins( voteResult, realCardsNow ) + "." );

@@ -189,16 +189,16 @@ public class Server{
         LinkedList< String > temp = new LinkedList<>( cardsInGame );
 
 //        //todo to remove when not testing with one player
-//        cardsOnBegin.add( "Troublemaker" );
-//        cardsNow.add( cardsOnBegin.get( 0 ) );
-//        temp.remove( "Troublemaker" );
+        cardsOnBegin.add( "Witch" );
+        cardsNow.add( cardsOnBegin.get( 0 ) );
+        temp.remove( "Witch" );
 
         for( int i = 0; i < 3; ++i ){
             int randInt = rand.nextInt( temp.size() );
             cardsInCenter[ i ] = temp.get( randInt );
             temp.remove( randInt );
         }
-        for( int i = 0; i < players.size(); ++i ){      //todo to i=0 when not testing with one player
+        for( int i = 1; i < players.size(); ++i ){      //todo to i=0 when not testing with one player
             int randInt = rand.nextInt( temp.size() );
             cardsOnBegin.add( temp.get( randInt ) );
             cardsNow.add( cardsOnBegin.get( i ) );

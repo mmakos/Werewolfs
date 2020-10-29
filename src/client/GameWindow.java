@@ -17,12 +17,16 @@ import java.util.Vector;
 public class GameWindow{
     private Game game;
 
-    public void setGame( Game game ){ this.game = game; }
+    public void setGame( Game game ){
+        this.game = game;
+        cardLabel.setText( game.statements[ 38 ] + " " );
+    }
 
     @FXML public void initialize(){ setOnDrag();
         card0.setId( Game.UNIQUE_CHAR + "card0" );
         card1.setId( Game.UNIQUE_CHAR + "card1" );
         card2.setId( Game.UNIQUE_CHAR + "card2" );
+        reverseCardButton.setVisible( false );
     }
 
     private void setOnDrag(){
@@ -56,23 +60,69 @@ public class GameWindow{
         Platform.runLater( () -> roleInfo.setText( str ) );
     }
 
-
     public void reverseCard( String player, String card ){
         ToggleButton toggle;
+        int idx;
         switch( player ){
-            case ( char )2 + "card0": toggle = card0; break;
-            case ( char )2 + "card1": toggle = card1; break;
-            case ( char )2 + "card2": toggle = card2; break;
-            default: toggle = playersCards.get( game.players.indexOf( player ) );
+            case ( char )2 + "card0": toggle = card0; idx = knownCards.size() - 3; break;
+            case ( char )2 + "card1": toggle = card1; idx = knownCards.size() - 2; break;
+            case ( char )2 + "card2": toggle = card2; idx = knownCards.size() - 1; break;
+            default: idx = game.players.indexOf( player ); toggle = playersCards.get( idx );
         }
-        if( !game.players.contains( player ) ){
+        knownCards.set( idx, card );
+        Platform.runLater( () -> {
+            reverseCardButton.setText( game.statements[ 36 ] );
+            reverseCardButton.setVisible( true );
+        } );
+        if( !game.players.contains( player ) )
             Platform.runLater( () -> toggle.setStyle( "-fx-background-image: url(\"img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" ) );
-        }
-        else{
+        else
             Platform.runLater( () -> toggle.setStyle( "-fx-graphic: url(\"img/smallCards/frontCardBig" + card.split( " " )[ 0 ] + ".png\")" ) );
-        }
         toggle.setOpacity( 1.0 );
     }
+
+    @FXML public void hideShowCardNames(){
+        if( reverseCardButton.getText().equals( game.statements[ 36 ] ) ){
+            card0.setStyle( "-fx-background-image: url(\"img/backCardSmallDark.png\")" );
+            card1.setStyle( "-fx-background-image: url(\"img/backCardSmallDark.png\")" );
+            card2.setStyle( "-fx-background-image: url(\"img/backCardSmallDark.png\")" );
+            if( card0.isDisabled() ) card0.setOpacity( 0.5 );
+            if( card1.isDisabled() ) card1.setOpacity( 0.5 );
+            if( card2.isDisabled() ) card2.setOpacity( 0.5 );
+            for( int i = 0; i < playersCards.size(); ++i ){
+                if( knownCards.get( i ) != null ){
+                    playersCards.get( i ).setStyle( "-fx-graphic: url(\"img/backCardSmallDark.png\")" );
+                    if( playersCards.get( i ).isDisabled() ) playersCards.get( i ).setOpacity( 0.5 );
+                }
+            }
+            reverseCardButton.setText( game.statements[ 37 ] );
+        } else{
+            for( int i = 0; i < playersCards.size(); ++i ){
+                if( knownCards.get( i ) != null )
+                    reverseCard( game.players.get( i ), knownCards.get( i ) );
+            }
+            for( int i = playersCards.size(), j = 0; i < knownCards.size(); ++i, ++j ){
+                if( knownCards.get( i ) != null )
+                    reverseCard( Game.UNIQUE_CHAR + "card" + j, knownCards.get( i ) );
+            }
+            reverseCardButton.setText( game.statements[ 36 ] );
+        }
+    }
+
+    public void hideCenterCard( String card ){
+        ToggleButton toggle;
+        int idx;
+        switch( card ){
+            case ( char )2 + "card0": toggle = card0; idx = knownCards.size() - 3; break;
+            case ( char )2 + "card1": toggle = card1; idx = knownCards.size() - 2; break;
+            case ( char )2 + "card2": toggle = card2; idx = knownCards.size() - 1; break;
+            default: return;
+        }
+        toggle.setStyle( "-fx-background-image: url(\"img/backCardSmallDark.png\")" );
+        toggle.setOpacity( 0.5 );
+        knownCards.set( idx, null );
+    }
+
     public void updateMyCard( String card ){
         ToggleButton toggle = playersCards.get( game.players.indexOf( game.nickname ) );
         game.displayedCard = card;
@@ -83,6 +133,8 @@ public class GameWindow{
         int a = 500, b = 280, p = game.players.size();
 
         playersCards.setSize( p );
+        knownCards.setSize( p + 3 );
+        knownCards.forEach( ( knownCard ) -> knownCard = "" );
         int ourPos = game.players.indexOf( game.nickname );        //start drawing cadrs from ours
         ToggleButton toggle = getPlayerCard( game.nickname );
         toggle.setId( Game.UNIQUE_CHAR + "You" );
@@ -147,8 +199,10 @@ public class GameWindow{
 
     public void setPlayersCardsActive( boolean active ){
         for( ToggleButton toggle: playersCards ){
-            if( !toggle.getId().equals( Game.UNIQUE_CHAR + "You" ) )
+            if( !toggle.getId().equals( Game.UNIQUE_CHAR + "You" ) ){
                 toggle.setDisable( !active );
+                toggle.setOpacity( active ? 1.0 : 0.5 );
+            }
         }
     }
 
@@ -159,10 +213,13 @@ public class GameWindow{
 
     public void setPlayerCardActive( int playerIndex, boolean active ){
         playersCards.get( playerIndex ).setDisable( !active );
+        playersCards.get( playerIndex ).setOpacity( active ? 1.0 : 0.5 );
     }
+
     public void setPlayerCardSelected( int playerIndex, boolean selected ){
         playersCards.get( playerIndex ).setSelected( selected );
     }
+
     public void setCenterCardSelected(String cardID,boolean selected){
         switch (cardID){
             case ( char )2 + "card0": card0.setSelected( selected ); break;
@@ -181,6 +238,9 @@ public class GameWindow{
         card0.setDisable( !active );
         card1.setDisable( !active );
         card2.setDisable( !active );
+        card0.setOpacity( active ? 1.0 : 0.5 );
+        card1.setOpacity( active ? 1.0 : 0.5 );
+        card2.setOpacity( active ? 1.0 : 0.5 );
     }
 //
 //    @FXML void tableCardClicked(){
@@ -198,11 +258,13 @@ public class GameWindow{
     @FXML private ToggleButton card0;
     @FXML private ToggleButton card1;
     @FXML private ToggleButton card2;
-    private Vector< ToggleButton > playersCards = new Vector<>();;
+    private Vector< ToggleButton > playersCards = new Vector<>();
+    public Vector< String > knownCards = new Vector<>();
     @FXML private Label cardLabel;
     @FXML public Label statementLabel;
     @FXML private Label nicknameLabel;
     @FXML private Label roleInfo;
+    @FXML private Button reverseCardButton;
     @FXML public Button quitButton;
     private static final int sceneWidth = 1280, sceneHeight = 820;
     private static final int cardWidth = 100, cardHeight = 72;
