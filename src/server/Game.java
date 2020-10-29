@@ -90,12 +90,12 @@ public class Game{
 
         //receive his moves, which is generally numbers splitted with (char)29 sign, here is one number, but for example Seer will send two numbers
         String chosenCard = s.receiveGame( idOfCopycat );     // first received number
-        s.writeLog( "Player chose card " + chosenCard );
+        //s.writeLog( "Player chose card " + chosenCard );
         //send name of card, which player has become
         String cardName = s.cardsInCenter[ s.getTableCardId( chosenCard ) ];
         s.realCopycat = cardName;
         s.sendGame( idOfCopycat, cardName );
-        s.writeLog( "This card is " + cardName );
+        //s.writeLog( "This card is " + cardName );
         //Change his card information on server
         s.cardsOnBegin.set( s.cardsOnBegin.indexOf( "Copycat" ), cardName );
 
@@ -119,7 +119,7 @@ public class Game{
             }
         }
         if( !isAnyoneWerewolf ){
-            s.writeLog( "All werewolves are on table" );
+            //s.writeLog( "All werewolves are on table" );
             Thread.sleep( 7000 );
         }
         else{
@@ -129,14 +129,14 @@ public class Game{
                 if( indexOfWerewolf != -1 ){
                     str.append( s.players.get( indexOfWerewolf ).name ).append( MSG_SPLITTER );
                     werewolves.add( s.players.get( indexOfWerewolf ).id );
-                    s.writeLog( "Werewolf is player " + s.players.get( indexOfWerewolf ).id );
+                    //s.writeLog( "Werewolf is player " + s.players.get( indexOfWerewolf ).id );
                 }
             }
             int indexOfMystic = s.cardsOnBegin.indexOf( "Mystic wolf" );
             if( indexOfMystic != -1 ){
                 str.append( s.players.get( indexOfMystic ).name ).append( MSG_SPLITTER );
                 werewolves.add( s.players.get( indexOfMystic ).id );
-                s.writeLog( "Mystic wolf is player " + s.players.get( indexOfMystic ).id );
+                //s.writeLog( "Mystic wolf is player " + s.players.get( indexOfMystic ).id );
             }
             for( Integer werewolf: werewolves )
                 s.sendGame( werewolf, str.toString() );
@@ -158,6 +158,7 @@ public class Game{
         s.sendGame( minionsId, werewolvesMsg );
         Thread.sleep( 7000 );
         s.cardsInGame.remove( "Minion" );
+        s.writeLog( "Minion falls asleep" );
     }
 
     void makeMysticWolf() throws InterruptedException, IOException {
@@ -166,8 +167,9 @@ public class Game{
         String cardToSee = s.receiveGame( idOfMysticWolf ).split( MSG_SPLITTER )[ 0 ];
         int cardToSeeId = s.getTableCardId(cardToSee);
         s.sendGame( idOfMysticWolf, s.cardsInCenter[cardToSeeId] );
-        s.writeLog(s.cardsInCenter[cardToSeeId]);
-        Thread.sleep( 7000 );
+        //s.writeLog(s.cardsInCenter[cardToSeeId]);
+        Thread.sleep( 3000 );
+        s.writeLog( "Mystic wolf falls asleep" );
     }
 
     void makeApprenticeSeer() throws InterruptedException, IOException {
@@ -176,8 +178,9 @@ public class Game{
         String cardToSee = s.receiveGame( idOfApprenticeSeer ).split( MSG_SPLITTER )[ 0 ];
         int cardToSeeId = s.getTableCardId(cardToSee);
         s.sendGame( idOfApprenticeSeer, s.cardsInCenter[cardToSeeId] );
-        s.writeLog(s.cardsInCenter[cardToSeeId]);
+        //s.writeLog(s.cardsInCenter[cardToSeeId]);
         Thread.sleep( 3000 );
+        s.writeLog( "Apprentice seer falls asleep" );
     }
 
     void makeWitch() throws InterruptedException, IOException{
@@ -191,6 +194,7 @@ public class Game{
         s.cardsInCenter[ s.getTableCardId( chosenCard ) ] = s.cardsNow.get( playersId );
         s.cardsNow.set( playersId, cardName );
         Thread.sleep( 3000 );
+        s.writeLog( "Witch falls asleep" );
     }
 
     void makeTroublemaker() throws InterruptedException, IOException{
@@ -199,6 +203,7 @@ public class Game{
         String[] chosenCards = s.receiveGame( idOfTroublemaker ).split( MSG_SPLITTER );
         Collections.swap( s.cardsNow, s.players.indexOf( s.getPlayer( chosenCards[ 0 ] ) ), s.players.indexOf( s.getPlayer( chosenCards[ 1 ] ) ) );
         Thread.sleep( 3000 );
+        s.writeLog( "Troublemaker falls asleep" );
     }
 
     void makeSeer() throws InterruptedException, IOException {
@@ -211,6 +216,7 @@ public class Game{
         String chosenCard2 = s.cardsInCenter[chosenCard2ID];
         s.sendGame(idOfSeer,chosenCard1+MSG_SPLITTER+chosenCard2);
         Thread.sleep( 3000 );
+        s.writeLog( "Seer falls asleep" );
     }
 
     void makeBeholder() throws InterruptedException {
@@ -223,15 +229,17 @@ public class Game{
         else
             s.sendGame(idOfBeholder,"NoSeer");
         Thread.sleep( 3000 );
+        s.writeLog( "Beholder falls asleep" );
     }
     void makeInsomniac() throws InterruptedException{
         int idOfInsomniac = startRole( "Insomniac" );
         if(idOfInsomniac<0) return;
         String insomniacNow = s.cardsNow.get(s.cardsOnBegin.indexOf("Insomniac"));
-        s.writeLog( "This card is " + insomniacNow );
+        //s.writeLog( "This card is " + insomniacNow );
         s.sendGame(idOfInsomniac, insomniacNow );
         Thread.sleep( 3000 );
         s.cardsInGame.remove( "Insomniac" );
+        s.writeLog( "Insomniac falls asleep" );
     }
 
     void makeThing() throws InterruptedException, IOException{
@@ -248,6 +256,7 @@ public class Game{
                 s.sendGame( player.id, "NOTHING" );
         }
         Thread.sleep( 3000 );
+        s.writeLog( "Thing falls asleep" );
     }
 
     void makeParanormal() throws InterruptedException, IOException{
@@ -263,6 +272,7 @@ public class Game{
             }
         }
         Thread.sleep( 3000 );
+        s.writeLog( "Paranormal investigator falls asleep" );
     }
 
     void makeRobber() throws IOException, InterruptedException{
@@ -277,6 +287,7 @@ public class Game{
         s.cardsNow.set( chosenPlayerIdx, paranormalsCard );
         s.sendGame( robberId, card );
         Thread.sleep( 3000 );
+        s.writeLog( "Robber falls asleep" );
     }
 
     //function does same begin of every role and returns id of player with this role, if role was not on the middle
@@ -284,16 +295,15 @@ public class Game{
         s.sendGame( 0, card.toUpperCase() );
         s.writeLog( card + "'s move" );
         if( !s.cardsOnBegin.contains( card ) ){
-            s.writeLog( card + " is on table" );
-            Thread.sleep( 10000 );
+            //s.writeLog( card + " is on table" );
+            Thread.sleep( new Random().nextInt( 10000 ) + 10000 );
             s.cardsInGame.remove( card );
             s.writeLog( card + " falls asleep" );
             return -1;
         }
         else{
-            int idOfCard = s.players.get( s.cardsOnBegin.indexOf( card ) ).id;
-            s.writeLog( card + " is player " + idOfCard );
-            return idOfCard;
+            //s.writeLog( card + " is player " + idOfCard );
+            return s.players.get( s.cardsOnBegin.indexOf( card ) ).id;
         }
     }
 }

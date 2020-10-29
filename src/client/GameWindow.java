@@ -238,9 +238,9 @@ public class GameWindow{
         card0.setDisable( !active );
         card1.setDisable( !active );
         card2.setDisable( !active );
-        card0.setOpacity( active ? 1.0 : 0.5 );
-        card1.setOpacity( active ? 1.0 : 0.5 );
-        card2.setOpacity( active ? 1.0 : 0.5 );
+        if( reverseCardButton.getText().equals( game.statements[ 37 ] ) || knownCards.get( knownCards.size() - 3 ) == null ) card0.setOpacity( active ? 1.0 : 0.5 );
+        if( reverseCardButton.getText().equals( game.statements[ 37 ] ) || knownCards.get( knownCards.size() - 2 ) == null ) card1.setOpacity( active ? 1.0 : 0.5 );
+        if( reverseCardButton.getText().equals( game.statements[ 37 ] ) || knownCards.get( knownCards.size() - 1 ) == null ) card2.setOpacity( active ? 1.0 : 0.5 );
     }
 //
 //    @FXML void tableCardClicked(){

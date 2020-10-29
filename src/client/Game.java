@@ -322,8 +322,8 @@ public class Game{
         gameWindow.setTableCardsActive( true );
 
         // Waiting for clicked card, but with time limit of 30 seconds
-        long start1 = System.currentTimeMillis();
-        while( waitingForButton && System.currentTimeMillis() - start1 < MAX_ROLE_TIME * 1000 );
+        long start = System.currentTimeMillis();
+        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 ) ;
         // If time is up, card will be selected randomly
         if( waitingForButton ){
             int rand = new Random().nextInt( 3 );
@@ -331,23 +331,23 @@ public class Game{
             waitingForButton = false;
         }
         String cards = clickedCard + MSG_SPLITTER;
-        gameWindow.setCenterCardSelected(clickedCard,false);
+        gameWindow.setCenterCardSelected( clickedCard, false );
         waitingForButton = true;
-        while( waitingForButton && System.currentTimeMillis() - start1 < MAX_ROLE_TIME * 1000 );
+        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 ) ;
         if( waitingForButton ){
             int rand = new Random().nextInt( 3 );
             clickedCard = UNIQUE_CHAR + "card" + rand;
             waitingForButton = false;
         }
         cards += clickedCard;
-        sendMsg(gameType,cards);
-        String cardsInCenter[] = readMsgOnly().split(MSG_SPLITTER);
-        String clickedCards[] = cards.split(MSG_SPLITTER);
-        gameWindow.setCenterCardSelected(clickedCard,false);
+        sendMsg( gameType, cards );
+        String cardsInCenter[] = readMsgOnly().split( MSG_SPLITTER );
+        String clickedCards[] = cards.split( MSG_SPLITTER );
+        gameWindow.setCenterCardSelected( clickedCard, false );
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
-        gameWindow.reverseCard(clickedCards[0],cardsInCenter[0]);
-        gameWindow.reverseCard(clickedCards[1],cardsInCenter[1]);
+        gameWindow.reverseCard( clickedCards[ 0 ], cardsInCenter[ 0 ] );
+        gameWindow.reverseCard( clickedCards[ 1 ], cardsInCenter[ 1 ] );
     }
     void makeInsomniac(){
         gameWindow.setRoleInfo( statements[ 28 ] );

@@ -115,6 +115,7 @@ public class Server{
         endVotingButton.setVisible( true );
         endVotingButton.setDisable( false );
         sendGame( 0, UNIQUE_CHAR + "VOTE" );
+        writeLog( "Voting ordered" );
         votes.setSize( players.size() + 1 );    //last element is table
         for( int i = 0; i < votes.size(); ++i )
             votes.set( i, 0 );
@@ -123,10 +124,13 @@ public class Server{
                 String vote;
                 try{
                     vote = receiveGame( player.id );
-                    if( vote.equals( UNIQUE_CHAR + "table" ) )
+                    if( vote.equals( UNIQUE_CHAR + "table" ) ){
+                        writeLog( "Player " + player.name + " voted for the table." );
                         votes.set( votes.size() - 1, votes.lastElement() + 1 );
+                    }
                     else{
                         int votedPlayerIdx = players.indexOf( getPlayer( vote ) );
+                        writeLog( "Player " + player.name + " voted for " + players.get( votedPlayerIdx ).name );
                         if( votedPlayerIdx != -1 ){
                             votes.set( votedPlayerIdx, votes.get( votedPlayerIdx ) + 1 );
                         }
@@ -143,23 +147,33 @@ public class Server{
         }
         playerReaders.removeAllElements();
         sendGame( 0, UNIQUE_CHAR + "VOTEEND" );
+        writeLog( "Voting ended" );
         countVotes();
     }
 
     private void countVotes(){
+        for( int i = 0; i < players.size(); ++i )
+            writeLog( players.get( i ).name + " got " + votes.get( i ) + " votes." );
+        writeLog( "Table got " + votes.lastElement() + " votes." );
         int max = Collections.max( votes );
         int maxIdx = votes.indexOf( max );
         boolean temp = true;
         if( maxIdx == -1 )      //no one voted
             temp = false;
         votes.set( maxIdx, -1 );
-        if( !temp || Collections.max( votes ) == max )       // same votes quantity
+        if( !temp || Collections.max( votes ) == max ){       // same votes quantity
             orderVoting();                                          // vote again
+            writeLog( "Unequivocal vote result. Voting will be repeated." );
+        }
         else{
-            if( maxIdx == votes.size() - 1 )
+            if( maxIdx == votes.size() - 1 ){
                 sendGame( 0, UNIQUE_CHAR + "table" );
-            else
+                writeLog( "Nobody has been killed." );
+            }
+            else{
                 sendGame( 0, players.get( maxIdx ).name );
+                writeLog( players.get( maxIdx ).name + " has been killed.");
+            }
             sendAllPlayers();
         }
     }
@@ -178,6 +192,7 @@ public class Server{
         for( String cardNow: cardsNow )
             str2.append( cardNow ).append( Game.MSG_SPLITTER );
         sendGame( 0, str2.toString() );
+        writeLog( "All cards have been revealed." );
     }
 
     public void setSelectedCards( LinkedList< String > selectedCards ){
@@ -189,9 +204,9 @@ public class Server{
         LinkedList< String > temp = new LinkedList<>( cardsInGame );
 
 //        //todo to remove when not testing with one player
-        cardsOnBegin.add( "Witch" );
+        cardsOnBegin.add( "Copycat" );
         cardsNow.add( cardsOnBegin.get( 0 ) );
-        temp.remove( "Witch" );
+        temp.remove( "Copycat" );
 
         for( int i = 0; i < 3; ++i ){
             int randInt = rand.nextInt( temp.size() );
