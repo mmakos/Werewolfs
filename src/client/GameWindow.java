@@ -8,11 +8,16 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaException;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.util.Vector;
 
 public class GameWindow{
@@ -300,12 +305,28 @@ public class GameWindow{
     }
 
     public void clearArrows(){
-            lines.forEach( ( line ) -> gamePane.getChildren().remove( line ) );
-            System.out.println( "cleared" );
+        lines.forEach( ( line ) -> gamePane.getChildren().remove( line ) );
         lines.removeAllElements();
     }
 
+    public void playMedia( String filename ){
+        try{
+            Media media = new Media( new File( filename ).toURI().toString() );
+            MediaPlayer mediaPlayer = new MediaPlayer( media );
+            Platform.runLater( () -> video.getParent().toFront() );
+            video.setMediaPlayer( mediaPlayer );
+            video.setVisible( true );
+            System.out.println( "play" );
+            mediaPlayer.play();
+            mediaPlayer.setOnEndOfMedia( () -> {
+                Platform.runLater( () -> video.getParent().toBack() );
+                video.setVisible( false );
+            } );
+        }catch( MediaException ignored ){}
+    }
+
     @FXML private AnchorPane gamePane;
+    @FXML private MediaView video;
     @FXML private ToggleButton card0;
     @FXML private ToggleButton card1;
     @FXML private ToggleButton card2;

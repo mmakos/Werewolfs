@@ -130,7 +130,6 @@ public class Game{
             case "Robber": makeRobber(); break;
             case "Troublemaker": makeTroublemaker(); break;
             case "Apprentice seer": makeApprenticeSeer(); break;
-
         }
     }
 
@@ -474,7 +473,6 @@ public class Game{
             if( clickedCard.substring( 0, 1 ).equals( UNIQUE_CHAR ) )
                 clickedCard = UNIQUE_CHAR + "table";
             sendMsg( gameType, clickedCard );
-            System.out.println( "card clicked: " + clickedCard );
         }
         waitingForButton = false;
         while( voteNotEnded.get() );
@@ -493,34 +491,40 @@ public class Game{
             else
                 gameWindow.reverseCard( players.get( i ), cardsNow.get( i ) );
         }
+        int winner = whoWins( voteResult, realCardsNow );       // 9-tanner, 10-miasto, 11/12-wilkołaki/+minion
         if( voteResult.equals( UNIQUE_CHAR + "table" ) ){
-            gameWindow.setStatementLabel( statements[ 35 ] + " - " + whoWins( voteResult, realCardsNow ) + "." );
+            gameWindow.setStatementLabel( statements[ 35 ] + " - " + statements[ winner ] + "." );
         }
         else if( voteResult.equals( nickname ) )
-            gameWindow.setStatementLabel( statements[ 7 ] + " - " + whoWins( voteResult, realCardsNow ) + "." );
+            gameWindow.setStatementLabel( statements[ 7 ] + " - " + statements[ winner ] + "." );
         else
-            gameWindow.setStatementLabel( voteResult + " " + statements[ 8 ] + " - " + whoWins( voteResult, realCardsNow ) + "." );
+            gameWindow.setStatementLabel( voteResult + " " + statements[ 8 ] + " - " + statements[ winner ] + "." );
         gameWindow.quitButton.setDisable( false );
+        switch( winner ){
+            case 10: gameWindow.playMedia( "video/cityWins.mp4" ); break;
+            case 11: case 12: gameWindow.playMedia( "video/werewolvesWin.mp4" ); break;
+            case 9: gameWindow.playMedia( "video/tannerWins.mp4" ); break;
+        }
         return 0;
     }
 
-    private String whoWins( String player, Vector< String > cardsNow ){
+    private int whoWins( String player, Vector< String > cardsNow ){
         if( player.equals( UNIQUE_CHAR + "table" ) ){
             if( cardsNow.contains( "Werewolf_0" ) || cardsNow.contains( "Werewolf_1" ) ||
                     cardsNow.contains( "Werewolf_2" ) || cardsNow.contains( "Mystic wolf" ) )
-                return statements[ 12 ];
+                return 12;
             else
-                return statements[ 10 ];
+                return 10;
         }
         if( cardsNow.get( players.indexOf( player ) ).equals( "Tanner" ) )
-            return statements[ 9 ];
+            return 9;
         if( cardsNow.get( players.indexOf( player ) ).split( "_" )[ 0 ].equals( "Werewolf" ) )
-            return statements[ 10 ];
+            return 10;
         else{
             if( cardsNow.get( players.indexOf( player ) ).equals( "Minion" ) && !minionWinsWhenHeDies )
-                return statements[ 11 ];
+                return 11;
             else
-                return statements[ 12 ];
+                return 12;
         }
     }
 
