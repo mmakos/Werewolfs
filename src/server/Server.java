@@ -1,13 +1,19 @@
 package server;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.*;
@@ -45,6 +51,7 @@ public class Server{
         cardsInCenter = new String[ 3 ];
         voteButton.setVisible( false );
         endVotingButton.setVisible( false );
+        kickOut.setVisible( false );
     }
 
     @FXML void connect(){
@@ -53,6 +60,9 @@ public class Server{
         // starting thread for player
         Thread connect = new Thread( () -> {
             runServer.setDisable( true );
+            runServer.setVisible( false );
+            kickOut.setVisible( true );
+            kickOut.setDisable( false );
             ServerSocket ss;
             try{
                 ss = new ServerSocket( 23000 );
@@ -61,28 +71,27 @@ public class Server{
                 for( int i = 0; i < MAX_PLAYERS; ++i ){     // later while( nie wciśnięto "RUN GAME" ), for now 2 clients will be accepted
                     socket = ss.accept();
                     if( connecting ){
-                        players.add( new Player( players.size() + 100, socket ) );  // new player with id: 100, 101, 102 itd.
-                        players.get( i ).start();       // starting thread for player
-                        int finalI = i;
-                        String nickname = players.get( finalI ).getNickname();
+                        Player p = new Player( players.size() == 0 ? 100 : players.lastElement().id + 1, socket );
+                        players.add( p );  // new player with id: 100, 101, 102 itd.
+                        String nickname = p.getNickname();
                         if( nickname.equals( "" ) ){
-                            players.remove( players.lastElement() );
+                            players.remove( p );
                             --i;
                             continue;
                         }
                         for( int j = 0; j < players.size() - 1; ++j ){
                             if( players.get( j ).name.equals( nickname ) ){       // same nickname
-                                sendMsg( players.get( finalI ).id, "0" + COM_SPLITTER + "wrongNickname" );
-                                players.remove( players.lastElement() );
+                                sendMsg( p.id, "0" + COM_SPLITTER + "wrongNickname" );
+                                players.remove( p );
                                 break;
                             }
                         }
                         if( i >= players.size() )   //was same nickname
                             --i;
                         else{
-                            if( finalI >= MIN_PLAYERS - 1 ) startGame.setDisable( false );
-                            Platform.runLater( () -> playersLabel.setText( playersLabel.getText() + " " + players.get( finalI ).name + "," ) );
-                            sendMsg( players.get( finalI ).id, "0" + COM_SPLITTER + "ok" );
+                            if( i >= MIN_PLAYERS - 1 ) startGame.setDisable( false );
+                            Platform.runLater( () -> playersLabel.setText( playersLabel.getText() + " " + p.name + "," ) );
+                            sendMsg( p.id, "0" + COM_SPLITTER + "ok" );
                         }
                     }
                 }
@@ -107,7 +116,7 @@ public class Server{
         cardChooser.setPlayers( players.size() );
         cardChooser.setServer( this );
         startGame.setVisible( false );
-        runServer.setVisible( false );
+        kickOut.setVisible( false );
         playersLabel.setVisible( false );
         logField.setVisible( true );
         voteButton.setVisible( true );
@@ -286,11 +295,11 @@ public class Server{
     }
 
     void sendMsg( int id, String str ){
-        players.get( id - 100 ).output.println( str );
+        getPlayer( id ).output.println( str );
     }
 
     String receiveMsg( int id ) throws IOException{
-        return players.get( id - 100 ).input.readLine();
+        return getPlayer( id ).input.readLine();
     }
 
     public int getTableCardId( String str ){
@@ -315,7 +324,46 @@ public class Server{
             if( player.name.equals( name ) )
                 return player;
         }
-        return null;
+        throw new NullPointerException( "No player with that name" );
+    }
+
+    @FXML private void kickOut(){
+        Stage stage = new Stage();
+        stage.setTitle( "Kick sb out" );
+        Label l = new Label( "Players nickname:" );
+        TextField t = new TextField();
+        t.setPromptText( "Nickname" );
+        Button b = new Button( "Kick out" );
+        t.setPrefWidth( 200 );
+        t.setMaxWidth( 200 );
+        b.setPrefWidth( 200 );
+        l.setFont( Font.font( 14 ) );
+        t.setFont( Font.font( 14 ) );
+        b.setFont( Font.font( 14 ) );
+        b.setOnAction( event -> {
+            try{
+                removePlayerFromGame( getPlayer( t.getText() ) );
+                stage.close();
+            } catch( NullPointerException e ){
+                Platform.runLater( () -> l.setText( "No such player!" ) );
+            }
+        } );
+        VBox v = new VBox( l, t, b );
+        v.setAlignment( Pos.BASELINE_CENTER );
+        Scene s = new Scene( v, 300, 200 );
+        stage.setScene( s );
+        stage.show();
+    }
+
+    private void removePlayerFromGame( Player player ){
+        players.remove( player );
+        Platform.runLater( () -> {
+            if( players.size() < MIN_PLAYERS )
+                startGame.setDisable( true );
+            StringBuilder s = new StringBuilder( "Players: " );
+            for( Player value : players ) s.append( value.name ).append( ", " );
+            playersLabel.setText( s.toString() );
+        } );
     }
 
     String getPlayersCard( String name ){
@@ -326,10 +374,11 @@ public class Server{
     @FXML private Button runServer;
     @FXML private Button startGame;
     @FXML public Button voteButton;
+    @FXML private Button kickOut;
     @FXML private Button endVotingButton;
     @FXML private Label playersLabel;
 
-    public class Player extends Thread{
+    public class Player{
         public int id;
         public String name;
         public BufferedReader input;
@@ -339,11 +388,6 @@ public class Server{
             this.id = id;
             this.input = new BufferedReader( new InputStreamReader( socket.getInputStream(), StandardCharsets.UTF_8 ) );
             this.output = new PrintWriter( new OutputStreamWriter( socket.getOutputStream(), StandardCharsets.UTF_8 ), true );
-        }
-
-        @Override
-        public void run(){
-            System.out.println( "Client connected." );
         }
 
         public String getNickname(){

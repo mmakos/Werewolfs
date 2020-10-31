@@ -9,7 +9,7 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #2b2a4c;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="server.Server">
    <children>
-      <Label fx:id="playersLabel" alignment="TOP_LEFT" prefHeight="318.0" prefWidth="601.0" text="Players: " textFill="WHITE">
+      <Label fx:id="playersLabel" alignment="TOP_LEFT" prefHeight="318.0" prefWidth="601.0" text="Players: " textFill="WHITE" wrapText="true">
          <font>
             <Font size="18.0" />
          </font>
@@ -34,6 +34,11 @@
          </font>
       </Button>
       <Button fx:id="endVotingButton" disable="true" layoutX="221.0" layoutY="345.0" mnemonicParsing="false" onAction="#endVoting" prefHeight="41.0" prefWidth="160.0" stylesheets="@../../styles/button.css" text="End voting">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <Button fx:id="kickOut" disable="true" layoutX="128.0" layoutY="345.0" mnemonicParsing="false" onAction="#kickOut" prefHeight="41.0" prefWidth="160.0" stylesheets="@../../styles/button.css" text="Kick sb out">
          <font>
             <Font size="18.0" />
          </font>

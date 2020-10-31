@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
@@ -69,15 +70,11 @@ public class Game{
 
     public void run( Window connectWindow ){
         new Thread( () -> {
-            getPlayers();
-            getCard();
-            Platform.runLater( () -> {
-                try{
-                    gameWindow( connectWindow );
-                } catch( IOException e ){
-                    e.printStackTrace();
-                }
-            } );
+            try{
+                getPlayers();
+                getCard();
+                gameWindow( connectWindow );
+            } catch( Exception ignored ){}
         } ).start();
     }
 
@@ -553,7 +550,7 @@ public class Game{
         System.exit( 0 );
     }
 
-    private void getPlayers(){
+    private void getPlayers() throws Exception{
         String[] playersTab = readMsgOnly().split( MSG_SPLITTER, 0 );
         players.addAll( Arrays.asList( playersTab ) );
     }
