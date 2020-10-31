@@ -70,11 +70,15 @@ public class Game{
 
     public void run( Window connectWindow ){
         new Thread( () -> {
-            try{
-                getPlayers();
-                getCard();
-                gameWindow( connectWindow );
-            } catch( Exception ignored ){}
+            getPlayers();
+            getCard();
+            Platform.runLater(() -> {
+                try{
+                    gameWindow( connectWindow );
+                } catch( IOException e ){
+                    e.printStackTrace();
+                }
+            } );
         } ).start();
     }
 
@@ -488,6 +492,8 @@ public class Game{
             else
                 gameWindow.reverseCard( players.get( i ), cardsNow.get( i ) );
         }
+        for( int i = players.size(), j = 0; i < cardsNow.size(); ++i, ++j )
+            gameWindow.reverseCard( UNIQUE_CHAR + "card" + j, cardsNow.get( i ) );
         int winner = whoWins( voteResult, realCardsNow );       // 9-tanner, 10-miasto, 11/12-wilkołaki/+minion
         if( voteResult.equals( UNIQUE_CHAR + "table" ) ){
             gameWindow.setStatementLabel( statements[ 35 ] + " - " + statements[ winner ] + "." );
@@ -550,7 +556,7 @@ public class Game{
         System.exit( 0 );
     }
 
-    private void getPlayers() throws Exception{
+    private void getPlayers(){
         String[] playersTab = readMsgOnly().split( MSG_SPLITTER, 0 );
         players.addAll( Arrays.asList( playersTab ) );
     }

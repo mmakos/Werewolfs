@@ -1,8 +1,6 @@
 package server;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -203,6 +201,8 @@ public class Server{
         StringBuilder str = new StringBuilder();
         for( String cardNow: cardsNow )
             str.append( cardNow ).append( Game.MSG_SPLITTER );
+        for( String middleCard: cardsInCenter )
+            str.append( middleCard ).append( Game.MSG_SPLITTER );
         sendGame( 0, str.toString() );
 
         StringBuilder str2 = new StringBuilder();

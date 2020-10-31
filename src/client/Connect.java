@@ -124,8 +124,6 @@ public class Connect{
                 quitButton.setVisible( false );
             } );
             game.run( loginField.getScene().getWindow() );
-        } catch( SecurityException e ){
-            infoLabel.setText( e.getMessage() );
         } catch( UnknownHostException e ){
             infoLabel.setText( "Cannot connect to " + ip + " on port " + port );
         } catch( IOException e ){
