@@ -518,7 +518,8 @@ public class Game{
         }
         if( cardsNow.get( players.indexOf( player ) ).equals( "Tanner" ) )
             return 9;
-        if( cardsNow.get( players.indexOf( player ) ).split( "_" )[ 0 ].equals( "Werewolf" ) )
+        if( cardsNow.get( players.indexOf( player ) ).split( "_" )[ 0 ].equals( "Werewolf" ) ||
+            cardsNow.get( players.indexOf( player ) ).equals( "Mystic wolf" ) )
             return 10;
         else{
             if( cardsNow.get( players.indexOf( player ) ).equals( "Minion" ) && !minionWinsWhenHeDies )
