@@ -18,7 +18,7 @@ Dokładny opis gry oraz zasady znajdziesz na stronie [One Night Ultimate](http:/
 
 ## Instalacja
 Instalator na Windows'a lub spakowane pliki gry (jeśli mamy Mac'a albo Linux'a) można pobrać z [zakładki *releases*](https://github.com/mmakos/Werewolves/releases). Następnie należy zainstalować grę podążając za wskazówkami instalatora. Dodatkowo konieczne jest posiadanie JRE (Java Runtine Environment) w wersji 8 - można je pobrać z <https://java.com/pl/download>.<br>
-Gdy mamy na komputerze system Windows to zalecam pobranie instalatora, gdyż z tym zipem częściej dzieją się dziwne rzeczy, które na moich komputerach nigdy się nie działy, więc nie bardzo mogę znaleźć ich przyczynę. Ale jeśli wystąpi jakić błąd to super - wtedy patrz punkt [*Błędy*](#bdy).
+Gdy mamy na komputerze system Windows to zalecam pobranie instalatora, gdyż z tym zipem częściej dzieją się dziwne rzeczy, które na moich komputerach nigdy się nie działy, więc nie bardzo mogę znaleźć ich przyczynę. Ale jeśli wystąpi jakić błąd to super - wtedy patrz punkt [*Błędy*](#bledy).
 
 ## Uruchomienie
 
