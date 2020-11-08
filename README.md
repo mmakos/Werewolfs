@@ -2,9 +2,11 @@
 
 ## Opis gry
 Wilkołaki to wieloosobowa gra podobna do popularnej "Mafii", z tym że każdy ma swoją własną rolę, a cała akcja dzieje się podczas jednej doby. Niniejszy projekt jest przełożeniem tejże gry na wersję online.
+Dokładny opis gry oraz zasady znajdziesz na stronie [One Night Ultimate](http://onenightultimate.com/).
 
 ## Instalacja
-Instalator na Windows'a lub spakowane pliki gry (jeśli mamy Mac'a albo Linux'a) można pobrać z [zakładki *releases*](https://github.com/mmakos/Werewolves/releases). Następnie należy zainstalować grę podążając za wskazówkami instalatora. Dodatkowo konieczne jest posiadanie JRE (Java Runtine Environment) w wersji 8 - można je pobrać z <https://java.com/pl/download>.
+Instalator na Windows'a lub spakowane pliki gry (jeśli mamy Mac'a albo Linux'a) można pobrać z [zakładki *releases*](https://github.com/mmakos/Werewolves/releases). Następnie należy zainstalować grę podążając za wskazówkami instalatora. Dodatkowo konieczne jest posiadanie JRE (Java Runtine Environment) w wersji 8 - można je pobrać z <https://java.com/pl/download>.<br>
+Gdy mamy na komputerze system Windows to zalecam pobranie instalatora, gdyż z tym zipem częściej dzieją się dziwne rzeczy, które na moich komputerach nigdy się nie działy, więc nie bardzo mogę znaleźć ich przyczynę. Ale jeśli wystąpi jakić błąd to super - wtedy patrz punkt [*Błędy*](##Błędy).
 
 ## Uruchomienie
 
@@ -19,3 +21,37 @@ Następnie należy uruchomić aplikację *SerWerewolves.exe* oraz wcisnąć *Run
 
 ## Rozgrywka
 W trakcie nocy czekaj na swoją kolej oraz wykonuj polecenia. Kiedy noc się skończy w celu ustalenia kto jest kim, trzeba połączyć się z graczami przez jakiegoś zooma czy coś. Następnie administrator włącza głosowanie i możemy głosować.
+
+## Błędy
+Niestety nie mam możliwości przetestować gry na zróżnicowanych platformach, szczególnie na urządzeniach z systemem macOS. W związku z tym aplikacja może nie działać poprawnie na niektórych urządzeniach.<br>
+
+### Częste problemy
+* Instalator nie chce się uruchomić:
+    * Spróbuj wyłączyć antywirusa - aplikacja nie posiada certyfikatu, więc programy antywirusowe mogą blokować tę aplikację.
+    * Sprawdź, czy twój system na pewno obsługuje pliki *.exe*, czyli czy jest to Windows.
+    * Pobierz wersję ZIP *(niezalecane rozwiązanie)*
+* Zainstalowana aplikacja *.exe* nie chce się uruchomić:
+    * Spróbuj wyłączyć antywirusa - aplikacja nie posiada certyfikatu, więc programy antywirusowe mogą blokować tę aplikację.
+    * Sprawdź czy posiadasz na komputerze Java JRE (Java Runtime Environment). Jeśli nie, to zainstaluj.
+    * Jeśli masz inną wersję JRE niż 1.8.x to spróbuj zainstalować tą wersję [stąd](https://java.com/pl/download/). Wersję JRE możesz sprawdzić wpisując w cmd (command line): `java --version`.
+    * Sprawdź, czy w zmiennej systemowej *PATH* znajduje się ścieżka do JRE. W tym celu wyszukaj w menu start *Edytuj zmienne środowiskowe systemu* lub wpisz w cmd `echo %PATH%`. Jeśli nie ma tam ścieżki do twojego JRE to musisz ją dodać.
+* Aplikacja z *.zip* nie chce się uruchomić:
+    * jw.
+    * spróbuj uruchomić aplikację przez opcję *otwórz za pomocą* i znajdź folder z zainstalowanym JRE i wybierz aplikację *java.exe*.
+    * spróbuj uruchomić aplikację wpisując w cmd: `java -jre Werewolves.jar`.
+* Nie możesz połączyć się z serwerem:
+    * Sprawdź czy podałeś dobre IP oraz port.
+    * Uruchom grę jako administrator.
+    * Sprawdź czy firewall nie blokuje połączenia lub po prostu o na chwilę wyłącz.
+* Gra zamiast napisówwyświetla dziwne *null*:
+    * Uruchom grę jako administrator.
+    * Sprawdź czy w folderze gdzie zainstalowałeś grę znajduje się folder *languages* a w nim pliki *polish.txt* i *english.txt* oraz czy te pliki nie są puste. Jeśli nie to zaistaluj grę jeszcze raz.
+    
+*Aby uruchomić cmd najlepiej klikniej gdzieś w folderze gry `Shift + PPM` (ale nie na plik) i wybierz opcję "otwórz tutaj okno programu PowerShell" lub "otwórz wiersz polecenia tutaj" na starszej wersji Windowsa niż Windows 10.*
+
+### Błędy podczas gry
+W przypadku błędów typu: "Kiedy Mystic Wolf zginie to wilkołaki wygrywają", czyli błędów w logice gry napisz do mnie lub stwórz [issue tutaj na Git](https://github.com/mmakos/Werewolves/issues) i opisz problem.
+<br>Kiedy jednak jest to błąd, który powoduje nietypowe zachowanie gry, np. komuś nie aktywowało się głosowanie (to występuje u niektórych i jeszcze nie wiem dlaczego) to wykonaj następujące kroki:
+* Uruchom grę z cmd. Jeśli masz plik *.exe* to wpisz w cmd `./Werewolves.exe`, a jeśli masz plik *.jar* to wpisz `java -jar Werewolves.jar`.
+* Spróbuj doprowadzić do tego błędu. Gra powinna wypisać w cmd jakieś błędy (tzw. stacktrace) - skopiuj je i mi wyślij bądź stwórz git issue.
+
