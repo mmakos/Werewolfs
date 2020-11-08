@@ -1,13 +1,13 @@
-[Wilkołaki](#wilkoaki)
+[Wilkołaki](#wilkołaki)
 1. [Opis gry](#opis-gry)
 2. [Instalacja](#instalacja)
 3. [Uruchomienie](#uruchomienie)
     * [Klient](#klient-gracz)
     * [Serwer](#serwer-administrator-gry)
 4. [Rozgrywka](#rozgrywka)
-5. [Błędy](#bdy)
-    * [Częste problemy](#czste-problemy)
-    * [Błędy podczas gry](#bdy-podczas-gry)
+5. [Błędy](#błędy)
+    * [Częste problemy](#częste-problemy)
+    * [Błędy podczas gry](#błędy-podczas-gry)
 
 
 # Wilkołaki
