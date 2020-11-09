@@ -12,12 +12,12 @@
 # Werewolves
 
 ## About game
-Werewolves is multiplayer game similar to "Mafia", but each player has its own unique role and whole action happens during one night. That's why it's also called "One Night Ultimate". This application is online adaptation of that game.
+**Werewolves** is multiplayer game similar to "Mafia", but each player has its own unique role and whole action happens during one night. That's why it's also called "One Night Ultimate". This application is online adaptation of that game.
 You can find precise description and game rules on [One Night Ultimate](http://onenightultimate.com/) website.
 
 ## Installation
 You can download Windows installer or zipped game folder from [*releases* tab](https://github.com/mmakos/Werewolves/releases). Then you have to install the game or unpack *.zip* file. You have to have Java JRE installed on your computer as well. You can get it from here: <https://java.com/pl/download>.<br>
-If you have Windows system on your computer it is highly recommended to download windows installer instead of zipped folder because strange things did happen to some when running this version - but never to e, so I wasn't able to find solution. However if you are forced to get zipped folder and you experience strange behaviour of this app check [*problems section*](#problems).
+If you have Windows system on your computer it is highly recommended to download windows installer instead of zipped folder because strange things did happen to some when running this version - yet never to ne, so I wasn't able to find solution. However if you are forced to get zipped folder and you experience strange behaviour of this app check [*problems section*](#problems).
 
 ## Start-up
 
@@ -25,7 +25,7 @@ If you have Windows system on your computer it is highly recommended to download
 To join the game you have to run *Werewolves.exe*. In *ip* field you have to type server's ip which you want to join to (it should be given by game admin). In *port* field you have to type *23000*. After clicking *login* button you will be asked to wait until game admin starts game.
 
 ### Server (game admin)
-Things are getting a little bit complicated. I don't share any server so in order to organise game you will have to set up your own server. If you have ever done it in Minecraft you probably know that you can use one of free VPNs like Hamachi. Best option however is to login into your router by typing in your web browser your router's ip which will be your IP (you can check it on site like [this](https://www.myip.com/))or your local IP with *.1* end which you can check by typing in *cmd* (command line) *ipconfig* command. So if your local ip is *192.168.100.9* you have to type in your browser *192.168.100.**1*** - it's default gateway address. Then you have to set up port forwarding on your router. This step will be different for every router but the common and most important thing is to set up port to forward on value *23000* and ip address to our computer address (in our case it is *192.168.100.9*), as shown below. And the best option of all is to search for some tutorials on youtube.<br><br>
+Things are getting a little bit complicated here. I don't share any server so in order to organise game you will have to set up your own server. If you have ever done this in Minecraft you probably know that you can use one of free VPNs like Hamachi. Best option however is to login into your router by typing in your web browser your router's ip, which will be your IP (you can check it on site like [this](https://www.myip.com/)) or your local IP with *.1* end, which you can check by typing in *cmd* (command line) *ipconfig* command. So if your local ip is *192.168.100.9* you have to type in your browser *192.168.100.**1*** - it's default gateway address. Then you have to set up port forwarding on your router. This step will be different for every router but the common and most important thing is to set up port to forward to value *23000* and ip address to our computer address (in our case it is *192.168.100.9*), as shown below. And the best option of all is to search for some tutorials on YouTube.<br><br>
 Then you have to run *SerWerewolves.exe* and click *Run Server* button. When all players will join (you see theirs names on the screen) click *Start game* button, choose the cards and start game. Before clicking *Start game* you can kick sb out of server by typing his name in the field that pops up after clicking *Kick sb out* button.
 
 ![Server instruction](https://lh3.googleusercontent.com/fife/ABSRlIoENTgQX3nmef-2z-g4rvtSfd1RXM6gb59A_8QcYkkE-DjHtih8teSC-TzmEApKg689wyxtInuwMUPCfK6a8LzXwt_EKq2RzjEFdbsRP-KH-iqyliEVM70zr8hndDKz-oYXTr3ajcrDKveG1YLvZwdd0JlTh3nCHOqYZHM1EmVVlY289Di0fdyjI3p1AQGqFCPFyILbw4wAf1rhFAWPjjQo6YN_Q1Cpgr53ahAZOLrJaj1CiOhFXY3K_yPzuEBReFKDSoAmqbNoa9EA4HbhxaHohd4yuIOO-kyROnurJLrm7f6xqI32IicixtYHz-tS796ZBofM5rn8UkGhcMCrRY3AiOMHwBZYQkexYUkxe-qY2u6J5Wl2ClBFLDUpfDxW4dr-F-nuqUzGvN7dvg_-1iZ8W2F2BNGNPP-_m1kCs4pqzqmuinV00cnTtPuZuKc537889eeIaj_y5yYFqKctHie-N0i6coUb29TEgt8cJo28GnESaRTIi-Kp7tnp2SakCTHp2XjgrwN8dzE-CvfAouoeK5VKBI8jUqoRGR6WtcoTrXN_CrCAvb1umkGhPig79oiiHBOeuQ1Ty6lznLUsWkVLuJ6p2Wsk4HPIl5uwhyrsWd15gFgvRhL-qWQM53UXhP3Y5GpU1FPKLTPMyTPAJAqtNqoTc8mMrIoNoyQYWcKTlSIrkngYznA8eH0_I0KjopEI6k3L7mh43kAK0ExLSx9_spjeEMEMBg=w1600-h828-ft)
@@ -64,7 +64,7 @@ I don't have possibility to test this game on multiple platforms, especially mac
 In case of errors like: "When mystic wolf dies,werewolves wins", so in case of game logic issues write to me what is the issue or [create issue here on git](https://github.com/mmakos/Werewolves/issues) and describe your problem.
 <br>However if game presents some unexpected behaviour, e.g. someone doesn't have vote chance (that happens on some computers and I don't have possibility to find the cause) please follow those steps:
 * Run app from cmd. If you have *.exe* file type in cmd `./Werewolves.exe` and if you have *.jar* file, then type `java -jar Werewolves.jar`.
-* Try to get this error as before. You should see some strange error messages in cmd (it's called stacktrace) - cpoy it and send it to me or create a git issue.
+* Try to get this error as before. You should see some strange error messages in cmd (it's called stacktrace) - copy it and send it to me or create a git issue.
 
 # Wilkołaki
 
