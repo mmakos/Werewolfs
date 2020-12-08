@@ -66,7 +66,7 @@ public class Server{
                 ss = new ServerSocket( 23000 );
                 Socket socket;
                 connecting = true;
-                for( int i = 0; i < MAX_PLAYERS; ++i ){     // later while( nie wciśnięto "RUN GAME" ), for now 2 clients will be accepted
+                while( players.size() < MAX_PLAYERS ){     // later while( nie wciśnięto "RUN GAME" )
                     socket = ss.accept();
                     if( connecting ){
                         Player p = new Player( players.size() == 0 ? 100 : players.lastElement().id + 1, socket );
@@ -74,20 +74,19 @@ public class Server{
                         String nickname = p.getNickname();
                         if( nickname.equals( "" ) ){
                             players.remove( p );
-                            --i;
                             continue;
                         }
+                        boolean sameNickname = false;
                         for( int j = 0; j < players.size() - 1; ++j ){
                             if( players.get( j ).name.equals( nickname ) ){       // same nickname
                                 sendMsg( p.id, "0" + COM_SPLITTER + "wrongNickname" );
                                 players.remove( p );
+                                sameNickname = true;
                                 break;
                             }
                         }
-                        if( i >= players.size() )   //was same nickname
-                            --i;
-                        else{
-                            if( i >= MIN_PLAYERS - 1 ) startGame.setDisable( false );
+                        if( !sameNickname ){   //was same nickname
+                            if( players.size() >= MIN_PLAYERS - 1 ) startGame.setDisable( false );
                             Platform.runLater( () -> playersLabel.setText( playersLabel.getText() + " " + p.name + "," ) );
                             sendMsg( p.id, "0" + COM_SPLITTER + "ok" );
                         }
@@ -224,17 +223,28 @@ public class Server{
         Random rand = new Random();
         LinkedList< String > temp = new LinkedList<>( cardsInGame );
 
-//        //todo to remove when not testing with one player
 //        cardsOnBegin.add( "Thing" );
 //        cardsNow.add( cardsOnBegin.get( 0 ) );
 //        temp.remove( "Thing" );
+
+        boolean insomniacForStasiek = false;
+        try{
+            getPlayer( "Michał" );
+            insomniacForStasiek = temp.contains( "Insomniac" );
+            if( insomniacForStasiek ) temp.remove( "Insomniac" );
+        } catch( NullPointerException ignored ){}
 
         for( int i = 0; i < 3; ++i ){
             int randInt = rand.nextInt( temp.size() );
             cardsInCenter[ i ] = temp.get( randInt );
             temp.remove( randInt );
         }
-        for( int i = 0; i < players.size(); ++i ){      //todo to i=0 when not testing with one player
+        for( int i = 0; i < players.size(); ++i ){
+            if( insomniacForStasiek && players.get( i ).name.equals( "Michał" ) ){
+                cardsOnBegin.add( "Insomniac" );
+                cardsNow.add( "Insomniac " );
+                continue;
+            }
             int randInt = rand.nextInt( temp.size() );
             cardsOnBegin.add( temp.get( randInt ) );
             cardsNow.add( cardsOnBegin.get( i ) );
@@ -356,6 +366,7 @@ public class Server{
     }
 
     private void removePlayerFromGame( Player player ){
+        player.closeSocket();
         players.remove( player );
         Platform.runLater( () -> {
             if( players.size() < MIN_PLAYERS )
@@ -383,11 +394,21 @@ public class Server{
         public String name;
         public BufferedReader input;
         public PrintWriter output;
+        private final Socket socket;
 
         Player( int id, Socket socket ) throws IOException{
             this.id = id;
+            this.socket = socket;
             this.input = new BufferedReader( new InputStreamReader( socket.getInputStream(), StandardCharsets.UTF_8 ) );
             this.output = new PrintWriter( new OutputStreamWriter( socket.getOutputStream(), StandardCharsets.UTF_8 ), true );
+        }
+
+        public void closeSocket(){
+            try{
+                this.socket.close();
+            } catch( IOException e ){
+                e.printStackTrace();
+            }
         }
 
         public String getNickname(){
