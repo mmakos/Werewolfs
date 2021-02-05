@@ -1,5 +1,6 @@
 package client;
 
+import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
@@ -16,6 +17,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.util.Vector;
@@ -278,16 +280,19 @@ public class GameWindow{
         }
         Vector< Line > v = getArrow( x1, toLayoutX, y1, toLayoutY );
         lines.addAll( v );
-        gamePane.getChildren().add( lines.get( lines.size() - 3 ) );
-        gamePane.getChildren().add( lines.get( lines.size() - 2 ) );
-        gamePane.getChildren().add( lines.get( lines.size() - 1 ) );
+        gamePane.getChildren().add( v.get( 0 ) );
+        gamePane.getChildren().add( v.get( 1 ) );
+        gamePane.getChildren().add( v.get( 2 ) );
+        // arrowAnimation( v );
     }
 
     private Vector< Line > getArrow( double fromX, double toX, double fromY, double toY ){
+        int animDuration = 1000;
         Vector< Line > v = new Vector<>();
-        Line line = new Line( fromX, fromY, toX, toY );
+        Line line = new Line( fromX, fromY, fromX, fromY );
         line.setStroke( Color.RED );
         v.add( line );
+
         double hypo = Math.hypot( fromX - toX, fromY - toY );
         double factor = 20 / hypo;
         double factorO = 7 / hypo;
@@ -295,13 +300,40 @@ public class GameWindow{
         double dy = ( fromY - toY ) * factor;
         double ox = ( fromX - toX ) * factorO;
         double oy = ( fromY - toY ) * factorO;
-        line = new Line( toX + dx - oy, toY + dy + ox, toX, toY );
-        line.setStroke( Color.RED );
-        v.add( line );
-        line = new Line( toX + dx + oy, toY + dy - ox, toX, toY );
-        line.setStroke( Color.RED );
-        v.add( line );
+        double line2ToX = toX + dx - oy, line2ToY = toY + dy + ox;
+        double line3ToX = toX + dx + oy, line3ToY = toY + dy - ox;
+        double divX = toX - fromX, divY = toY - fromY;
+        Line line2 = new Line( line2ToX - divX, line2ToY - divY, fromX, fromY );
+        line2.setStroke( Color.RED );
+        v.add( line2 );
+        Line line3 = new Line( line3ToX - divX, line3ToY - divY, fromX, fromY );
+        line3.setStroke( Color.RED );
+        v.add( line3 );
+
+        Timeline tl = new Timeline(
+                new KeyFrame( Duration.millis( animDuration ),
+                        new KeyValue( line.endXProperty(), toX, Interpolator.EASE_BOTH ),
+                        new KeyValue( line.endYProperty(), toY, Interpolator.EASE_BOTH ),
+                        new KeyValue( line2.startXProperty(), line2ToX, Interpolator.EASE_BOTH ),
+                        new KeyValue( line2.startYProperty(), line2ToY, Interpolator.EASE_BOTH ),
+                        new KeyValue( line2.endXProperty(), toX, Interpolator.EASE_BOTH ),
+                        new KeyValue( line2.endYProperty(), toY, Interpolator.EASE_BOTH ),
+                        new KeyValue( line3.startXProperty(), line3ToX, Interpolator.EASE_BOTH ),
+                        new KeyValue( line3.startYProperty(), line3ToY, Interpolator.EASE_BOTH ),
+                        new KeyValue( line3.endXProperty(), toX, Interpolator.EASE_BOTH ),
+                        new KeyValue( line3.endYProperty(), toY, Interpolator.EASE_BOTH ) )
+        );
+        tl.play();
+
         return v;
+    }
+
+    private void arrowAnimation( Vector< Line > l ){
+        Timeline tl = new Timeline(
+                new KeyFrame( Duration.millis( 2000 ),
+                        new KeyValue( l.get( 0 ).endXProperty(), 200, Interpolator.EASE_BOTH ),
+                        new KeyValue( l.get( 0 ).endYProperty(), 200, Interpolator.EASE_BOTH ) )
+        );
     }
 
     public void clearArrows(){
