@@ -280,17 +280,18 @@ public class GameWindow{
         }
         Vector< Line > v = getArrow( x1, toLayoutX, y1, toLayoutY );
         lines.addAll( v );
-        gamePane.getChildren().add( v.get( 0 ) );
-        gamePane.getChildren().add( v.get( 1 ) );
-        gamePane.getChildren().add( v.get( 2 ) );
+        gamePane.getChildren().addAll( v );
         // arrowAnimation( v );
     }
 
     private Vector< Line > getArrow( double fromX, double toX, double fromY, double toY ){
         int animDuration = 1000;
+        Color arrowColor = Color.rgb( 255, 0, 0, 0.6 );
+        double arrowThick = 4.0f;
         Vector< Line > v = new Vector<>();
         Line line = new Line( fromX, fromY, fromX, fromY );
-        line.setStroke( Color.RED );
+        line.setStroke( arrowColor );
+        line.setStrokeWidth( arrowThick );
         v.add( line );
 
         double hypo = Math.hypot( fromX - toX, fromY - toY );
@@ -304,10 +305,12 @@ public class GameWindow{
         double line3ToX = toX + dx + oy, line3ToY = toY + dy - ox;
         double divX = toX - fromX, divY = toY - fromY;
         Line line2 = new Line( line2ToX - divX, line2ToY - divY, fromX, fromY );
-        line2.setStroke( Color.RED );
+        line2.setStroke( arrowColor );
+        line2.setStrokeWidth( arrowThick );
         v.add( line2 );
         Line line3 = new Line( line3ToX - divX, line3ToY - divY, fromX, fromY );
-        line3.setStroke( Color.RED );
+        line3.setStroke( arrowColor );
+        line3.setStrokeWidth( arrowThick );
         v.add( line3 );
 
         Timeline tl = new Timeline(
