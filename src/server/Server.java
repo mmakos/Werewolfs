@@ -27,8 +27,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Server{
     public Vector< Player > players = new Vector<>();
-    private final static String ip = "localhost";
-    private final static int port = 23000;
+    private static String ip = "localhost";
+    private static int port = 23000;
     private final String COM_SPLITTER = String.valueOf( ( char )28 );
     private final String UNIQUE_CHAR = String.valueOf( ( char )2 );
     private String gameId;
@@ -62,12 +62,6 @@ public class Server{
     @FXML private Label gameIdLabel;
     @FXML private Button copyIdButton;
 
-    public static void main( String[] args ){
-        StringSelection stringSelection = new StringSelection( "elo321" );
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboard.setContents( stringSelection, null );
-    }
-
     @FXML public void initialize(){
         cardsInCenter = new String[ 3 ];
         voteButton.setVisible( false );
@@ -76,6 +70,17 @@ public class Server{
         gameIdLabel.setVisible( false );
         copyIdButton.setVisible( false );
         runServer.setText( "New Game" );
+        getDefaultSettings();
+    }
+
+    private void getDefaultSettings(){
+        try{
+            Scanner scan = new Scanner( new File( "default.cfg" ) );
+            String[] config = scan.nextLine().split( ":" );
+            port = Integer.parseInt( config[ 1 ] );
+            ip = config[ 0 ];
+            scan.close();
+        }catch( IOException | IndexOutOfBoundsException | NumberFormatException ignored ){}
     }
 
     @FXML private void connect(){

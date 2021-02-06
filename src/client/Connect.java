@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.net.*;
+import java.util.Scanner;
 
 public class Connect{
     public static final int MAX_LOGIN_LENGTH = 8;
@@ -19,6 +20,17 @@ public class Connect{
     public void initialize(){
         setOnDrag();
         langChoiceBox();
+        getDefaultSettings();
+    }
+
+    private void getDefaultSettings(){
+        try{
+            Scanner scan = new Scanner( new File( "default.cfg" ) );
+            String[] config = scan.nextLine().split( ":" );
+            port = Integer.parseInt( config[ 1 ] );
+            ip = config[ 0 ];
+            scan.close();
+        }catch( IOException | IndexOutOfBoundsException | NumberFormatException ignored ){}
     }
 
     private void langChoiceBox(){

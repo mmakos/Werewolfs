@@ -5,3 +5,6 @@
 /srcOld/
 /screens/
 /.idea/
+/werewolvesServer/out/
+/werewolvesServer/.idea/
+/werewolvesServer/server.iml
