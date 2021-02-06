@@ -49,7 +49,6 @@ public class Server{
     public String realCopycat;        // Needed to show on the end who was copycat
     public String realParanormal;       // --- || ---
     private Vector< Integer > votes = new Vector<>();
-    private AtomicInteger votesQuant = new AtomicInteger();
     private Thread voting;
 
     @FXML private TextArea logField;
@@ -123,8 +122,11 @@ public class Server{
                     if( playerNickname.equals( "" ) )
                         continue;
                     for( Player player : players ){
-                        if( player.name.equals( playerNickname ) )     // same nickname
+                        if( player.name.equals( playerNickname ) ){     // same nickname
                             send( playerID + COM_SPLITTER + "WRONGNICK" );
+                            send( "REMOVE" + COM_SPLITTER + playerID );
+                            return;
+                        }
                     }
                     players.add( new Player( playerID, playerNickname ) );
                     if( players.size() >= MIN_PLAYERS - 1 ) startGame.setDisable( false );
@@ -139,7 +141,9 @@ public class Server{
         while( reading ){
             try{
                 String[] msg = input.readLine().split( COM_SPLITTER );
+                System.out.println( "From: " + msg[ 0 ] );
                 if( msg.length == 2 )      // message from player, [ 0 ] is id, [ 1 ] is message
+                    System.out.println( "msg: " + msg[ 1 ] );
                     getPlayer( Integer.parseInt( msg[ 0 ] ) ).addMsg( msg[ 1 ] );
             } catch( IOException | NumberFormatException ignored ){}
         }
@@ -251,36 +255,36 @@ public class Server{
         send( 0, UNIQUE_CHAR + "VOTE" );
         writeLog( "Voting ordered" );
         votes.removeAllElements();
-        votesQuant.set( 0 );
+        AtomicInteger votesQuant = new AtomicInteger();
         votes.setSize( players.size() + 1 );    //last element is table
         for( int i = 0; i < votes.size(); ++i )
             votes.set( i, 0 );
         isVoting = true;
+        Vector< Player > playersNotVoted = new Vector<>( players );
         voting = new Thread( () -> {
             while( isVoting ){
-                String vote;
-                try{
-                    while( !input.ready() ) ;
-                    String[] msg = input.readLine().split( COM_SPLITTER );
-                    Player player = getPlayer( Integer.parseInt( msg[ 0 ] ) );
-                    assert player != null;
-                    vote = msg[ 1 ];
-                    if( vote.equals( UNIQUE_CHAR + "table" ) ){
-                        writeLog( "Player " + player.name + " voted for the table." );
-                        votes.set( votes.size() - 1, votes.lastElement() + 1 );
-                    } else{
-                        int votedPlayerIdx = players.indexOf( getPlayer( vote ) );
-                        writeLog( "Player " + player.name + " voted for " + players.get( votedPlayerIdx ).name );
-                        if( votedPlayerIdx != -1 )
-                            votes.set( votedPlayerIdx, votes.get( votedPlayerIdx ) + 1 );
+                for( Player player : playersNotVoted ){
+                    if( player.ready() ){
+                        try{
+                        String vote = player.getMsg();
+                        if( vote.equals( UNIQUE_CHAR + "table" ) ){
+                            writeLog( "Player " + player.name + " voted for the table." );
+                            votes.set( votes.size() - 1, votes.lastElement() + 1 );
+                        } else{
+                            int votedPlayerIdx = players.indexOf( getPlayer( vote ) );
+                            writeLog( "Player " + player.name + " voted for " + players.get( votedPlayerIdx ).name );
+                            if( votedPlayerIdx != -1 )
+                                votes.set( votedPlayerIdx, votes.get( votedPlayerIdx ) + 1 );
+                        }
+                        send( 0, player.name + Game.MSG_SPLITTER + vote );
+                        votesQuant.incrementAndGet();
+                        if( votesQuant.get() == players.size() ){
+                            writeLog( "Everyone has already voted. Press \"End voting\" button" );
+                            break;
+                        }
+                        playersNotVoted.remove( player );
+                        } catch( IOException ignored ){}
                     }
-                    send( 0, player.name + Game.MSG_SPLITTER + vote );
-                    votesQuant.incrementAndGet();
-                    if( votesQuant.get() == players.size() ){
-                        writeLog( "Everyone has already voted. Press \"End voting\" button" );
-                        break;
-                    }
-                } catch( IOException ignored ){
                 }
             }
         } );
@@ -442,22 +446,32 @@ public class Server{
     public class Player{
         int id;
         String name;
-        Queue< String > msg;
+        LinkedList< String > msg = new LinkedList<>();
 
         Player( int id, String nickname ){
             this.id = id;
             this.name = nickname;
         }
 
+        public boolean ready(){
+            return !msg.isEmpty();
+        }
+
         public void addMsg( String msg ){
-            this.msg.add( msg );
+            this.msg.addLast( msg );
         }
 
         public String getMsg() throws IOException{
+            System.out.println( "Waiting for msg from player " + id );
             long start = System.currentTimeMillis();
-            while( msg.isEmpty() && System.currentTimeMillis() - start < MAX_READ_TIME * 1000 );
+            while( msg.isEmpty() && System.currentTimeMillis() - start < MAX_READ_TIME * 1000 ){
+                try{
+                    Thread.sleep( 10 );
+                } catch( InterruptedException ignored ){}
+            };
+            System.out.println( "Got msg from player " + id );
             if( !msg.isEmpty() )
-                return msg.remove();
+                return msg.removeFirst();
             else
                 throw new IOException( "Time's up, cannot read a message." );
         }

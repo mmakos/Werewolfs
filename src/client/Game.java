@@ -575,7 +575,7 @@ public class Game{
             quit();
         }
         else{
-            String[] playersTab = receive().split( MSG_SPLITTER, 0 );
+            String[] playersTab = msg.split( MSG_SPLITTER, 0 );
             players.addAll( Arrays.asList( playersTab ) );
         }
     }
