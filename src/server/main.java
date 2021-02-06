@@ -11,21 +11,19 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 public class main extends Application{
+    private Server server;
 
     @Override
     public void start( Stage stage ) throws Exception{
-        Parent root = FXMLLoader.load( getClass().getResource( "fxml/runWindow.fxml" ) );
+        FXMLLoader fxmlLoader = new FXMLLoader( getClass().getResource( "fxml/runWindow.fxml" ) );
+        Parent root = fxmlLoader.load();
         stage.getIcons().add( new Image( this.getClass().getResourceAsStream( "/img/sericon.png" ) ) );
         stage.setTitle( "Players" );
         stage.setScene( new Scene( root, 600, 400 ) );
         stage.setResizable( false );
         stage.show();
-        stage.getScene().getWindow().addEventFilter( WindowEvent.WINDOW_CLOSE_REQUEST, this::quit );
-    }
-
-    private < T extends Event > void quit( T t ){
-        Platform.exit();
-        System.exit( 0 );
+        server = fxmlLoader.getController();
+        stage.getScene().getWindow().addEventFilter( WindowEvent.WINDOW_CLOSE_REQUEST, server::endGame );
     }
 
     public static void main( String[] args ) {

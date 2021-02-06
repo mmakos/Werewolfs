@@ -7,10 +7,8 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.*;
-import java.util.Scanner;
 
 public class Connect{
     public static final int MAX_LOGIN_LENGTH = 8;
@@ -21,29 +19,6 @@ public class Connect{
     public void initialize(){
         setOnDrag();
         langChoiceBox();
-        getDefaultSettings();
-    }
-
-    private void getDefaultSettings(){
-        try{
-            Scanner scan = new Scanner( new File( "default.cfg" ) );
-            String[] config = scan.nextLine().split( ":" );
-            port = Integer.parseInt( config[ 1 ] );
-            ip = config[ 0 ];
-            scan.close();
-        }catch( IOException | IndexOutOfBoundsException | NumberFormatException ignored ){}
-        portField.setText( Integer.toString( port ) );
-        ipField.setText( ip );
-    }
-
-    private void saveDefault(){
-        try{
-            if( !ipField.getText().equals( ip ) || !portField.getText().equals( Integer.toString( port ) ) ){
-                FileWriter wr = new FileWriter( "default.cfg" );
-                wr.write( ipField.getText() + ":" + portField.getText() );
-                wr.close();
-            }
-        }catch( IOException | NumberFormatException ignored ){}
     }
 
     private void langChoiceBox(){
@@ -68,53 +43,52 @@ public class Connect{
         dragField.setOnMouseReleased( mouseEvent -> dragField.getScene().getWindow().setOpacity( 1.0 ) );
     }
 
+    @FXML private void newGame(){
+        try{
+            Runtime.getRuntime().exec( "SerWerewolves.exe" );
+        } catch( IOException ignored ){
+            infoLabel.setText( "No SerWerewolves.exe app in your game folder." );
+        }
+    }
+
     @FXML private void quit(){
         dragField.getScene().getWindow().hide();
         Platform.exit();
         System.exit( 0 );
     }
 
-    @FXML protected void setDefault(){
-        if( defaultCheckBox.isSelected() ){
-            ipField.setText( ip );
-            ipField.setDisable( true );
-            portField.setText( Integer.toString( port ) );
-            portField.setDisable( true );
-        } else{
-            ipField.setText( "" );
-            ipField.setDisable( false );
-            portField.setText( "" );
-            portField.setDisable( false );
-        }
-    }
 
     @FXML protected void connect(){
-        if( loginField.getText().length() <= 0 ){
+        String login = loginField.getText();
+        if( login.length() <= 0 ){
             infoLabel.setText( "Empty login" );
             return;
         }
-        if( loginField.getText().length() > MAX_LOGIN_LENGTH ){
+        if( login.length() > MAX_LOGIN_LENGTH ){
             infoLabel.setText( "Login too long" );
             return;
         }
 
         Socket socket;
-        String ip = ipField.getText();
-        int port = 23000;
-        try{
-            port = Integer.parseInt( portField.getText() );
-        } catch( NumberFormatException ignored ){}
-        saveDefault();
         try{
             socket = new Socket( ip, port );
             Game game = new Game( socket, getLanguage() );
-            game.sendNickname( loginField.getText() );
-            String nickInfo = game.receiveMsg();
-            if( nickInfo.equals( "0" + Game.COM_SPLITTER + "wrongNickname" ) ){
+            game.sendToServer( gameIdField.getText() );
+            if( !game.receive().equals( "GOOD" ) ){
+                infoLabel.setText( "No such game. Make sure you have correct id." );
+                return;
+            }
+            game.sendMsg( login );
+            String nickInfo = game.receive();
+            if( nickInfo.equals( "WRONGNICK" ) ){
                 infoLabel.setText( "Nickname already taken." );
                 return;
             }
-            if( !nickInfo.equals( "0" + Game.COM_SPLITTER + "ok" ) ) return;
+            if( !nickInfo.equals( "OK" ) ){
+                infoLabel.setText( "Something went wrong." );
+                return;
+            }
+            game.setNickname( login );
             Platform.runLater( ( ) -> {
                 infoLabel.setText( "Game will start soon. Please don't close this window." );
                 loginButton.setDisable( true );
@@ -135,10 +109,8 @@ public class Connect{
     }
 
     @FXML private TextField loginField;
-    @FXML private TextField ipField;
-    @FXML private TextField portField;
+    @FXML private TextField gameIdField;
     @FXML public Label infoLabel;
-    @FXML private CheckBox defaultCheckBox;
     @FXML private GridPane dragField;
     @FXML private ChoiceBox lang;
     @FXML private Button quitButton;

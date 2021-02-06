@@ -9,7 +9,12 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #2b2a4c;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="server.Server">
    <children>
-      <Label fx:id="playersLabel" alignment="TOP_LEFT" prefHeight="318.0" prefWidth="601.0" text="Players: " textFill="WHITE" wrapText="true">
+      <Button fx:id="copyIdButton" layoutX="404.0" layoutY="14.0" mnemonicParsing="false" onAction="#copyId" prefHeight="41.0" prefWidth="183.0" stylesheets="@../../styles/button.css" text="Copy to clipboard">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <Label fx:id="playersLabel" alignment="TOP_LEFT" layoutY="51.0" prefHeight="267.0" prefWidth="601.0" text="Players: " textFill="WHITE" wrapText="true">
          <font>
             <Font size="18.0" />
          </font>
@@ -43,5 +48,13 @@
             <Font size="18.0" />
          </font>
       </Button>
+      <Label fx:id="gameIdLabel" alignment="BOTTOM_RIGHT" layoutY="10.0" prefHeight="41.0" prefWidth="401.0" text="Game ID:" textFill="WHITE">
+         <font>
+            <Font size="18.0" />
+         </font>
+         <padding>
+            <Insets right="30.0" />
+         </padding>
+      </Label>
    </children>
 </AnchorPane>
