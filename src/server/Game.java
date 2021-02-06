@@ -27,7 +27,7 @@ public class Game{
             s.cardsInGame.remove( "Copycat" );
         }
         boolean isWerewolf = false;
-        for( int i = 0; i < Card.werewolvesQuant; ++i ){
+        for( int i = 0; i < CardChooser.werewolvesQuant; ++i ){
             if( s.cardsInGame.contains( "Werewolf_" + i ) ){
                 isWerewolf = true;
                 break;
@@ -41,7 +41,7 @@ public class Game{
             }catch( IOException e ){
                 s.writeLog( "No response from werewolves." );
             }
-            for( int i = 0; i < Card.werewolvesQuant; ++i )
+            for( int i = 0; i < CardChooser.werewolvesQuant; ++i )
                 s.cardsInGame.remove( "Werewolf_" + i );
         }
         if( s.cardsInGame.contains( "Mystic wolf" ) ){
@@ -112,7 +112,7 @@ public class Game{
         boolean isAnyoneWerewolf = false;
         if( s.cardsOnBegin.contains( "Mystic wolf" ) ) isAnyoneWerewolf = true;
         else{
-            for( int i = 0; i < Card.werewolvesQuant; ++i ){
+            for( int i = 0; i < CardChooser.werewolvesQuant; ++i ){
                 if( s.cardsOnBegin.contains( "Werewolf_" + i ) ){
                     isAnyoneWerewolf = true;
                     break;
@@ -125,7 +125,7 @@ public class Game{
         }
         else{
             Vector< Integer > werewolves = new Vector<>();
-            for( int i = 0; i < Card.werewolvesQuant; ++i ){
+            for( int i = 0; i < CardChooser.werewolvesQuant; ++i ){
                 int indexOfWerewolf = s.cardsOnBegin.indexOf( "Werewolf_" + i );
                 if( indexOfWerewolf != -1 ){
                     str.append( s.players.get( indexOfWerewolf ).name ).append( MSG_SPLITTER );

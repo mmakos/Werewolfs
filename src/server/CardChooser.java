@@ -17,20 +17,24 @@ import java.util.LinkedList;
 import java.util.Vector;
 
 public class CardChooser{
-    @FXML
-    public void initialize(){
+    public static int werewolvesQuant = 3;
+    public static String[] card = { "Copycat", "Werewolf_0", "Insomniac", "Mystic wolf", "Seer", "Beholder",
+            "Witch", "Apprentice seer", "Tanner", "Minion", "Werewolf_1", "Werewolf_2",
+            "Robber", "Thing", "Paranormal investigator", "Troublemaker" };
+
+    @FXML public void initialize(){
         createToggles();
     }
 
     public void createToggles(){
-        for( int i = 0; i < Card.card.length; ++i ){
+        for( int i = 0; i < CardChooser.card.length; ++i ){
             ToggleButton toggle = new ToggleButton();
-            toggle.setId( Card.card[ i ] );
+            toggle.setId( CardChooser.card[ i ] );
             toggle.setMinSize( 72, 100 );
             toggle.setMaxSize( 72, 100 );
             toggle.setWrapText( true );
-            final Image unselected = new Image( "/img/smallCards/frontCardBig" + Card.card[ i ].split( " " )[ 0 ] + "Dark.png" );
-            final Image selected = new Image( "/img/smallCards/frontCardBig" + Card.card[ i ].split( " " )[ 0 ] + ".png" );
+            final Image unselected = new Image( "/img/smallCards/frontCardBig" + CardChooser.card[ i ].split( " " )[ 0 ] + "Dark.png" );
+            final Image selected = new Image( "/img/smallCards/frontCardBig" + CardChooser.card[ i ].split( " " )[ 0 ] + ".png" );
             final ImageView toggleImage = new ImageView();
             toggleImage.setFitWidth( 72 );      // scaling
             toggleImage.setPreserveRatio( true );

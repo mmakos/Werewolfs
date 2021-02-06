@@ -11,7 +11,6 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 public class main extends Application{
-    private Server server;
 
     @Override
     public void start( Stage stage ) throws Exception{
@@ -22,7 +21,7 @@ public class main extends Application{
         stage.setScene( new Scene( root, 600, 400 ) );
         stage.setResizable( false );
         stage.show();
-        server = fxmlLoader.getController();
+        Server server = fxmlLoader.getController();
         stage.getScene().getWindow().addEventFilter( WindowEvent.WINDOW_CLOSE_REQUEST, server::endGame );
     }
 

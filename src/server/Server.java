@@ -38,7 +38,7 @@ public class Server{
     private BufferedReader input;
     private PrintWriter output;
     private Socket s;
-    private static final int MAX_PLAYERS = Card.card.length;
+    private static final int MAX_PLAYERS = CardChooser.card.length;
     private static final int MIN_PLAYERS = 3;
     private static final int MAX_READ_TIME = 45;
     private volatile boolean connecting = false;
