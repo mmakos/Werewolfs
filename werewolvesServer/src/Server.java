@@ -13,11 +13,13 @@ public class Server{
     private static final int port = 23000;
     private static final int ID_LENGTH = 6;
     private static final int INACTIVE_TIME = 3600; //in seconds
+    private int logLevel = 1;
+    private LinkedList< String > viewedGames = new LinkedList<>();
 
     public Server() throws IOException{
         ss = new ServerSocket( port );
         commands.start();
-        System.out.println( "Server is running." );
+        print( "Server is running." );
         listen();
     }
 
@@ -31,54 +33,92 @@ public class Server{
                 arg = input[ 1 ];
             }
             switch( command ){
-                case "shutdown":
+                case "shutdown": case "halt":
                     System.exit( 0 );
                     break;
                 case "listgames":
                     for( Game game : games )
-                        System.out.println( game.getID() );
+                        print( game.getID() );
                     break;
                 case "listplayers":
                     if( arg == null ){      // no concrete game, list all
                         for( Game game : games ){
-                            System.out.println( "Game: " + game.getID() );
+                            print( "Game: " + game.getID() );
                             for( Player player : game.getPlayers() ){
-                                System.out.println( "\t-> " + player.getID() );
+                                print( "\t-> " + player.getID() );
                             }
                         }
                     }
                     else{
                         Game g = getGame( arg );
                         if( g == null )
-                            System.out.println( "No such game." );
+                            print( "No such game." );
                         else{
-                            System.out.println( "Game: " + g.getID() );
+                            print( "Game: " + g.getID() );
                             for( Player player : g.getPlayers() ){
-                                System.out.println( "\t-> " + player.getID() );
+                                print( "\t-> " + player.getID() );
                             }
                         }
                     }
                     break;
                 case "endgame":
                     if( arg == null )
-                        System.out.println( "No game provided." );
+                        print( "No game provided." );
                     else{
                         Game g = getGame( arg );
                         if( g == null )
-                            System.out.println( "No such game." );
+                            print( "No such game." );
                         else{
                             endGame( g );
-                            System.out.println( "Game " + arg + " ended." );
+                            print( "Game " + arg + " aborted." );
                         }
                     }
                     break;
+                case "loglevel":
+                    if( arg == null )
+                        print( "No log level provided." );
+                    else{
+                        try{
+                            logLevel = Integer.parseInt( arg );
+                            if( logLevel < 0 ) logLevel = 0;
+                            print( "Log level set to " + logLevel + "." );
+                        } catch( NumberFormatException e ){
+                            print( "Invalid log level." );
+                        }
+                    }
+                    break;
+                case "viewgame":
+                    if( arg == null )
+                        print( "No game provided." );
+                    else if( getGame( arg ) == null )
+                        print( "No such game." );
+                    else{
+                        viewedGames.add( arg );
+                        print( "Game " + arg + " will display all the logs now." );
+                    }
+                    break;
+                case "unviewgame":
+                    if( arg == null ){
+
+                    }
+                    else{
+                        boolean removed = viewedGames.remove( arg );
+                        if( removed )
+                            print( "Game " + arg + " will be not viewed anymore." );
+                        else
+                            print( "Game " + arg + " were not currently viewed." );
+                    }
+                    break;
                 case "help": default:
-                    System.out.println( "Invalid command. Here is list of available commands:" );
-                    System.out.println( "\tshutdown - shuts down the server." );
-                    System.out.println( "\tlistgames - lists all games" );
-                    System.out.println( "\tlistplayers (<gameID>) - lists players from given game. If no game provided, then lists players from all games." );
-                    System.out.println( "\tendgame <gameID> - ends given game." );
-                    System.out.println( "\thelp - shows this help." );
+                    print( "Invalid command. Here is list of available commands:" );
+                    print( "\tshutdown / halt - shuts down the server." );
+                    print( "\tlistgames - lists all games" );
+                    print( "\tlistplayers (<gameID>) - lists players from given game. If no game provided, then lists players from all games." );
+                    print( "\tendgame <gameID> - ends given game." );
+                    print( "\tloglevel <level> - sets amount of displayed logs (0 - only server logs (crashed etc, 3 - all logs)." );
+                    print( "\tviewgame <gameID> - views all logs from given game." );
+                    print( "\tunviewgame (<gameID>) - undo view game command. If no game provided, then all games will be unviewed." );
+                    print( "\thelp - shows this help." );
             }
         }
     } );
@@ -119,6 +159,7 @@ public class Server{
         }
         Game game = new Game( newGameID, admin );
         games.add( game );
+        print( "New game created. Game id: " + newGameID, 1 );
         return game;
     }
 
@@ -135,11 +176,24 @@ public class Server{
     }
 
     public void endGame( Game game ){
-        System.out.println( "Ending game " + game.getID() );
         game.endPlayers();
         games.remove( game );
+        print( "Game " + game.getID() + " has ended.", 1 );
     }
 
+    public void print( String log, int level ){
+        if( level <= logLevel )
+            System.out.println( log );
+    }
+
+    public void print( String log ){
+        print( log, 0 );
+    }
+
+    public void print( String log, String g, int level ){
+        if( level <= logLevel || viewedGames.contains( g ) )
+            print( "Game " + g + ": " + log );
+    }
 
     private class Game{
         private Vector< Player > players = new Vector<>();
@@ -158,8 +212,8 @@ public class Server{
                     e.printStackTrace();
                 }
             }
+            print( "Game " + this.getID() + " is inactive.", 1 );
             this.admin.getServer().endGame( this );
-            System.out.println( "END GAME" );
         } );
 
         Game( String gameID, Player admin ){
@@ -170,6 +224,7 @@ public class Server{
 
         public void setStarted( boolean started ){
             this.started = started;
+            print( "Game started.", this.gameID, 2 );
         }
 
         public void active(){
@@ -182,6 +237,7 @@ public class Server{
 
         public void addPlayer( Player p ){
             players.add( p );
+            print( "New player: " + p.getID(), this.gameID, 2 );
         }
 
         public int getPlayerID(){
@@ -193,6 +249,7 @@ public class Server{
             if( p == null ) return;
             p.close();
             players.remove( p );
+            print( "Player " + p.getID() + " removed.", this.gameID, 2 );
         }
 
         public Player getPlayer( int id ){
@@ -214,16 +271,20 @@ public class Server{
         }
 
         public void send( int to, String msg ){
-            if( to == -1 )
+            if( to == -1 ){
                 admin.send( msg );
+                print( "Message to admin: " + msg, this.gameID, 3 );
+            }
             else if( to == -2 ){
                 for( Player player : players )
                     player.send( msg );
+                print( "Message to all: " + msg, this.gameID, 3 );
             }
             else{
                 Player player = getPlayer( to );
                 if( player != null )
                     player.send( msg );
+                print( "Message to player " + to + ": " + msg, this.gameID, 3 );
             }
         }
     }
@@ -247,7 +308,6 @@ public class Server{
 
         public void send( String msg ){
             output.println( msg );
-            System.out.println( "Message to " + playerID + "\tmsg: " + msg );
         }
 
         public int getID(){
@@ -287,11 +347,9 @@ public class Server{
                 try{
                     int idToRemove = Integer.parseInt( msg );
                     game.removePlayer( idToRemove );
-                    System.out.println( "Player " + idToRemove + " removed." );
                     StringBuilder players = new StringBuilder();
                     for( Player p : game.players )
                         players.append( p.playerID ).append( ", " );
-                    System.out.println( "Players: " + players.toString() );
                 } catch( NumberFormatException ignored ){}
                 return;
             }
@@ -319,7 +377,6 @@ public class Server{
                 this.game = server.newGame( this );
                 this.playerID = -1; // Admin
                 game.send( -1, game.gameID );
-                System.out.println( "Create new game." );
             }
             else{   // join game
                 try{
