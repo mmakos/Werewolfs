@@ -121,16 +121,14 @@ public class Server{
                     String playerNickname = msg[ 1 ];
                     if( playerNickname.equals( "" ) )
                         continue;
-                    for( Player player : players ){
-                        if( player.name.equals( playerNickname ) ){     // same nickname
-                            send( playerID + COM_SPLITTER + "WRONGNICK" );
-                            send( "REMOVE" + COM_SPLITTER + playerID );
-                            return;
-                        }
+                    if( isPlayer( playerNickname ) ){
+                        send( playerID + COM_SPLITTER + "WRONGNICK" );
+                        send( "REMOVE" + COM_SPLITTER + playerID );
+                        continue;
                     }
                     players.add( new Player( playerID, playerNickname ) );
                     if( players.size() >= MIN_PLAYERS - 1 ) startGame.setDisable( false );
-                    Platform.runLater( () -> playersLabel.setText( playersLabel.getText() + " " + playerNickname + "," ) );
+                    Platform.runLater( ( ) -> playersLabel.setText( playersLabel.getText() + " " + playerNickname + "," ) );
                     send( playerID, "OK" );
                 }
             } catch( NumberFormatException | IOException ignored ){}
@@ -263,7 +261,8 @@ public class Server{
         Vector< Player > playersNotVoted = new Vector<>( players );
         voting = new Thread( () -> {
             while( isVoting ){
-                for( Player player : playersNotVoted ){
+                for( Iterator< Player > it = playersNotVoted.iterator(); it.hasNext(); ){
+                    Player player = it.next();
                     if( player.ready() ){
                         try{
                         String vote = player.getMsg();
@@ -282,7 +281,7 @@ public class Server{
                             writeLog( "Everyone has already voted. Press \"End voting\" button" );
                             break;
                         }
-                        playersNotVoted.remove( player );
+                        it.remove();
                         } catch( IOException ignored ){}
                     }
                 }
@@ -440,6 +439,14 @@ public class Server{
             logField.setText( logField.getText() + "\n" + log );
             logField.positionCaret( logField.getText().length() );
         } );
+    }
+
+    private boolean isPlayer( String name ){
+        for( Player player : players ){
+            if( player.name.equals( name ) )
+                return true;
+        }
+        return false;
     }
 
 

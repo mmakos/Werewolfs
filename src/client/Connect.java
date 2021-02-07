@@ -93,6 +93,7 @@ public class Connect{
             game.sendMsg( login );
             String nickInfo = game.receive();
             if( nickInfo.equals( "WRONGNICK" ) ){
+                //socket.close();
                 infoLabel.setText( "Nickname already taken." );
                 return;
             }
