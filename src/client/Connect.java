@@ -58,7 +58,7 @@ public class Connect{
     @FXML private void newGame(){
         try{
             Runtime.getRuntime().exec( "SerWerewolves.exe" );
-        } catch( IOException ignored ){
+        } catch( IOException e ){
             infoLabel.setText( "No SerWerewolves.exe app in your game folder." );
         }
     }

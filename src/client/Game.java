@@ -556,19 +556,10 @@ public class Game{
         gameLogic();
     }
 
-    private < T extends Event > void quit( T t ){
-        quit();
-    }
-
-    private void quit(){
-        Platform.exit();
-        System.exit( 0 );
-    }
-
     private void getPlayers(){
         String msg = receive();
         if( msg == null ){     // kicked out
-            Platform.runLater( ( ) -> error( "You have been kicked out from the game" ) );
+            Platform.runLater( () -> error( "You have been kicked out from the game", true ) );
             try{
                 Thread.sleep( 60000 );
             } catch( InterruptedException ignored ){}
@@ -604,16 +595,37 @@ public class Game{
 
     String receive(){
         try{
-            return input.readLine();
+            String msg = input.readLine();
+            if( msg == null ){
+                Platform.runLater( () -> error( "You have been removed from the game or game has been ended by a main server." ) );
+                return "";
+            }
+            return msg;
         }catch( IOException e ){
             return "";
         }
     }
 
+    private < T extends Event > void quit( T t ){
+        quit();
+    }
+
+    private void quit(){
+        Platform.exit();
+        System.exit( 0 );
+    }
+
+    private < T extends Event > void restart( T t ){
+        try{
+            Runtime.getRuntime().exec( "Werewolves.exe" );
+        } catch( IOException ignored ){}
+        quit();
+    }
+
     public void setWaitingForButton( boolean value ){ waitingForButton = value; }
     public void setClickedCard( String card ){ clickedCard = card; }
 
-    private void error( String error ){
+    private void error( String error, boolean restart ){
         Stage stage = new Stage();
         stage.setTitle( "Error" );
         Label l = new Label( error );
@@ -622,7 +634,12 @@ public class Game{
         v.setAlignment( Pos.BASELINE_CENTER );
         Scene s = new Scene( v, 500, 200 );
         stage.setScene( s );
-        stage.getScene().getWindow().addEventFilter( WindowEvent.WINDOW_CLOSE_REQUEST, this::quit );
+        if( restart )
+            stage.getScene().getWindow().addEventFilter( WindowEvent.WINDOW_CLOSE_REQUEST, this::restart );
         stage.showAndWait();
+    }
+
+    private void error( String error ){
+        error( error, false );
     }
 }
