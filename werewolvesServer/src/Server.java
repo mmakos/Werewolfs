@@ -64,13 +64,21 @@ public class Server{
                 case "endgame":
                     if( arg == null )
                         print( "No game provided." );
+                    else if( arg.equals( "-a" ) ){
+                        for( Game g : games ){
+                            g.send( -1, "ABORT" );
+                            endGame( g );
+                            print( "ALL games have been aborted." );
+                        }
+                    }
                     else{
                         Game g = getGame( arg );
                         if( g == null )
                             print( "No such game." );
                         else{
+                            g.send( -1, "ABORT" );
                             endGame( g );
-                            print( "Game " + arg + " aborted." );
+                            print( "Game " + arg + " has been aborted." );
                         }
                     }
                     break;
@@ -176,7 +184,7 @@ public class Server{
     }
 
     public void endGame( Game game ){
-        game.endPlayers();
+        game.end();
         games.remove( game );
         print( "Game " + game.getID() + " has ended.", 1 );
     }
@@ -222,6 +230,11 @@ public class Server{
             timer.start();
         }
 
+        public void end(){
+            timer.stop();
+            endPlayers();
+        }
+
         public void setStarted( boolean started ){
             this.started = started;
             print( "Game started.", this.gameID, 2 );
@@ -264,7 +277,7 @@ public class Server{
             return players;
         }
 
-        public void endPlayers(){
+        private void endPlayers(){
             for( Player player : players )
                 player.close();
             admin.close();

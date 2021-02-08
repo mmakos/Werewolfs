@@ -1,5 +1,8 @@
 public class Werewolves{
-    public static void main( String[] args ) throws Exception{
-        client.Client.main( args );
+    public static void main( String[] args ){
+        if( args.length > 0 && args[ 0 ].equals( "-a" ) )
+            server.main.main( args );
+        else
+            client.Client.main( args );
     }
 }

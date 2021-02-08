@@ -5,6 +5,7 @@ import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -28,9 +29,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Game{
     private volatile boolean waitingForButton = false;
+    private volatile boolean error = false;
     private String clickedCard = "card0";
-    private static final int nicknameType = 0;
-    private static final int gameType = 1;
     public static final String COM_SPLITTER = String.valueOf( ( char )28 );
     public final static String MSG_SPLITTER = String.valueOf( ( char )29 );
     public final static String UNIQUE_CHAR = String.valueOf( ( char )2 );
@@ -558,17 +558,8 @@ public class Game{
 
     private void getPlayers(){
         String msg = receive();
-        if( msg == null ){     // kicked out
-            Platform.runLater( () -> error( "You have been kicked out from the game", true ) );
-            try{
-                Thread.sleep( 60000 );
-            } catch( InterruptedException ignored ){}
-            quit();
-        }
-        else{
-            String[] playersTab = msg.split( MSG_SPLITTER, 0 );
-            players.addAll( Arrays.asList( playersTab ) );
-        }
+        String[] playersTab = msg.split( MSG_SPLITTER, 0 );
+        players.addAll( Arrays.asList( playersTab ) );
     }
 
     private String getRandomPlayerCard(){
@@ -597,11 +588,14 @@ public class Game{
         try{
             String msg = input.readLine();
             if( msg == null ){
-                Platform.runLater( () -> error( "You have been removed from the game or game has been ended by a main server." ) );
+                error = true;
+                Platform.runLater( () -> error( "The game has been aborted or you have been removed by the admin or by the main server." ) );
+                while( error )
+                    Thread.sleep( 10 );
                 return "";
             }
             return msg;
-        }catch( IOException e ){
+        }catch( IOException | InterruptedException e ){
             return "";
         }
     }
@@ -615,7 +609,7 @@ public class Game{
         System.exit( 0 );
     }
 
-    private < T extends Event > void restart( T t ){
+    private void restart(){
         try{
             Runtime.getRuntime().exec( "Werewolves.exe" );
         } catch( IOException ignored ){}
@@ -625,21 +619,12 @@ public class Game{
     public void setWaitingForButton( boolean value ){ waitingForButton = value; }
     public void setClickedCard( String card ){ clickedCard = card; }
 
-    private void error( String error, boolean restart ){
-        Stage stage = new Stage();
-        stage.setTitle( "Error" );
-        Label l = new Label( error );
-        l.setFont( Font.font( 14 ) );
-        VBox v = new VBox( l );
-        v.setAlignment( Pos.BASELINE_CENTER );
-        Scene s = new Scene( v, 500, 200 );
-        stage.setScene( s );
-        if( restart )
-            stage.getScene().getWindow().addEventFilter( WindowEvent.WINDOW_CLOSE_REQUEST, this::restart );
-        stage.showAndWait();
-    }
-
     private void error( String error ){
-        error( error, false );
+        Alert alert = new Alert( Alert.AlertType.ERROR );
+        alert.setTitle( "Error" );
+        alert.setContentText( error );
+        alert.showAndWait();
+        this.error = false;
+        restart();
     }
 }

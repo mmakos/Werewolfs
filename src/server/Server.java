@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -35,6 +36,7 @@ public class Server{
     private boolean listening = true;
     private boolean reading = false;
     private boolean isVoting = false;
+    private volatile boolean error = false;
     private BufferedReader input;
     private PrintWriter output;
     private Socket s;
@@ -99,7 +101,7 @@ public class Server{
 
             listen.start();
         } catch( IOException e ){
-            System.out.println( "Cannot connect to the server." );
+            gameIdLabel.setText( "Cannot connect." );
         }
     }
 
@@ -113,7 +115,7 @@ public class Server{
         while( listening && players.size() < MAX_PLAYERS ){         // create new player
             try{
                 while( !input.ready() );
-                String[] msg = input.readLine().split( COM_SPLITTER );
+                String[] msg = read();
                 if( msg.length == 2 ){
                     int playerID = Integer.parseInt( msg[ 0 ] );
                     String playerNickname = msg[ 1 ];
@@ -136,14 +138,45 @@ public class Server{
     private final Thread reader = new Thread( () -> {
         while( reading ){
             try{
-                String[] msg = input.readLine().split( COM_SPLITTER );
-                System.out.println( "From: " + msg[ 0 ] );
+                String[] msg = read();
                 if( msg.length == 2 )      // message from player, [ 0 ] is id, [ 1 ] is message
-                    System.out.println( "msg: " + msg[ 1 ] );
                     getPlayer( Integer.parseInt( msg[ 0 ] ) ).addMsg( msg[ 1 ] );
             } catch( IOException | NumberFormatException ignored ){}
         }
     } );
+
+    private String[] read() throws IOException {
+        String message = input.readLine();
+        if( message == null || message.equals( "ABORT" ) ){
+            error = true;
+            Platform.runLater( () -> error( "Game has been aborted by the main server." ) );
+            while( error ) {
+                try{
+                    Thread.sleep( 1000 );
+                } catch( InterruptedException ignored ){}
+            }
+            return new String[ 0 ];
+        }
+        else
+            return message.split( COM_SPLITTER );
+    }
+
+    private void error( String error ){
+        Alert alert = new Alert( Alert.AlertType.ERROR );
+        alert.setTitle( "Error" );
+        alert.setContentText( error );
+        alert.showAndWait();
+        this.error = false;
+        restart();
+    }
+
+    private void restart(){
+        try{
+            Runtime.getRuntime().exec( "SerWerewolves.exe" );
+        } catch( IOException ignored ){}
+        Platform.exit();
+        System.exit( 0 );
+    }
 
     public void send( String msg ){
         output.println( msg );
@@ -338,8 +371,7 @@ public class Server{
             send( "QUIT" );
             try{
                 this.s.close();
-            } catch( IOException ignored ){
-            }
+            } catch( IOException ignored ){}
         }
     }
 
@@ -467,14 +499,12 @@ public class Server{
         }
 
         public String getMsg() throws IOException{
-            System.out.println( "Waiting for msg from player " + id );
             long start = System.currentTimeMillis();
             while( msg.isEmpty() && System.currentTimeMillis() - start < MAX_READ_TIME * 1000 ){
                 try{
                     Thread.sleep( 10 );
                 } catch( InterruptedException ignored ){}
             }
-            System.out.println( "Got msg from player " + id );
             if( !msg.isEmpty() )
                 return msg.removeFirst();
             else
