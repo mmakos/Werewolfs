@@ -122,7 +122,7 @@ public class Server{
                     print( "\tshutdown / halt - shuts down the server." );
                     print( "\tlistgames - lists all games" );
                     print( "\tlistplayers (<gameID>) - lists players from given game. If no game provided, then lists players from all games." );
-                    print( "\tendgame <gameID> - ends given game." );
+                    print( "\tendgame <gameID> - ends given game. If <gameID> is -a then ends all games." );
                     print( "\tloglevel <level> - sets amount of displayed logs (0 - only server logs (crashed etc, 3 - all logs)." );
                     print( "\tviewgame <gameID> - views all logs from given game." );
                     print( "\tunviewgame (<gameID>) - undo view game command. If no game provided, then all games will be unviewed." );
