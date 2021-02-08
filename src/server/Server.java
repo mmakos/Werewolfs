@@ -41,7 +41,6 @@ public class Server{
     private static final int MAX_PLAYERS = CardChooser.card.length;
     private static final int MIN_PLAYERS = 3;
     private static final int MAX_READ_TIME = 45;
-    private volatile boolean connecting = false;
     public String[] cardsInCenter;
     public Vector< String > cardsOnBegin = new Vector<>();
     public Vector< String > cardsNow = new Vector<>();
@@ -88,8 +87,7 @@ public class Server{
             this.input = new BufferedReader( new InputStreamReader( this.s.getInputStream(), StandardCharsets.UTF_8 ) );;
             this.output = new PrintWriter( new OutputStreamWriter( this.s.getOutputStream(), StandardCharsets.UTF_8 ), true );
             this.output.println( "NEWGAME" );
-            String response = this.input.readLine();
-            this.gameId = response;
+            this.gameId = this.input.readLine();
             gameIdLabel.setText( "Game ID: " + this.gameId );
 
             runServer.setDisable( true );
@@ -111,7 +109,7 @@ public class Server{
         clipboard.setContents( stringSelection, null );
     }
 
-    private Thread listen = new Thread( () -> {
+    private final Thread listen = new Thread( () -> {
         while( listening && players.size() < MAX_PLAYERS ){         // create new player
             try{
                 while( !input.ready() );
@@ -135,7 +133,7 @@ public class Server{
         }
     } );
 
-    private Thread reader = new Thread( () -> {
+    private final Thread reader = new Thread( () -> {
         while( reading ){
             try{
                 String[] msg = input.readLine().split( COM_SPLITTER );
@@ -475,7 +473,7 @@ public class Server{
                 try{
                     Thread.sleep( 10 );
                 } catch( InterruptedException ignored ){}
-            };
+            }
             System.out.println( "Got msg from player " + id );
             if( !msg.isEmpty() )
                 return msg.removeFirst();
