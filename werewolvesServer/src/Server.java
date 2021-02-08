@@ -34,6 +34,7 @@ public class Server{
             }
             switch( command ){
                 case "shutdown": case "halt":
+                    endALlGames();
                     System.exit( 0 );
                     break;
                 case "listgames":
@@ -65,11 +66,7 @@ public class Server{
                     if( arg == null )
                         print( "No game provided." );
                     else if( arg.equals( "-a" ) ){
-                        for( Game g : games ){
-                            g.send( -1, "ABORT" );
-                            endGame( g );
-                            print( "ALL games have been aborted." );
-                        }
+                        endALlGames();
                     }
                     else{
                         Game g = getGame( arg );
@@ -187,6 +184,14 @@ public class Server{
         game.end();
         games.remove( game );
         print( "Game " + game.getID() + " has ended.", 1 );
+    }
+
+    public void endALlGames(){
+        for( Game g : games ){
+            g.send( -1, "ABORT" );
+            endGame( g );
+        }
+        print( "ALL games have been aborted." );
     }
 
     public void print( String log, int level ){
