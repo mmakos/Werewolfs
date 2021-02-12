@@ -25,6 +25,8 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Game{
@@ -42,6 +44,7 @@ public class Game{
     private GameWindow gameWindow;
     public String nickname;
     public String[] statements = new String[ 50 ];
+    private BlockingQueue< String > msgQueue = new LinkedBlockingQueue<>();
 
     private MediaPlayer wakeUpSignal = null;
     private MediaPlayer roleSignal = null;
@@ -85,12 +88,26 @@ public class Game{
                 }
             } );
         } ).start();
+
+        new Thread( () -> {
+            while( true ){
+                try{
+                    String msg = input.readLine();
+                    if( msg == null ){
+                        error = true;
+                        Platform.runLater( () -> error( "The game has been aborted or you have been removed by the admin or by the main server." ) );
+                        return;
+                    }
+                    msgQueue.put( msg );
+                } catch( IOException | InterruptedException ignored ){}
+            }
+        } ).start();
     }
 
     public void gameLogic(){
         Thread gameLogic = new Thread( () -> {
             while( true ){
-                String msg = receive();
+                String msg = read();
                 if( msg.equals( "WakeUp" ) ){
                     wakeUp();
                     break;
@@ -107,7 +124,7 @@ public class Game{
                 if( msg.equals( "THING" ) )
                     waitForTingsTouch();
             }
-            if( receive().equals( UNIQUE_CHAR + "VOTE" ) ){
+            if( read().equals( UNIQUE_CHAR + "VOTE" ) ){
                 gameWindow.setStatementLabel( statements[ 2 ] );
                 while( vote() != 0 );
             }
@@ -160,7 +177,7 @@ public class Game{
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
         sendMsg( clickedCard );
-        card = receive();
+        card = read();
         gameWindow.setStatementLabel( statements[ 3 ] + " " + card.split( "_" )[ 0 ] );
         gameWindow.reverseCard( clickedCard, card );
         gameWindow.setCardLabel( " -> " + card.split( "_" )[ 0 ] );
@@ -168,7 +185,7 @@ public class Game{
 
     void makeWerewolf(){
         StringBuilder str = new StringBuilder();
-        String[] werewolves = receive().split( MSG_SPLITTER );
+        String[] werewolves = read().split( MSG_SPLITTER );
         for( String werewolf: werewolves ){
             if( !werewolf.equals( nickname ) ){
                 gameWindow.reverseCard( werewolf, "Werewolf_0" );
@@ -190,7 +207,7 @@ public class Game{
             gameWindow.setTableCardsActive( false );
             gameWindow.setTableCardsSelected( false );
             sendMsg( clickedCard );
-            String chosenCard = receive();
+            String chosenCard = read();
             gameWindow.reverseCard( clickedCard, chosenCard );
         }
         else
@@ -199,7 +216,7 @@ public class Game{
 
     void makeMinion(){
         StringBuilder str = new StringBuilder();
-        String[] werewolves = receive().split( MSG_SPLITTER, 0 );
+        String[] werewolves = read().split( MSG_SPLITTER, 0 );
         if( !werewolves[ 0 ].equals( "" ) ){
             for( String werewolf : werewolves ){
                 gameWindow.reverseCard( werewolf, "Werewolf_0" );
@@ -230,7 +247,7 @@ public class Game{
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
         sendMsg( clickedCard );
-        String chosenCard = receive();
+        String chosenCard = read();
         gameWindow.reverseCard( clickedCard, chosenCard );
     }
     void makeApprenticeSeer(){
@@ -251,7 +268,7 @@ public class Game{
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
         sendMsg( clickedCard );
-        String chosenCard = receive();
+        String chosenCard = read();
         gameWindow.reverseCard( clickedCard, chosenCard );
     }
     void makeWitch(){
@@ -272,7 +289,7 @@ public class Game{
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
         sendMsg( clickedCard );
-        String chosenCard = receive();
+        String chosenCard = read();
         gameWindow.reverseCard( clickedCard, chosenCard );
         String firstClickedCard = clickedCard;
 
@@ -324,7 +341,7 @@ public class Game{
 
     void makeBeholder(){
         gameWindow.setRoleInfo( statements[ 32 ] );
-        String msg = receive();
+        String msg = read();
         if( msg.equals( "NoSeer" ) ) gameWindow.setRoleInfo( statements[ 33 ] );
         else gameWindow.reverseCard(msg,"Seer");
     }
@@ -354,7 +371,7 @@ public class Game{
         }
         cards += clickedCard;
         sendMsg( cards );
-        String[] cardsInCenter = receive().split( MSG_SPLITTER );
+        String[] cardsInCenter = read().split( MSG_SPLITTER );
         String[] clickedCards = cards.split( MSG_SPLITTER );
         gameWindow.setCenterCardSelected( clickedCard, false );
         gameWindow.setTableCardsActive( false );
@@ -364,7 +381,7 @@ public class Game{
     }
     void makeInsomniac(){
         gameWindow.setRoleInfo( statements[ 28 ] );
-        String insomniacNow = receive();
+        String insomniacNow = read();
         gameWindow.setCardLabel( " -> " + insomniacNow );
         gameWindow.updateMyCard( insomniacNow );
     }
@@ -383,7 +400,7 @@ public class Game{
             }
             gameWindow.setPlayersCardsSelected( false );
             sendMsg( clickedCard );
-            String msg = receive();
+            String msg = read();
             gameWindow.reverseCard( clickedCard, msg );
             msg = msg.split( "_" )[ 0 ];
             if( msg.equals( "Tanner" ) || msg.equals( "Werewolf" ) || msg.equals( "Mystic wolf" ) ){
@@ -409,7 +426,7 @@ public class Game{
         gameWindow.setPlayersCardsActive( false );
         gameWindow.setPlayersCardsSelected( false );
         sendMsg( clickedCard );
-        String msg = receive();
+        String msg = read();
         String msg2 = msg.split( "_" )[ 0 ];
         gameWindow.setCardLabel( " -> " + msg2 );
         gameWindow.setStatementLabel( statements[ 3 ] + " " + msg2 );
@@ -439,7 +456,7 @@ public class Game{
     }
 
     void waitForTingsTouch(){
-        if( receive().equals( "TOUCH" ) ){
+        if( read().equals( "TOUCH" ) ){
             gameWindow.setCardLabel( " -> " + statements[ 4 ] );
             gameWindow.setStatementLabel( statements[ 5 ] );
         }
@@ -461,7 +478,7 @@ public class Game{
         AtomicBoolean voteNotEnded = new AtomicBoolean( true );
         Thread votes = new Thread( () -> {
             while( true ){
-                String vote = receive();
+                String vote = read();
                 if( vote.equals( UNIQUE_CHAR + "VOTEEND" ) ){
                     voteNotEnded.set( false );
                     break;
@@ -482,15 +499,15 @@ public class Game{
         }
         waitingForButton = false;
         while( voteNotEnded.get() );
-        String voteResult = receive();
+        String voteResult = read();
         if( voteResult.equals( UNIQUE_CHAR + "VOTE" ) ){      // vote again
             gameWindow.setStatementLabel( statements[ 6 ] );
             Thread t = new Thread( () -> Platform.runLater( () -> gameWindow.clearArrows() ) );
             t.start();
             return -1;
         }
-        Vector< String > cardsNow = new Vector<>( Arrays.asList( receive().split( MSG_SPLITTER ) ) );
-        Vector< String > realCardsNow = new Vector<>( Arrays.asList( receive().split( MSG_SPLITTER ) ) );
+        Vector< String > cardsNow = new Vector<>( Arrays.asList( read().split( MSG_SPLITTER ) ) );
+        Vector< String > realCardsNow = new Vector<>( Arrays.asList( read().split( MSG_SPLITTER ) ) );
         for( int i = 0; i < players.size(); ++i ){
             if( players.get( i ).equals( nickname ) )
                 gameWindow.updateMyCard( cardsNow.get( i ) );
@@ -557,7 +574,7 @@ public class Game{
     }
 
     private void getPlayers(){
-        String msg = receive();
+        String msg = read();
         String[] playersTab = msg.split( MSG_SPLITTER, 0 );
         players.addAll( Arrays.asList( playersTab ) );
     }
@@ -569,7 +586,7 @@ public class Game{
     }
 
     private void getCard(){
-        card = receive();
+        card = read();
     }
 
     public void sendToServer( String msg ){
@@ -582,6 +599,14 @@ public class Game{
 
     public void sendMsg( String str ){
         output.println( "ADM" + COM_SPLITTER + str );
+    }
+
+    String read(){
+        try{
+            return msgQueue.take();
+        } catch( InterruptedException e ){
+            return "";
+        }
     }
 
     String receive(){

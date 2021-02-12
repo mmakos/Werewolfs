@@ -266,6 +266,7 @@ public class Server{
             Player p = getPlayer( playerID );
             if( p == null ) return;
             p.close();
+            p.active = false;
             players.remove( p );
             print( "Player " + p.getID() + " removed.", this.gameID, 2 );
         }
@@ -315,6 +316,7 @@ public class Server{
         private BufferedReader input;
         private PrintWriter output;
         private final String SPLITTER = String.valueOf( ( char )28 );
+        public boolean active = true;
 
         Player( Socket socket, Server server ) throws IOException{
             this.server = server;
@@ -345,6 +347,13 @@ public class Server{
         }
 
         private void proceedMsg( String in ){
+            if( in == null ){
+                game.removePlayer( playerID );
+                game.send( -1, "REMOVE" + SPLITTER + playerID );
+                if( playerID == -1 )
+                    server.endGame( game );
+                return;
+            }
             if( in.equals( "QUIT" ) && playerID == -1 ){
                 server.endGame( game );     // Admin ended the game
                 return;
@@ -424,11 +433,11 @@ public class Server{
             }
         }
 
-        private Thread run = new Thread( () ->{
+        public Thread run = new Thread( () ->{
             try{
                 if( getFirstMsg() == -1 )
                     return;
-                while( true ){      // listen for messages
+                while( active ){      // listen for messages
                     proceedMsg( input.readLine() );
                 }
             }

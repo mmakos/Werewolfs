@@ -36,6 +36,7 @@ public class Server{
     private boolean listening = true;
     private boolean reading = false;
     private boolean isVoting = false;
+    private boolean gameStarted = false;
     private volatile boolean error = false;
     private BufferedReader input;
     private PrintWriter output;
@@ -157,8 +158,14 @@ public class Server{
             }
             return new String[ 0 ];
         }
-        else
-            return message.split( COM_SPLITTER );
+        String[] msg = message.split( COM_SPLITTER );
+        if( msg[ 0 ].equals( "REMOVE" ) && msg.length >= 2 && !gameStarted ){
+            try{
+                removePlayerFromGame( getPlayer( Integer.parseInt( msg[ 1 ] ) ), true );
+            } catch( NumberFormatException ignored ){}
+            return new String[ 0 ];
+        }
+        return message.split( COM_SPLITTER );
     }
 
     private void error( String error ){
@@ -222,6 +229,7 @@ public class Server{
     @FXML void runGame() throws IOException{
         listening = false;
         reading = true;
+        gameStarted = true;
         listen.stop();
         reader.start();
         sendPlayersList();
@@ -247,9 +255,9 @@ public class Server{
         Random rand = new Random();
         LinkedList< String > temp = new LinkedList<>( cardsInGame );
 
-//        cardsOnBegin.add( "Thing" );
+//        cardsOnBegin.add( "Seer" );
 //        cardsNow.add( cardsOnBegin.get( 0 ) );
-//        temp.remove( "Thing" );
+//        temp.remove( "Seer" );
 
 //        boolean insomniacForStasiek = false;
 //        try{
@@ -422,8 +430,9 @@ public class Server{
         stage.show();
     }
 
-    private void removePlayerFromGame( Player player ){
-        send( "REMOVE" + COM_SPLITTER + player.id );
+    private void removePlayerFromGame( Player player, boolean dontSend ){
+        if( !dontSend )
+            send( "REMOVE" + COM_SPLITTER + player.id );
         players.remove( player );
         Platform.runLater( () -> {
             if( players.size() < MIN_PLAYERS )
@@ -432,6 +441,9 @@ public class Server{
             for( Player value : players ) s.append( value.name ).append( ", " );
             playersLabel.setText( s.toString() );
         } );
+    }
+    private void removePlayerFromGame( Player player ){
+        removePlayerFromGame( player, false );
     }
 
     public void setSelectedCards( LinkedList< String > selectedCards ){
