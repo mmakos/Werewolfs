@@ -3,18 +3,12 @@ package client;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
@@ -30,9 +24,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Game{
-    private volatile boolean waitingForButton = false;
     private volatile boolean error = false;
-    private String clickedCard = "card0";
+    private final Object errorLock = new Object();
+    private String clickedCard = null;
+    private final Object clickedLock = new Object();        // to synchronize clicked card moment
+    private Boolean isClicked = false;
     public static final String COM_SPLITTER = String.valueOf( ( char )28 );
     public final static String MSG_SPLITTER = String.valueOf( ( char )29 );
     public final static String UNIQUE_CHAR = String.valueOf( ( char )2 );
@@ -44,15 +40,18 @@ public class Game{
     private GameWindow gameWindow;
     public String nickname;
     public String[] statements = new String[ 50 ];
-    private BlockingQueue< String > msgQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue< String > msgQueue = new LinkedBlockingQueue<>();
 
     private MediaPlayer wakeUpSignal = null;
     private MediaPlayer roleSignal = null;
 
     public BufferedReader input;
     public PrintWriter output;
+    private Thread reader;
+    private final Socket socket;
 
     Game( Socket socket, String language ) throws IOException{
+        this.socket = socket;
         this.input = new BufferedReader( new InputStreamReader( socket.getInputStream(), StandardCharsets.UTF_8 ) );
         this.output = new PrintWriter( new OutputStreamWriter( socket.getOutputStream(), StandardCharsets.UTF_8 ), true );
         try{
@@ -71,7 +70,7 @@ public class Game{
         }catch( IOException ignored ){}
         try{
             Scanner line = new Scanner( new File( "settings.cfg" ) );
-            if( line.nextLine().split( "=" )[ 1 ].equals( "true" ) );
+            if( line.nextLine().split( "=" )[ 1 ].equals( "true" ) )
                 minionWinsWhenHeDies = true;
         }catch( IOException | IndexOutOfBoundsException ignored ){}
     }
@@ -89,19 +88,22 @@ public class Game{
             } );
         } ).start();
 
-        new Thread( () -> {
+        reader = new Thread( () -> {
             while( true ){
                 try{
                     String msg = input.readLine();
                     if( msg == null ){
                         error = true;
-                        Platform.runLater( () -> error( "The game has been aborted or you have been removed by the admin or by the main server." ) );
+                        Platform.runLater( this::error );
                         return;
                     }
+                    if( msg.equals( UNIQUE_CHAR + "ENDGAME" ) )
+                        endGame();
                     msgQueue.put( msg );
                 } catch( IOException | InterruptedException ignored ){}
             }
-        } ).start();
+        } );
+        reader.start();
     }
 
     public void gameLogic(){
@@ -132,6 +134,13 @@ public class Game{
         gameLogic.start();
     }
 
+    private void endGame(){
+        reader.interrupt();
+        try{
+            socket.close();
+        } catch( IOException ignored ){}
+    }
+
     private void proceedCard( String card ) throws InterruptedException {
         try{
             roleSignal.seek( Duration.ZERO );
@@ -158,28 +167,25 @@ public class Game{
 
     void makeCopycat(){
         gameWindow.setRoleInfo( statements[ 16 ] );
-        waitingForButton = true;
         gameWindow.setTableCardsActive( true );
 
         // Waiting for clicked card, but with time limit of 30 seconds
-        long start = System.currentTimeMillis();
-        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
+        String cardClick = getClickedCard();
         // If time is up, card will be selected randomly
-        if( waitingForButton ){
+        if( cardClick == null ){
             int rand = new Random().nextInt( 3 );
-            clickedCard = UNIQUE_CHAR + "card" + rand;
+            cardClick = UNIQUE_CHAR + "card" + rand;
             gameWindow.setRoleInfo( statements[ 13 ] + "\n" +
                     statements[ 17 ] );
-            waitingForButton = false;
         }
         else
             gameWindow.setRoleInfo( statements[ 17 ] );
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
-        sendMsg( clickedCard );
+        sendMsg( cardClick );
         card = read();
         gameWindow.setStatementLabel( statements[ 3 ] + " " + card.split( "_" )[ 0 ] );
-        gameWindow.reverseCard( clickedCard, card );
+        gameWindow.reverseCard( cardClick, card );
         gameWindow.setCardLabel( " -> " + card.split( "_" )[ 0 ] );
     }
 
@@ -194,21 +200,18 @@ public class Game{
         }
         if( str.toString().isEmpty() ){
             gameWindow.setRoleInfo( statements[ 18 ] );
-            waitingForButton = true;
             gameWindow.setTableCardsActive( true );
-            long start1 = System.currentTimeMillis();
-            while( waitingForButton && System.currentTimeMillis() - start1 < MAX_ROLE_TIME * 1000 );
-            if( waitingForButton ){
+            String cardClick = getClickedCard();
+            if( cardClick == null ){
                 int rand = new Random().nextInt( 3 );
-                clickedCard = UNIQUE_CHAR + "card" + rand;
+                cardClick = UNIQUE_CHAR + "card" + rand;
                 gameWindow.setRoleInfo( statements[ 13 ] );
-                waitingForButton = false;
             }
             gameWindow.setTableCardsActive( false );
             gameWindow.setTableCardsSelected( false );
-            sendMsg( clickedCard );
+            sendMsg( cardClick );
             String chosenCard = read();
-            gameWindow.reverseCard( clickedCard, chosenCard );
+            gameWindow.reverseCard( cardClick, chosenCard );
         }
         else
             gameWindow.setRoleInfo( statements[ 19 ] + str.toString() + "." );
@@ -231,109 +234,91 @@ public class Game{
 
     void makeMysticWolf(){
         gameWindow.setRoleInfo( statements[ 22 ] );
-        waitingForButton = true;
         gameWindow.setTableCardsActive( true );
 
         // Waiting for clicked card, but with time limit of 30 seconds
-        long start1 = System.currentTimeMillis();
-        while( waitingForButton && System.currentTimeMillis() - start1 < MAX_ROLE_TIME * 1000 );
+        String cardClick = getClickedCard();
         // If time is up, card will be selected randomly
-        if( waitingForButton ){
+        if( cardClick == null ){
             int rand = new Random().nextInt( 3 );
-            clickedCard = UNIQUE_CHAR + "card" + rand;
+            cardClick = UNIQUE_CHAR + "card" + rand;
             gameWindow.setRoleInfo( statements[ 13 ] );
-            waitingForButton = false;
         }
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
-        sendMsg( clickedCard );
+        sendMsg( cardClick );
         String chosenCard = read();
-        gameWindow.reverseCard( clickedCard, chosenCard );
+        gameWindow.reverseCard( cardClick, chosenCard );
     }
     void makeApprenticeSeer(){
         gameWindow.setRoleInfo( statements[ 22 ] );
-        waitingForButton = true;
         gameWindow.setTableCardsActive( true );
 
         // Waiting for clicked card, but with time limit of 30 seconds
-        long start1 = System.currentTimeMillis();
-        while( waitingForButton && System.currentTimeMillis() - start1 < MAX_ROLE_TIME * 1000 );
+        String cardClick = getClickedCard();
         // If time is up, card will be selected randomly
-        if( waitingForButton ){
+        if( cardClick == null ){
             int rand = new Random().nextInt( 3 );
-            clickedCard = UNIQUE_CHAR + "card" + rand;
+            cardClick = UNIQUE_CHAR + "card" + rand;
             gameWindow.setRoleInfo( statements[ 13 ] );
-            waitingForButton = false;
         }
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
-        sendMsg( clickedCard );
+        sendMsg( cardClick );
         String chosenCard = read();
-        gameWindow.reverseCard( clickedCard, chosenCard );
+        gameWindow.reverseCard( cardClick, chosenCard );
     }
     void makeWitch(){
         gameWindow.setRoleInfo( statements[ 23 ] );
-        waitingForButton = true;
         gameWindow.setTableCardsActive( true );
 
         // Waiting for clicked card, but with time limit of 30 seconds
-        long start = System.currentTimeMillis();
-        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
+        String cardClick = getClickedCard();
         // If time is up, card will be selected randomly
-        if( waitingForButton ){
+        if( cardClick == null ){
             int rand = new Random().nextInt( 3 );
-            clickedCard = UNIQUE_CHAR + "card" + rand;
+            cardClick = UNIQUE_CHAR + "card" + rand;
             gameWindow.setRoleInfo( statements[ 13 ] + "\n" + statements[ 24 ] );
-            waitingForButton = false;
         }
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
-        sendMsg( clickedCard );
+        sendMsg( cardClick );
         String chosenCard = read();
-        gameWindow.reverseCard( clickedCard, chosenCard );
-        String firstClickedCard = clickedCard;
+        gameWindow.reverseCard( cardClick, chosenCard );
+        String firstClickedCard = cardClick;
 
-        waitingForButton = true;
         gameWindow.setPlayersCardsActive( true );
-        start = System.currentTimeMillis();
-        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
-        if( waitingForButton ){
-            clickedCard = getRandomPlayerCard();
+        cardClick = getClickedCard();
+        if( cardClick == null ){
+            cardClick = getRandomPlayerCard();
             gameWindow.setRoleInfo( statements[ 13 ] );
-            waitingForButton = false;
         }
         gameWindow.setPlayersCardsActive( false );
         gameWindow.setPlayersCardsSelected( false );
         gameWindow.hideCenterCard( firstClickedCard );
-        gameWindow.reverseCard( clickedCard, chosenCard );
-        sendMsg( clickedCard );
+        gameWindow.reverseCard( cardClick, chosenCard );
+        sendMsg( cardClick );
     }
 
     void makeTroublemaker(){
         gameWindow.setRoleInfo( statements[ 25 ] );
-        waitingForButton = true;
         gameWindow.setPlayersCardsActive( true );
 
         // Waiting for clicked card, but with time limit of 30 seconds
-        long start = System.currentTimeMillis();
-        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
+        String cardClick = getClickedCard();
         // If time is up, card will be selected randomly
-        if( waitingForButton ){
-            clickedCard = getRandomPlayerCard();
+        if( cardClick == null ){
+            cardClick = getRandomPlayerCard();
             gameWindow.setRoleInfo( statements[ 13 ] + "\n" + statements[ 26 ] );
-            waitingForButton = false;
         }
-        String cards = clickedCard + MSG_SPLITTER;
-        gameWindow.setPlayerCardActive( players.indexOf( clickedCard ), false );
-        waitingForButton = true;
-        start = System.currentTimeMillis();
-        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
-        if( waitingForButton ){
-            clickedCard = getRandomPlayerCard();
+        String cards = cardClick + MSG_SPLITTER;
+        gameWindow.setPlayerCardActive( players.indexOf( cardClick ), false );
+        cardClick = getClickedCard();
+        if( cardClick == null ){
+            cardClick = getRandomPlayerCard();
             gameWindow.setRoleInfo( statements[ 13 ] );
-            waitingForButton = false;
         }
-        cards += clickedCard;
+        cards += cardClick;
         gameWindow.setPlayersCardsActive( false );
         gameWindow.setPlayersCardsSelected( false );
         sendMsg( cards );
@@ -346,34 +331,29 @@ public class Game{
         else gameWindow.reverseCard(msg,"Seer");
     }
 
-    void makeSeer() throws InterruptedException {
+    void makeSeer(){
         gameWindow.setRoleInfo( statements[ 31 ] );
-        waitingForButton = true;
         gameWindow.setTableCardsActive( true );
 
         // Waiting for clicked card, but with time limit of 30 seconds
-        long start = System.currentTimeMillis();
-        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 ) ;
+        String cardClick = getClickedCard();
         // If time is up, card will be selected randomly
-        if( waitingForButton ){
+        if( cardClick == null ){
             int rand = new Random().nextInt( 3 );
-            clickedCard = UNIQUE_CHAR + "card" + rand;
-            waitingForButton = false;
+            cardClick = UNIQUE_CHAR + "card" + rand;
         }
-        String cards = clickedCard + MSG_SPLITTER;
-        gameWindow.setCenterCardSelected( clickedCard, false );
-        waitingForButton = true;
-        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 ) ;
-        if( waitingForButton ){
+        String cards = cardClick + MSG_SPLITTER;
+        gameWindow.setCenterCardSelected( cardClick, false );
+        cardClick = getClickedCard();
+        if( cardClick == null ){
             int rand = new Random().nextInt( 3 );
-            clickedCard = UNIQUE_CHAR + "card" + rand;
-            waitingForButton = false;
+            cardClick = UNIQUE_CHAR + "card" + rand;
         }
-        cards += clickedCard;
+        cards += cardClick;
         sendMsg( cards );
         String[] cardsInCenter = read().split( MSG_SPLITTER );
         String[] clickedCards = cards.split( MSG_SPLITTER );
-        gameWindow.setCenterCardSelected( clickedCard, false );
+        gameWindow.setCenterCardSelected( cardClick, false );
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
         gameWindow.reverseCard( clickedCards[ 0 ], cardsInCenter[ 0 ] );
@@ -390,18 +370,15 @@ public class Game{
         gameWindow.setRoleInfo( statements[ 27 ] );
         gameWindow.setPlayersCardsActive( true );
         for( int i = 0; i < 2; ++i ){
-            waitingForButton = true;
-            long start = System.currentTimeMillis();
-            while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
-            if( waitingForButton ){
-                clickedCard = getRandomPlayerCard();
+            String cardClick = getClickedCard();
+            if( cardClick == null ){
+                cardClick = getRandomPlayerCard();
                 gameWindow.setRoleInfo( statements[ 13 ] + "\n" + statements[ 34 ] );
-                waitingForButton = false;
             }
             gameWindow.setPlayersCardsSelected( false );
-            sendMsg( clickedCard );
+            sendMsg( cardClick );
             String msg = read();
-            gameWindow.reverseCard( clickedCard, msg );
+            gameWindow.reverseCard( cardClick, msg );
             msg = msg.split( "_" )[ 0 ];
             if( msg.equals( "Tanner" ) || msg.equals( "Werewolf" ) || msg.equals( "Mystic wolf" ) ){
                 gameWindow.setCardLabel( " -> " + msg );
@@ -414,45 +391,39 @@ public class Game{
 
     void makeRobber(){
         gameWindow.setRoleInfo( statements[ 29 ] );
-        waitingForButton = true;
         gameWindow.setPlayersCardsActive( true );
-        long start = System.currentTimeMillis();
-        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
-        if( waitingForButton ){
-            clickedCard = getRandomPlayerCard();
+        String cardClick = getClickedCard();
+        if( cardClick == null ){
+            cardClick = getRandomPlayerCard();
             gameWindow.setRoleInfo( statements[ 13 ] );
-            waitingForButton = false;
         }
         gameWindow.setPlayersCardsActive( false );
         gameWindow.setPlayersCardsSelected( false );
-        sendMsg( clickedCard );
+        sendMsg( cardClick );
         String msg = read();
         String msg2 = msg.split( "_" )[ 0 ];
         gameWindow.setCardLabel( " -> " + msg2 );
         gameWindow.setStatementLabel( statements[ 3 ] + " " + msg2 );
-        gameWindow.reverseCard( clickedCard, displayedCard );
+        gameWindow.reverseCard( cardClick, displayedCard );
         gameWindow.updateMyCard( msg );
     }
 
     void makeThing(){
         gameWindow.setRoleInfo( statements[ 30 ] );
         int myIndex = players.indexOf( nickname );
-        waitingForButton = true;
         gameWindow.setPlayerCardActive( ( myIndex + 1 ) % players.size(), true );
         if( myIndex == 0 )
             gameWindow.setPlayerCardActive( players.size() - 1, true );
         else
             gameWindow.setPlayerCardActive( myIndex - 1, true );
-        long start = System.currentTimeMillis();
-        while( waitingForButton && System.currentTimeMillis() - start < MAX_ROLE_TIME * 1000 );
-        if( waitingForButton ){
-            clickedCard = players.get( ( myIndex + 1 ) % players.size() );
+        String cardClick = getClickedCard();
+        if( cardClick == null ){
+            cardClick = players.get( ( myIndex + 1 ) % players.size() );
             gameWindow.setRoleInfo( statements[ 13 ] );
-            waitingForButton = false;
         }
         gameWindow.setPlayersCardsActive( false );
         gameWindow.setPlayersCardsSelected( false );
-        sendMsg( clickedCard );
+        sendMsg( cardClick );
     }
 
     void waitForTingsTouch(){
@@ -474,31 +445,44 @@ public class Game{
     private int vote(){
         gameWindow.setPlayersCardsActive( true );
         gameWindow.setTableCardsActive( true );
-        waitingForButton = true;
+        Object voteLock = new Object();
         AtomicBoolean voteNotEnded = new AtomicBoolean( true );
         Thread votes = new Thread( () -> {
             while( true ){
                 String vote = read();
                 if( vote.equals( UNIQUE_CHAR + "VOTEEND" ) ){
-                    voteNotEnded.set( false );
+                    synchronized( voteLock ){
+                        voteNotEnded.set( false );
+                        voteLock.notify();
+                    }
+                    synchronized( clickedLock ){
+                        clickedLock.notify();
+                    }
                     break;
                 }
                 Platform.runLater( () -> gameWindow.drawArrow( vote.split( MSG_SPLITTER )[ 0 ], vote.split( MSG_SPLITTER )[ 1 ] ) );
             }
         } );
         votes.start();
-        while( waitingForButton && voteNotEnded.get() );
+        String cardVoted = getClickedCard( true );
         gameWindow.setPlayersCardsActive( false );
         gameWindow.setPlayersCardsSelected( false );
         gameWindow.setTableCardsActive( false );
         gameWindow.setTableCardsSelected( false );
-        if( !waitingForButton ){
-            if( clickedCard.substring( 0, 1 ).equals( UNIQUE_CHAR ) )
-                clickedCard = UNIQUE_CHAR + "table";
-            sendMsg( clickedCard );
+        if( cardVoted != null && voteNotEnded.get() ){
+            if( cardVoted.substring( 0, 1 ).equals( UNIQUE_CHAR ) )
+                cardVoted = UNIQUE_CHAR + "table";
+            sendMsg( cardVoted );
         }
-        waitingForButton = false;
-        while( voteNotEnded.get() );
+        synchronized( voteLock ){
+            while( voteNotEnded.get() ){
+                try{
+                    voteLock.wait();
+                } catch( InterruptedException e ){
+                    break;
+                }
+            }
+        }
         String voteResult = read();
         if( voteResult.equals( UNIQUE_CHAR + "VOTE" ) ){      // vote again
             gameWindow.setStatementLabel( statements[ 6 ] );
@@ -613,10 +597,12 @@ public class Game{
         try{
             String msg = input.readLine();
             if( msg == null ){
-                error = true;
-                Platform.runLater( () -> error( "The game has been aborted or you have been removed by the admin or by the main server." ) );
-                while( error )
-                    Thread.sleep( 10 );
+                synchronized( errorLock ){
+                    error = true;
+                    Platform.runLater( this::error );
+                    while( error )
+                        wait();
+                }
                 return "";
             }
             return msg;
@@ -630,6 +616,9 @@ public class Game{
     }
 
     private void quit(){
+        try{
+            socket.close();
+        } catch( IOException ignored ){}
         Platform.exit();
         System.exit( 0 );
     }
@@ -641,15 +630,45 @@ public class Game{
         quit();
     }
 
-    public void setWaitingForButton( boolean value ){ waitingForButton = value; }
-    public void setClickedCard( String card ){ clickedCard = card; }
+    public void setClickedCard( String c ){
+        synchronized( clickedLock ){
+            clickedCard = c;
+            isClicked = true;
+            clickedLock.notify();
+        }
+    }
 
-    private void error( String error ){
+    private String getClickedCard( boolean vote ){
+        synchronized( clickedLock ){
+            while( !isClicked ){
+                try{
+                    clickedLock.wait( MAX_ROLE_TIME * 1000 );
+                    if( !vote )
+                        break;
+                } catch( InterruptedException e ){
+                    return null;
+                }
+            }
+            isClicked = false;
+            String c = clickedCard;
+            clickedCard = null;
+            return c;
+        }
+    }
+
+    private String getClickedCard(){
+        return getClickedCard( false );
+    }
+
+    private void error(){
         Alert alert = new Alert( Alert.AlertType.ERROR );
         alert.setTitle( "Error" );
-        alert.setContentText( error );
+        alert.setContentText( "The game has been aborted or you have been removed by the admin or by the main server." );
         alert.showAndWait();
-        this.error = false;
+        synchronized( errorLock ){
+            this.error = false;
+            errorLock.notify();
+        }
         restart();
     }
 }

@@ -24,6 +24,8 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Server{
@@ -159,7 +161,7 @@ public class Server{
             return new String[ 0 ];
         }
         String[] msg = message.split( COM_SPLITTER );
-        if( msg[ 0 ].equals( "REMOVE" ) && msg.length >= 2 && !gameStarted ){
+        if( msg[ 0 ].equals( "REMOVE" ) && msg.length >= 2 ){
             try{
                 removePlayerFromGame( getPlayer( Integer.parseInt( msg[ 1 ] ) ), true );
             } catch( NumberFormatException ignored ){}
@@ -362,6 +364,7 @@ public class Server{
                 writeLog( players.get( maxIdx ).name + " has been killed." );
             }
             sendAllPlayers();
+            send( 0, UNIQUE_CHAR + "ENDGAME" );
             endGame();
         }
     }
@@ -433,14 +436,19 @@ public class Server{
     private void removePlayerFromGame( Player player, boolean dontSend ){
         if( !dontSend )
             send( "REMOVE" + COM_SPLITTER + player.id );
-        players.remove( player );
-        Platform.runLater( () -> {
-            if( players.size() < MIN_PLAYERS )
-                startGame.setDisable( true );
-            StringBuilder s = new StringBuilder( "Players: " );
-            for( Player value : players ) s.append( value.name ).append( ", " );
-            playersLabel.setText( s.toString() );
-        } );
+        if( !gameStarted ){
+            players.remove( player );
+            Platform.runLater( () -> {
+                if( players.size() < MIN_PLAYERS )
+                    startGame.setDisable( true );
+                StringBuilder s = new StringBuilder( "Players: " );
+                for( Player value : players ) s.append( value.name ).append( ", " );
+                playersLabel.setText( s.toString() );
+            } );
+        }
+        else{
+            player.isActive = false;
+        }
     }
     private void removePlayerFromGame( Player player ){
         removePlayerFromGame( player, false );
@@ -495,7 +503,8 @@ public class Server{
     public class Player{
         int id;
         String name;
-        LinkedList< String > msg = new LinkedList<>();
+        boolean isActive = true;
+        BlockingQueue< String > msg = new LinkedBlockingQueue<>();
 
         Player( int id, String nickname ){
             this.id = id;
@@ -507,7 +516,13 @@ public class Server{
         }
 
         public void addMsg( String msg ){
-            this.msg.addLast( msg );
+            try{
+                this.msg.put( msg );
+            } catch( InterruptedException ignored ){}
+        }
+
+        public void clearMsgQueue(){
+            msg.clear();
         }
 
         public String getMsg() throws IOException{
@@ -517,8 +532,13 @@ public class Server{
                     Thread.sleep( 10 );
                 } catch( InterruptedException ignored ){}
             }
-            if( !msg.isEmpty() )
-                return msg.removeFirst();
+            if( !msg.isEmpty() ){
+                try{
+                    return msg.take();
+                } catch( InterruptedException ignored ){
+                    return null;
+                }
+            }
             else
                 throw new IOException( "Time's up, cannot read a message." );
         }

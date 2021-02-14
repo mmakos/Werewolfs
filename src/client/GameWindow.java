@@ -202,7 +202,6 @@ public class GameWindow{
         String selected = ( ( ToggleButton )event.getSource() ).getId();
         ( ( ToggleButton )event.getSource() ).setDisable(true);
         game.setClickedCard( selected );
-        game.setWaitingForButton( false );
     }
 
     public void setPlayersCardsActive( boolean active ){
@@ -224,10 +223,6 @@ public class GameWindow{
         playersCards.get( playerIndex ).setDisable( !active );
         if( reverseCardButton.getText().equals( game.statements[ 37 ] ) || knownCards.get( playerIndex ) == null )
             playersCards.get( playerIndex ).setOpacity( active ? 1.0 : 0.5 );
-    }
-
-    public void setPlayerCardSelected( int playerIndex, boolean selected ){
-        playersCards.get( playerIndex ).setSelected( selected );
     }
 
     public void setCenterCardSelected(String cardID,boolean selected){
@@ -252,13 +247,6 @@ public class GameWindow{
         if( reverseCardButton.getText().equals( game.statements[ 37 ] ) || knownCards.get( knownCards.size() - 2 ) == null ) card1.setOpacity( active ? 1.0 : 0.5 );
         if( reverseCardButton.getText().equals( game.statements[ 37 ] ) || knownCards.get( knownCards.size() - 1 ) == null ) card2.setOpacity( active ? 1.0 : 0.5 );
     }
-//
-//    @FXML void tableCardClicked(){
-//        String selected = getToggleId( card0.getToggleGroup().getSelectedToggle() );
-//        setTableCardsActive( false );
-//        game.setClickedCard( selected );
-//        game.setWaitingForButton( false );
-//    }
 
     public void drawArrow( String from, String to ){
         ToggleButton fromToggle = playersCards.get( game.players.indexOf( from ) );
@@ -331,14 +319,6 @@ public class GameWindow{
         return v;
     }
 
-    private void arrowAnimation( Vector< Line > l ){
-        Timeline tl = new Timeline(
-                new KeyFrame( Duration.millis( 2000 ),
-                        new KeyValue( l.get( 0 ).endXProperty(), 200, Interpolator.EASE_BOTH ),
-                        new KeyValue( l.get( 0 ).endYProperty(), 200, Interpolator.EASE_BOTH ) )
-        );
-    }
-
     public void clearArrows(){
         lines.forEach( ( line ) -> gamePane.getChildren().remove( line ) );
         lines.removeAllElements();
@@ -365,8 +345,8 @@ public class GameWindow{
     @FXML private ToggleButton card0;
     @FXML private ToggleButton card1;
     @FXML private ToggleButton card2;
-    private Vector< ToggleButton > playersCards = new Vector<>();
-    private Vector< Line > lines = new Vector<>();
+    private final Vector< ToggleButton > playersCards = new Vector<>();
+    private final Vector< Line > lines = new Vector<>();
     public Vector< String > knownCards = new Vector<>();
     @FXML private Label cardLabel;
     @FXML public Label statementLabel;

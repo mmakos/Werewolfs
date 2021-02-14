@@ -15,6 +15,7 @@ public class Connect{
     public static final int MAX_LOGIN_LENGTH = 8;
     private int port = 23000;
     private String ip = "localhost";
+    private Socket socket;
 
     @FXML
     public void initialize(){
@@ -63,7 +64,10 @@ public class Connect{
         }
     }
 
-    @FXML private void quit(){
+    @FXML public void quit(){
+        try{
+            socket.close();
+        } catch( IOException ignored ){}
         dragField.getScene().getWindow().hide();
         Platform.exit();
         System.exit( 0 );
@@ -81,7 +85,6 @@ public class Connect{
             return;
         }
 
-        Socket socket;
         try{
             socket = new Socket( ip, port );
             Game game = new Game( socket, getLanguage() );

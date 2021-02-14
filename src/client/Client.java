@@ -1,10 +1,8 @@
 package client;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -12,6 +10,7 @@ import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
 public class Client extends Application{
+    Connect c;
 
     @Override
     public void start( Stage primaryStage ) throws Exception{
@@ -23,12 +22,11 @@ public class Client extends Application{
         primaryStage.setResizable( false );
         primaryStage.show();
         primaryStage.getScene().getWindow().addEventFilter( WindowEvent.WINDOW_CLOSE_REQUEST, this::quit );
-        Connect c = root.getController();
+        c = root.getController();
     }
 
     private < T extends Event > void quit( T t ){
-        Platform.exit();
-        System.exit( 0 );
+        c.quit();
     }
 
     public static void main( String[] args ) {

@@ -57,7 +57,6 @@ public class Game{
 
         Random rand = new Random();
 
-        // TODO main loop, here we have to put all the cards, and call theirs functions
         while( s.cardsInGame.size() > 0 ){
             String card = s.cardsInGame.get( rand.nextInt( s.cardsInGame.size() ) );
             try{
@@ -119,11 +118,8 @@ public class Game{
                 }
             }
         }
-        if( !isAnyoneWerewolf ){
-            //s.writeLog( "All werewolves are on table" );
-            Thread.sleep( 7000 );
-        }
-        else{
+        //Not necessary, time for werewolves to meet together
+        if( isAnyoneWerewolf ){
             Vector< Integer > werewolves = new Vector<>();
             for( int i = 0; i < CardChooser.werewolvesQuant; ++i ){
                 int indexOfWerewolf = s.cardsOnBegin.indexOf( "Werewolf_" + i );
@@ -147,8 +143,8 @@ public class Game{
                 int cardToSeeId = s.getTableCardId(cardToSee);
                 s.send( werewolves.get( 0 ), s.cardsInCenter[ cardToSeeId ] );
             }
-            Thread.sleep( 7000 );       //Not necessary, time for werewolves to meet together
         }
+        Thread.sleep( 7000 );
         s.writeLog( "Werewolves fall asleep" );
         return str.toString();
     }
@@ -291,9 +287,16 @@ public class Game{
 
     //function does same begin of every role and returns id of player with this role, if role was not on the middle
     int startRole( String card ) throws InterruptedException{
+        int playerIdx = s.cardsOnBegin.indexOf( card );
+        Server.Player p = null;
+        if( playerIdx != -1 ){
+            p = s.players.get( playerIdx );
+            p.clearMsgQueue();
+        }
+
         s.send( 0, card.toUpperCase() );
         s.writeLog( card + "'s move" );
-        if( !s.cardsOnBegin.contains( card ) ){
+        if( p == null || !p.isActive ){
             //s.writeLog( card + " is on table" );
             Thread.sleep( 7000 );
             s.cardsInGame.remove( card );
@@ -302,7 +305,7 @@ public class Game{
         }
         else{
             //s.writeLog( card + " is player " + idOfCard );
-            return s.players.get( s.cardsOnBegin.indexOf( card ) ).id;
+            return p.id;
         }
     }
 }

@@ -12,6 +12,7 @@ public class Server{
     private LinkedList< Game > games = new LinkedList<>();
     private static final int port = 23000;
     private static final int ID_LENGTH = 6;
+    private static final String UNIQUE_CHAR = String.valueOf( ( char )2 );
     private static final int INACTIVE_TIME = 3600; //in seconds
     private int logLevel = 1;
     private LinkedList< String > viewedGames = new LinkedList<>();
@@ -173,11 +174,12 @@ public class Server{
         int rightLimit = 122;
         Random random = new Random();
 
-        return random.ints(leftLimit, rightLimit + 1 )
-                .filter( i -> ( i <= 57 || i >= 65 ) && ( i <= 90 || i >= 97 ) )
-                .limit( ID_LENGTH )
-                .collect( StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append )
-                .toString();
+//        return random.ints(leftLimit, rightLimit + 1 )
+//                .filter( i -> ( i <= 57 || i >= 65 ) && ( i <= 90 || i >= 97 ) )
+//                .limit( ID_LENGTH )
+//                .collect( StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append )
+//                .toString();
+        return "x";
     }
 
     public void endGame( Game game ){
@@ -361,6 +363,10 @@ public class Server{
             if( in.equals( "START" ) && playerID == -1 ){
                 game.setStarted( true );
                 return;
+            }
+            if( in.equals( UNIQUE_CHAR + "ALIVE" ) ){
+                print( "Message to player " + playerID + ": " + in, 4 );
+                this.send( in );
             }
             if( playerID == -1 )
                 game.active();      // Admin is still there
