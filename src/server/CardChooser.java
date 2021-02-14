@@ -12,7 +12,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Vector;
 
@@ -103,7 +102,7 @@ public class CardChooser{
     private int players = 0;
     private int selectedToggles = 0;
     private static final int gridpaneWidth = 6;
-    private Vector< ToggleButton > toggles = new Vector<>();
+    private final Vector< ToggleButton > toggles = new Vector<>();
     @FXML private GridPane gridpane;
     @FXML private Button dealButton;
     private Server server;

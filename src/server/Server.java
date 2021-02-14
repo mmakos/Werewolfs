@@ -26,6 +26,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Server{
@@ -40,6 +42,7 @@ public class Server{
     private boolean isVoting = false;
     private boolean gameStarted = false;
     private volatile boolean error = false;
+    private final Object errorLock = new Object();
     private BufferedReader input;
     private PrintWriter output;
     private Socket s;
@@ -52,7 +55,7 @@ public class Server{
     public LinkedList< String > cardsInGame;
     public String realCopycat;        // Needed to show on the end who was copycat
     public String realParanormal;       // --- || ---
-    private Vector< Integer > votes = new Vector<>();
+    private final Vector< Integer > votes = new Vector<>();
     private Thread voting;
 
     @FXML private TextArea logField;
@@ -89,7 +92,7 @@ public class Server{
     @FXML private void connect(){
         try{
             this.s = new Socket( ip, port );
-            this.input = new BufferedReader( new InputStreamReader( this.s.getInputStream(), StandardCharsets.UTF_8 ) );;
+            this.input = new BufferedReader( new InputStreamReader( this.s.getInputStream(), StandardCharsets.UTF_8 ) );
             this.output = new PrintWriter( new OutputStreamWriter( this.s.getOutputStream(), StandardCharsets.UTF_8 ), true );
             this.output.println( "NEWGAME" );
             this.gameId = this.input.readLine();
@@ -117,7 +120,6 @@ public class Server{
     private final Thread listen = new Thread( () -> {
         while( listening && players.size() < MAX_PLAYERS ){         // create new player
             try{
-                while( !input.ready() );
                 String[] msg = read();
                 if( msg.length == 2 ){
                     int playerID = Integer.parseInt( msg[ 0 ] );
@@ -134,7 +136,9 @@ public class Server{
                     Platform.runLater( ( ) -> playersLabel.setText( playersLabel.getText() + " " + playerNickname + "," ) );
                     send( playerID, "OK" );
                 }
-            } catch( NumberFormatException | IOException ignored ){}
+            }
+            catch( InterruptedException e ){ break; }
+            catch( NumberFormatException | IOException ignored ){}
         }
     } );
 
@@ -144,19 +148,21 @@ public class Server{
                 String[] msg = read();
                 if( msg.length == 2 )      // message from player, [ 0 ] is id, [ 1 ] is message
                     getPlayer( Integer.parseInt( msg[ 0 ] ) ).addMsg( msg[ 1 ] );
-            } catch( IOException | NumberFormatException ignored ){}
+            }
+            catch( InterruptedException e ){ break; }
+            catch( IOException | NumberFormatException ignored ){}
         }
     } );
 
-    private String[] read() throws IOException {
+    private String[] read() throws IOException, InterruptedException{
         String message = input.readLine();
         if( message == null || message.equals( "ABORT" ) ){
-            error = true;
-            Platform.runLater( () -> error( "Game has been aborted by the main server." ) );
-            while( error ) {
-                try{
-                    Thread.sleep( 1000 );
-                } catch( InterruptedException ignored ){}
+            synchronized( errorLock ){
+                error = true;
+                Platform.runLater( this::error );
+                while( error ){
+                    errorLock.wait();
+                }
             }
             return new String[ 0 ];
         }
@@ -170,12 +176,15 @@ public class Server{
         return message.split( COM_SPLITTER );
     }
 
-    private void error( String error ){
+    private void error(){
         Alert alert = new Alert( Alert.AlertType.ERROR );
         alert.setTitle( "Error" );
-        alert.setContentText( error );
+        alert.setContentText( "Game has been aborted by the main server." );
         alert.showAndWait();
-        this.error = false;
+        synchronized( errorLock ){
+            this.error = false;
+            errorLock.notify();
+        }
         restart();
     }
 
@@ -191,10 +200,6 @@ public class Server{
         output.println( msg );
     }
 
-    public void send( Player p, String msg ){
-        send( p.id + COM_SPLITTER + msg );
-    }
-
     public void send( int id, String msg ){
         if( id == 0 )       // send ALL
             send( "ALL" + COM_SPLITTER + msg );
@@ -202,7 +207,7 @@ public class Server{
             send( id + COM_SPLITTER + msg );
     }
 
-    public String receive( int id ) throws IOException{
+    public String receive( int id ) throws TimeoutException{
         return getPlayer( id ).getMsg();
     }
 
@@ -256,29 +261,12 @@ public class Server{
     void drawCards(){   // Randomly give cards to players and 3 on the table
         Random rand = new Random();
         LinkedList< String > temp = new LinkedList<>( cardsInGame );
-
-//        cardsOnBegin.add( "Seer" );
-//        cardsNow.add( cardsOnBegin.get( 0 ) );
-//        temp.remove( "Seer" );
-
-//        boolean insomniacForStasiek = false;
-//        try{
-//            getPlayer( "Michał" );
-//            insomniacForStasiek = temp.contains( "Insomniac" );
-//            if( insomniacForStasiek ) temp.remove( "Insomniac" );
-//        } catch( NullPointerException ignored ){}
-
         for( int i = 0; i < 3; ++i ){
             int randInt = rand.nextInt( temp.size() );
             cardsInCenter[ i ] = temp.get( randInt );
             temp.remove( randInt );
         }
         for( int i = 0; i < players.size(); ++i ){
-//            if( insomniacForStasiek && players.get( i ).name.equals( "Michał" ) ){
-//                cardsOnBegin.add( "Insomniac" );
-//                cardsNow.add( "Insomniac " );
-//                continue;
-//            }
             int randInt = rand.nextInt( temp.size() );
             cardsOnBegin.add( temp.get( randInt ) );
             cardsNow.add( cardsOnBegin.get( i ) );
@@ -323,7 +311,7 @@ public class Server{
                             break;
                         }
                         it.remove();
-                        } catch( IOException ignored ){}
+                        } catch( TimeoutException ignored ){}
                     }
                 }
             }
@@ -525,22 +513,17 @@ public class Server{
             msg.clear();
         }
 
-        public String getMsg() throws IOException{
-            long start = System.currentTimeMillis();
-            while( msg.isEmpty() && System.currentTimeMillis() - start < MAX_READ_TIME * 1000 ){
-                try{
-                    Thread.sleep( 10 );
-                } catch( InterruptedException ignored ){}
+        public String getMsg() throws TimeoutException{
+            String message;
+            try{
+                message = msg.poll( MAX_READ_TIME, TimeUnit.SECONDS );
+            } catch( InterruptedException e ){
+                return null;
             }
-            if( !msg.isEmpty() ){
-                try{
-                    return msg.take();
-                } catch( InterruptedException ignored ){
-                    return null;
-                }
-            }
+            if( message == null )
+                throw new TimeoutException( "Time's up, cannot read a message." );
             else
-                throw new IOException( "Time's up, cannot read a message." );
+                return message;
         }
     }
 }

@@ -1,7 +1,9 @@
 package server;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Random;
+import java.util.Vector;
+import java.util.concurrent.TimeoutException;
 
 public class Game{
     private final Server s;
@@ -21,7 +23,7 @@ public class Game{
         if( s.cardsInGame.contains( "Copycat" ) ){
             try{
                 makeCopycat();
-            }catch( IOException e ){
+            }catch( TimeoutException e ){
                 s.writeLog( "No response from copycat." );
             }
             s.cardsInGame.remove( "Copycat" );
@@ -38,7 +40,7 @@ public class Game{
         if( isWerewolf ){
             try{
                 werewolvesMsg = makeWerewolves();
-            }catch( IOException e ){
+            }catch( TimeoutException e ){
                 s.writeLog( "No response from werewolves." );
             }
             for( int i = 0; i < CardChooser.werewolvesQuant; ++i )
@@ -47,7 +49,7 @@ public class Game{
         if( s.cardsInGame.contains( "Mystic wolf" ) ){
             try{
                 makeMysticWolf();
-            }catch( IOException e ){
+            }catch( TimeoutException e ){
                 s.writeLog( "No response from mystic wolf." );
             }
             s.cardsInGame.remove( "Mystic wolf" );
@@ -71,7 +73,7 @@ public class Game{
                     case "Troublemaker": makeTroublemaker(); break;
                     case "Apprentice seer": makeApprenticeSeer(); break;
                 }
-            }catch( IOException e ){
+            }catch( TimeoutException e ){
                 s.writeLog( "No response from " + card + "." );
             }
             s.cardsInGame.remove( card );
@@ -84,7 +86,7 @@ public class Game{
     }
 
     //new function copycat
-    void makeCopycat() throws IOException, InterruptedException{
+    void makeCopycat() throws InterruptedException, TimeoutException{
         int idOfCopycat = startRole( "Copycat" );
         if( idOfCopycat < 0 ) return;
 
@@ -104,7 +106,7 @@ public class Game{
         Thread.sleep( 3000 );
     }
 
-    String makeWerewolves() throws InterruptedException, IOException{
+    String makeWerewolves() throws InterruptedException, TimeoutException{
         s.send( 0, "WEREWOLF" );
         s.writeLog( "Werewolf" + "'s move" );
         StringBuilder str = new StringBuilder();
@@ -158,7 +160,7 @@ public class Game{
         s.writeLog( "Minion falls asleep" );
     }
 
-    void makeMysticWolf() throws InterruptedException, IOException {
+    void makeMysticWolf() throws InterruptedException, TimeoutException{
         int idOfMysticWolf = startRole("Mystic wolf");
         if(idOfMysticWolf<0) return;
         String cardToSee = s.receive( idOfMysticWolf ).split( MSG_SPLITTER )[ 0 ];
@@ -169,7 +171,7 @@ public class Game{
         s.writeLog( "Mystic wolf falls asleep" );
     }
 
-    void makeApprenticeSeer() throws InterruptedException, IOException {
+    void makeApprenticeSeer() throws InterruptedException, TimeoutException{
         int idOfApprenticeSeer = startRole("Apprentice seer");
         if(idOfApprenticeSeer<0) return;
         String cardToSee = s.receive( idOfApprenticeSeer ).split( MSG_SPLITTER )[ 0 ];
@@ -180,7 +182,7 @@ public class Game{
         s.writeLog( "Apprentice seer falls asleep" );
     }
 
-    void makeWitch() throws InterruptedException, IOException{
+    void makeWitch() throws InterruptedException, TimeoutException{
         int idOfWitch = startRole( "Witch" );
         if( idOfWitch < 0 ) return;
         String chosenCard = s.receive( idOfWitch );
@@ -194,7 +196,7 @@ public class Game{
         s.writeLog( "Witch falls asleep" );
     }
 
-    void makeTroublemaker() throws InterruptedException, IOException{
+    void makeTroublemaker() throws InterruptedException, TimeoutException{
         int idOfTroublemaker = startRole( "Troublemaker" );
         if( idOfTroublemaker < 0 ) return;
         String[] chosenCards = s.receive( idOfTroublemaker ).split( MSG_SPLITTER );
@@ -202,7 +204,7 @@ public class Game{
         s.writeLog( "Troublemaker falls asleep" );
     }
 
-    void makeSeer() throws InterruptedException, IOException {
+    void makeSeer() throws InterruptedException, TimeoutException{
         int idOfSeer = startRole( "Seer" );
         if( idOfSeer < 0 ) return;
         String[] chosenCards = s.receive( idOfSeer ).split( MSG_SPLITTER );
@@ -237,7 +239,7 @@ public class Game{
         s.writeLog( "Insomniac falls asleep" );
     }
 
-    void makeThing() throws InterruptedException, IOException{
+    void makeThing() throws InterruptedException, TimeoutException{
         int thingId = startRole( "Thing" );
         if( thingId < 0 ){
             s.send( 0, "NOTHING" );
@@ -254,7 +256,7 @@ public class Game{
         s.writeLog( "Thing falls asleep" );
     }
 
-    void makeParanormal() throws InterruptedException, IOException{
+    void makeParanormal() throws InterruptedException, TimeoutException{
         int paranormalId = startRole( "Paranormal investigator" );
         if( paranormalId < 0 ) return;
         for( int i = 0; i < 2; ++i ){
@@ -270,7 +272,7 @@ public class Game{
         s.writeLog( "Paranormal investigator falls asleep" );
     }
 
-    void makeRobber() throws IOException, InterruptedException{
+    void makeRobber() throws InterruptedException, TimeoutException{
         int robberId = startRole( "Robber" );
         if( robberId < 0 ) return;
         String chosenCard = s.receive( robberId );

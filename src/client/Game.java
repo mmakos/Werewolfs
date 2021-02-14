@@ -93,8 +93,12 @@ public class Game{
                 try{
                     String msg = input.readLine();
                     if( msg == null ){
-                        error = true;
-                        Platform.runLater( this::error );
+                        synchronized( errorLock ){
+                            error = true;
+                            Platform.runLater( this::error );
+                            while( error )
+                                errorLock.wait();
+                        }
                         return;
                     }
                     if( msg.equals( UNIQUE_CHAR + "ENDGAME" ) )

@@ -1,8 +1,6 @@
 package server;
 
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -10,7 +8,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-public class main extends Application{
+public class ServerMain extends Application{
 
     @Override
     public void start( Stage stage ) throws Exception{
