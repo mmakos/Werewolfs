@@ -223,9 +223,11 @@ public class Server{
                 } catch( InterruptedException e ){
                     break;
                 }
+                if( !active ){
+                    print( "Game " + this.getID() + " is inactive.", 1 );
+                    this.admin.getServer().endGame( this );
+                }
             }
-            print( "Game " + this.getID() + " is inactive.", 1 );
-            this.admin.getServer().endGame( this );
         } );
 
         Game( String gameID, Player admin ){
