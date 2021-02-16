@@ -7,7 +7,8 @@
 /.idea/
 /werewolvesServer/out/
 /werewolvesServer/.idea/
-/werewolvesServer/server.iml
+/werewolvesServer/werewolvesServer.iml
 /werewolvesServer/src/META-INF/
 /werewolvesServer/src/Client.java
 /SerWerewolves/
+/aws/

@@ -5,7 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.Vector;
 
 public class Server{
     private final ServerSocket ss;
@@ -33,6 +32,7 @@ public class Server{
                 switch( command ){
                     case "shutdown":
                     case "halt":
+                        isRunning = false;
                         endALlGames();
                         System.exit( 0 );
                         break;
@@ -71,6 +71,7 @@ public class Server{
                                 print( "No such game." );
                             else{
                                 g.send( -1, "ABORT" );
+                                g.send( -2, "ABORT" );
                                 endGame( g );
                                 print( "Game " + arg + " has been aborted." );
                             }
@@ -188,10 +189,10 @@ public class Server{
     public void endALlGames(){
         for( Game g : games ){
             g.send( -1, "ABORT" );
+            g.send( -2, "ABORT" );
             endGame( g );
         }
         print( "ALL games have been aborted." );
-        isRunning = false;
     }
 
     public void print( String log, int level ){
@@ -209,7 +210,7 @@ public class Server{
     }
 
     private class Game{
-        private final Vector< Player > players = new Vector<>();
+        private final LinkedList< Player > players = new LinkedList<>();
         private Player admin;
         private final String gameID;
         private int newPlayerID = 100;
@@ -275,7 +276,7 @@ public class Server{
             return null;
         }
 
-        public Vector<Player> getPlayers(){
+        public LinkedList< Player > getPlayers(){
             return players;
         }
 
