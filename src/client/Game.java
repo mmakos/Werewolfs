@@ -460,6 +460,7 @@ public class Game{
                         voteLock.notify();
                     }
                     synchronized( clickedLock ){
+                        isClicked = true;
                         clickedLock.notify();
                     }
                     break;
