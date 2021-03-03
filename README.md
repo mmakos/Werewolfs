@@ -1,3 +1,11 @@
+# Werewolves
+
+![Android screen](http://www.mmakos.pl/storage/2021/02/androidPhone-1536x743.png)
+![Desktop screen](http://www.mmakos.pl/storage/2021/02/winlaptop-1536x1178.png)
+
+## This documentation refers to version 1.x and 2.x
+If you want to be up-to-date with this project, please visit [my website](http://www.mmakos.pl/programming/werewolves). There you can find descriptions of the newest releases etc.
+
 ### ([Werewolves](#werewolves)) [Wilkołaki](#wilkołaki)
 1. ([About game](#about-game)) [Opis gry](#opis-gry)
 2. ([Installation](#installation)) [Instalacja](#instalacja)
@@ -8,8 +16,6 @@
 5. ([Problems](#problems)) [Błędy](#błędy)
     * ([Common problems](#common-problems)) [Częste problemy](#częste-problemy)
     * ([Errors during the game](#errors-during-the-game)) [Błędy podczas gry](#błędy-podczas-gry)
-
-# Werewolves
 
 ## About game
 **Werewolves** is multiplayer game similar to "Mafia", but each player has its own unique role and whole action happens during one night. That's why it's also called "One Night Ultimate". This application is online adaptation of that game.
